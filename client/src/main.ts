@@ -14,7 +14,7 @@ Vue.use(new VueSocketIO({
   vuex: {
       store,
       actionPrefix: 'IOA_',
-      mutationPrefix: 'IOM_'
+      mutationPrefix: 'IOM._'
   }
 }))
 
