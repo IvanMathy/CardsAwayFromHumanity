@@ -9,6 +9,9 @@ export default new Vuex.Store({
   mutations: {
   },
   actions: {
+    "IOA_test"() {
+      console.log('hello')
+    }
   },
   modules: {
   }
