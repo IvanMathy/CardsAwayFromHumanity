@@ -1,3 +1,4 @@
-export var events = {
-    ping: "p"
+export var Events = {
+    ping: "p",
+    hostGame: "h"
 }
