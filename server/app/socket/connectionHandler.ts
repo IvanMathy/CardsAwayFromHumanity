@@ -1,18 +1,25 @@
-import {Player} from '../state/player'
-import {Events} from '../../../shared/events'
+import {Player} from "../state/player";
+import {Events} from "../../../shared/events";
 
 export function onConnection(socket:SocketIO.Socket) {
+    let redis = (socket.adapter as any).pubClient
     console.log("Hello!");
 
-    let player = new Player(socket)
+    let player = new Player(socket);
 
-    socket.emit('test', 'toast')
+    socket.emit('test', 'toast');
     
     socket.on('disconnect', function () {
-        console.log('Goodbye!');
+        console.log('Goodbye!')
     });
 
+
+    redis.set("test", "test");
+
     socket.on(Events.hostGame, function (data) {
-        
-    })
+        console.log("aaah")
+    });
+
+
+
 }

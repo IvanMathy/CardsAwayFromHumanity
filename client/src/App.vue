@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <button v-on:click="hostGame()">Host</button>
   </div>
 </template>
 
@@ -26,6 +27,12 @@ import {Events} from '../../shared/events'
       console.log(`test ${val}`)
     }
   },
+  methods: {
+    hostGame() {
+      this.$socket.client.emit(Events.hostGame)
+      console.log("sent")
+    }
+  }
 })
 export default class App extends Vue {}
 </script>
