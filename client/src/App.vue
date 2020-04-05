@@ -14,7 +14,18 @@ import {Events} from '../../shared/events'
 @Component({
   components: {
     HelloWorld,
-  }
+  },
+  sockets: {
+    connect() {
+      console.log('socket connected')
+    },
+    customEmit(val) {
+      console.log('this method was fired by the socket server. eg: io.emit("customEmit", data)')
+    },
+    test(val) {
+      console.log(`test ${val}`)
+    }
+  },
 })
 export default class App extends Vue {}
 </script>

@@ -5,6 +5,8 @@ export function onConnection(socket:SocketIO.Socket) {
     console.log("Hello!");
 
     let player = new Player(socket)
+
+    socket.emit('test', 'toast')
     
     socket.on('disconnect', function () {
         console.log('Goodbye!');
