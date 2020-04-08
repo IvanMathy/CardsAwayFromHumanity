@@ -1,4 +1,6 @@
 export var Events = {
     ping: "p",
-    hostGame: "h"
+    hostGame: "h",
+    roomCreated: "r",
+    roomCreationFailed: "rf"
 }
