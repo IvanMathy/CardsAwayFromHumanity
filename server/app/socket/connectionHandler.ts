@@ -20,6 +20,15 @@ export function onConnection(socket:SocketIO.Socket) {
         player.host(data.password, redis)
     });
 
+    socket.on(Events.joinGame, function (data) {
+        try {
+            player.attemptJoining(data.gameId, redis)
+        } catch (error) {
+            console.error("Error in joinGame: ", error)
+            player.sendEvent(Events.unknownError)
+        }
+    });
+
 
 
 }

@@ -1,5 +1,7 @@
 import { RedisClient } from "redis";
 import { isNullOrUndefined } from "util";
+import { state } from "./state";
+import { Player } from "./player";
 
 // This whole file should use promises.
 
@@ -44,6 +46,7 @@ export class Room {
                 return
             }
 
+            // Use multi here
             redis.sadd("rooms", code)
 
 
@@ -56,6 +59,10 @@ export class Room {
                 this.roomCode = code
                 this.password = password
 
+                state.rooms[code] = this
+                
+                console.log(state)
+
                 callback(true, code)
             })
         }, 0)
@@ -67,8 +74,17 @@ export class Room {
         if(isNullOrUndefined(this.roomCode)) {
             return
         }
-        redis.srem("rooms", this.roomCode!)
+        redis.multi()
+            .srem("rooms", this.roomCode)
+            .del(`room:${this.roomCode}`)
+            .exec()
+
+        delete state.rooms[this.roomCode]
     }
 
+
+    public playerLeft(player: Player) {
+
+    }
 
 }

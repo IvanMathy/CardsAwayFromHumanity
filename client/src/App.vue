@@ -1,36 +1,44 @@
 <template>
   <div id="app">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <div>
+      <span>{{ $socket.connected ? 'Connected' : 'Disconnected' }}</span>
+    </div>
     <button v-on:click="hostGame()">Host</button>
+    <button v-on:click="joinGame('D0KM')">Join</button>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
-import {Events} from '../../shared/events'
-
-
+import { Component, Vue } from "vue-property-decorator";
+import HelloWorld from "./components/HelloWorld.vue";
+import { Events } from "../../shared/events";
 
 @Component({
   components: {
-    HelloWorld,
+    HelloWorld
   },
   sockets: {
-    connect() {
-      console.log('socket connected')
-    },
-    customEmit(val) {
-      console.log('this method was fired by the socket server. eg: io.emit("customEmit", data)')
-    },
-    test(val) {
-      console.log(`test ${val}`)
-    }
+  connect() {
+    console.log("socket connected");
   },
+  [Events.alreadyHosting]() {
+    alert("Already Hosting");
+  },
+  [Events.invalidRoomCode]() {
+    alert("Invalid Room Code");
+  },
+  [Events.unknownError]() {
+    alert("Unknown Error");
+  }
+},
   methods: {
     hostGame() {
-      this.$socket.client.emit(Events.hostGame, { password: "test" })
-      console.log("sent")
+      this.$socket.client.emit(Events.hostGame, { password: "test" });
+      console.log("sent");
+    },
+    joinGame(gameId) {
+      this.$socket.client.emit(Events.joinGame, { gameId: gameId });
+      console.log("sent");
     }
   }
 })
