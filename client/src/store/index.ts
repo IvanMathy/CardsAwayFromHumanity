@@ -9,10 +9,7 @@ export default new Vuex.Store({
   mutations: {
   },
   actions: {
-    // eslint-disable-next-line camelcase
-    socket_test() { 
-      console.log('hello')
-    }
+   
   },
   modules: {
   }

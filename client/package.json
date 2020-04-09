@@ -44,7 +44,11 @@
       "@vue/typescript/recommended"
     ],
     "parserOptions": {
-      "ecmaVersion": 2020
+      "ecmaVersion": 2020,
+      "ecmaFeatures": {
+        "jsx": true,
+        "modules": true
+      }
     },
     "rules": {}
   },

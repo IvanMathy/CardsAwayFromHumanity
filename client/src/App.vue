@@ -29,7 +29,7 @@ import {Events} from '../../shared/events'
   },
   methods: {
     hostGame() {
-      this.$socket.client.emit(Events.hostGame)
+      this.$socket.client.emit(Events.hostGame, { password: "test" })
       console.log("sent")
     }
   }
