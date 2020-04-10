@@ -8,6 +8,7 @@
     </div>
     <button v-on:click="hostGame()">Host</button>
     <button v-on:click="joinGame('NKMV')">Join</button>
+    <button v-on:click="authenticate()">Authenticate</button>
   </div>
 </template>
 
@@ -44,7 +45,13 @@ import { Events } from "../shared/events";
       console.log("sent");
     },
     authenticate() {
-      this.$socket.client.emit(Events.Commands.authenticate, this.$store.state.userId);
+      this.$socket.client.emit(Events.Commands.authenticate, this.$store.state.userId, (newId?: string) => {
+        if(newId == undefined) {
+          alert("Could not authenticate. Sorry!")
+          return
+        }
+        this.$store.dispatch('setId', newId)
+      });
       console.log("sent");
     }
   },

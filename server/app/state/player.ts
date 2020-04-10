@@ -9,6 +9,9 @@ import { state } from "./state";
 import { Socket } from "socket.io";
 
 export class Player {
+
+    id?: String
+
     isHost: boolean = false
     socket: Socket
 
@@ -51,7 +54,7 @@ export class Player {
         let code = roomName.toUpperCase()
 
         if (code.length != 4 || /[^A-Z]/.test(code)) {
-            console.debug("Invalid room code " +code)
+            console.debug("Invalid room code " + code)
             this.sendEvent(Events.invalidRoomCode)
             return
         }
@@ -99,26 +102,36 @@ export class Player {
     }
 
     authenticate(id?: string): Player {
-        if (id == null) {
+        if (id !== undefined && id.length == 8 && !/[^A-Z]/.test(id)) {
+
+            var local = state.players[id]
+
+            if (local != null) {
+                console.debug("Recovering session")
+                local.reconnect(this.socket)
+                return local
+            }
+
+            // ID is valid, but unknown to this instance.
+            console.debug("Returning player")
+
+        } else {
             console.debug("New player")
             id = randomCode(8)
-            state.players[id] = this
-            return this
         }
 
-        var local = state.players[id]
+        this.id = id
+        state.players[id] = this
+        return this
+
 
         if (local == null) {
+            this.id = id
             state.players[id] = this
             return this
         }
 
-        console.debug("Recovering session")
-
-        local.reconnect(this.socket)
 
 
-        return local
-        
     }
 }

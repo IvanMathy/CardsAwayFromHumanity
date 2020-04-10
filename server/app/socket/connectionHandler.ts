@@ -34,8 +34,10 @@ export function onConnection(socket:SocketIO.Socket) {
         }
     });
 
-    socket.on(Events.Commands.authenticate, function (data) {
-        player.host(data.password)
+    socket.on(Events.Commands.authenticate, function (data, callback: Function) {
+        player = player.authenticate(data)
+
+        callback(player.id)
     });
 
 
