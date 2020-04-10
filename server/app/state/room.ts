@@ -4,9 +4,12 @@ import { state } from "./state";
 import { Player } from "./player";
 import { redisClient } from "../lib/redis";
 
+export enum RoomKeys {
+    password = "password",
+    roomCode = "roomCode"
+}
+
 export class RoomBase {
-
-
 
     static getRoom(roomCode: string) {
 

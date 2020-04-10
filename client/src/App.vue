@@ -3,15 +3,18 @@
     <div>
       <span>{{ $socket.connected ? 'Connected' : 'Disconnected' }}</span>
     </div>
+    <div>
+      <span>{{ $store.state.userId }}</span>
+    </div>
     <button v-on:click="hostGame()">Host</button>
-    <button v-on:click="joinGame('D0KM')">Join</button>
+    <button v-on:click="joinGame('NKMV')">Join</button>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "./components/HelloWorld.vue";
-import { Events } from "../../shared/events";
+import { Events } from "../shared/events";
 
 @Component({
   components: {
@@ -39,6 +42,15 @@ import { Events } from "../../shared/events";
     joinGame(gameId) {
       this.$socket.client.emit(Events.joinGame, { gameId: gameId });
       console.log("sent");
+    },
+    authenticate() {
+      this.$socket.client.emit(Events.Commands.authenticate, this.$store.state.userId);
+      console.log("sent");
+    }
+  },
+  mounted() {
+    if (this.$store.state.userId == null) {
+      alert('empty')
     }
   }
 })

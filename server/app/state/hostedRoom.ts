@@ -1,23 +1,16 @@
-import { Room, RoomBase } from "./room";
+import { Room, RoomBase, RoomKeys } from "./room";
 import { state } from "./state";
 import { Player } from "./player";
 import { redisClient } from "../lib/redis";
+import { randomCode } from "../lib/generator";
 
 
 // This whole file should use promises.
 
-function randomCode() {
-    var out = ""
-    for (var i = 0; i++ < 4;) {
-        var charCode = Math.floor(Math.random() * (90 - 65) + 65);
-        out += String.fromCharCode(charCode);
-    }
-    return out
-}
 
 function tryName(callback: (success: boolean, code?: string) => void, attempt: number) {
 
-    var id = randomCode()
+    var id = randomCode(4)
 
     redisClient.exists(id, function (err, count) {
         if (count > 0) {
@@ -49,25 +42,28 @@ export class HostedRoom extends RoomBase implements Room {
                 return
             }
 
-            // Use multi here
-            redisClient.sadd("rooms", code)
+            let key = `room:${code}`
 
+            redisClient.multi()
+                .sadd("rooms", code)
+                // Create the room, expire it in 24 hours
+                .hmset(key,
+                    RoomKeys.password, password,
+                    RoomKeys.roomCode, code
+                )
+                .expire(key, 60 * 60 * 24)
+                .exec(function (this: HostedRoom, err, success) {
+                    if (err !== null) {
+                        callback(false)
+                        return
+                    }
+                    this.roomCode = code
+                    this.password = password
 
-            // Create the room, expire it in 24 hours
-            redisClient.set(`room:${code}`, password, 'EX', 60 * 60 * 24, function (this: HostedRoom, err, success) {
-                if (success !== "OK") {
-                    callback(false)
-                    return
-                }
-                this.roomCode = code
-                this.password = password
+                    state.rooms[code] = this
 
-                state.rooms[code] = this
-                
-                console.log(state)
-
-                callback(true, code)
-            })
+                    callback(true, code)
+                })
         }, 0)
 
         this.password = password

@@ -3,10 +3,13 @@ export var Events = {
     ping: "p",
     hostGame: "h",
     joinGame: "j",
+    joinedGame: "s",
     roomCreated: "r",
     roomCreationFailed: "rf",
     alreadyHosting: "ah",
-    alreadyJoined: "aj",
     invalidRoomCode: "ir",
-    unknownError: "e"
+    unknownError: "e",
+    Commands: {
+        authenticate: "auth"
+    }
 }

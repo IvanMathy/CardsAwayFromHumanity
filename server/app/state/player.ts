@@ -1,18 +1,21 @@
 import { Room, RoomBase } from "./room";
 import { HostedRoom } from "./hostedRoom";
 import { RedisClient } from "redis";
-import { Events } from "../../../shared/events";
+import { Events } from "../../../client/shared/events";
 import { isDate } from "util";
 import { redisClient } from "../lib/redis";
+import { randomCode } from "../lib/generator";
+import { state } from "./state";
+import { Socket } from "socket.io";
 
 export class Player {
     isHost: boolean = false
-    socket: SocketIO.Socket
+    socket: Socket
 
     hostedRoom?: Room
     joinedRoom?: Room
 
-    constructor(socket: SocketIO.Socket) {
+    constructor(socket: Socket) {
         this.socket = socket
     }
 
@@ -47,7 +50,8 @@ export class Player {
 
         let code = roomName.toUpperCase()
 
-        if (code.length != 4 || !/[^A-Z]/.test(code)) {
+        if (code.length != 4 || /[^A-Z]/.test(code)) {
+            console.debug("Invalid room code " +code)
             this.sendEvent(Events.invalidRoomCode)
             return
         }
@@ -72,6 +76,7 @@ export class Player {
 
             }).then((room) => {
                 this.joinedRoom = room
+                this.sendEvent(Events.joinedGame)
             })
             .catch((error) => {
                 console.error(error)
@@ -87,5 +92,33 @@ export class Player {
 
     sendEvent(event: string) {
         this.socket.emit(event)
+    }
+
+    reconnect(socket: Socket) {
+
+    }
+
+    authenticate(id?: string): Player {
+        if (id == null) {
+            console.debug("New player")
+            id = randomCode(8)
+            state.players[id] = this
+            return this
+        }
+
+        var local = state.players[id]
+
+        if (local == null) {
+            state.players[id] = this
+            return this
+        }
+
+        console.debug("Recovering session")
+
+        local.reconnect(this.socket)
+
+
+        return local
+        
     }
 }

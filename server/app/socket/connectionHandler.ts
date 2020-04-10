@@ -1,11 +1,13 @@
 import {Player} from "../state/player"
-import {Events} from "../../../shared/events"
+import {Events} from "../../../client/shared/events"
 import { redisClient } from "../lib/redis";
+import { Socket } from "net";
 
 export function onConnection(socket:SocketIO.Socket) {
     console.log("Hello!")
 
-    let player = new Player(socket)
+    console.log(socket.id)
+    var player = new Player(socket)
 
     socket.emit('test', 'toast')
     
@@ -17,6 +19,9 @@ export function onConnection(socket:SocketIO.Socket) {
     redisClient.set("test", "test")
 
     socket.on(Events.hostGame, function (data) {
+        if(player == null) {
+            return 
+        }
         player.host(data.password)
     });
 
@@ -29,6 +34,9 @@ export function onConnection(socket:SocketIO.Socket) {
         }
     });
 
+    socket.on(Events.Commands.authenticate, function (data) {
+        player.host(data.password)
+    });
 
 
 }
