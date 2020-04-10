@@ -1,8 +1,8 @@
 import {Player} from "../state/player"
 import {Events} from "../../../shared/events"
+import { redisClient } from "../lib/redis";
 
 export function onConnection(socket:SocketIO.Socket) {
-    let redis = (socket.adapter as any).pubClient
     console.log("Hello!")
 
     let player = new Player(socket)
@@ -14,15 +14,15 @@ export function onConnection(socket:SocketIO.Socket) {
     });
 
 
-    redis.set("test", "test")
+    redisClient.set("test", "test")
 
     socket.on(Events.hostGame, function (data) {
-        player.host(data.password, redis)
+        player.host(data.password)
     });
 
     socket.on(Events.joinGame, function (data) {
         try {
-            player.attemptJoining(data.gameId, redis)
+            player.attemptJoining(data.gameId)
         } catch (error) {
             console.error("Error in joinGame: ", error)
             player.sendEvent(Events.unknownError)

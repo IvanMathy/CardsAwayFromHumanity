@@ -2,89 +2,53 @@ import { RedisClient } from "redis";
 import { isNullOrUndefined } from "util";
 import { state } from "./state";
 import { Player } from "./player";
+import { redisClient } from "../lib/redis";
 
-// This whole file should use promises.
+export class RoomBase {
 
-function randomCode() {
-    var out = ""
-    for (var i = 0; i++ < 4;) {
-        var charCode = Math.floor(Math.random() * (90 - 65) + 65);
-        out += String.fromCharCode(charCode);
-    }
-    return out
-}
 
-function tryName(redis: RedisClient, callback: (success: boolean, code?: string) => void, attempt: number) {
 
-    var id = randomCode()
+    static getRoom(roomCode: string) {
 
-    redis.exists(id, function (err, count) {
-        if (count > 0) {
-            if (attempt > 20) {
-                callback(false) // give up
-            } else {
-                tryName(redis, callback, attempt + 1)
+        return new Promise<Room>((resolve, reject) => {
+            let localRoom = state.rooms[roomCode]
+            if (localRoom !== null) {
+                console.debug("Found Local Room")
+                resolve(localRoom)
+                return 
             }
-        } else {
-            callback(true, id)
-        }
-    })
+            
+            // Room is on another server
 
-}
-
-export class Room {
-    roomCode?: string;
-    password: string;
-
-    constructor(redis: RedisClient, password: string, callback: (success: boolean, code?: string) => void) {
-
-
-        tryName(redis, function (this: Room, success, code) {
-
-            if (!success || code == null) {
-                callback(false)
-                return
-            }
-
-            // Use multi here
-            redis.sadd("rooms", code)
-
-
-            // Create the room, expire it in 24 hours
-            redis.set(`room:${code}`, password, 'EX', 60 * 60 * 24, function (this: Room, err, success) {
-                if (success !== "OK") {
-                    callback(false)
+            redisClient.hgetall(`room:${roomCode}`, (err, values) => {
+                if(err !== null) {
+                    reject(err)
                     return
                 }
-                this.roomCode = code
-                this.password = password
 
-                state.rooms[code] = this
+                try {
+                    console.debug("Created Proxy Room")
+                    let newRoom = new ProxyRoom(values.roomCode, values.password)
+                    state.rooms[values.roomCode] = newRoom
+                    resolve(newRoom)
+                    
+                } catch (error) {
+                    reject(error)
+                }
                 
-                console.log(state)
-
-                callback(true, code)
             })
-        }, 0)
-
-        this.password = password
+        });
     }
-
-    clear(redis: RedisClient) {
-        if(isNullOrUndefined(this.roomCode)) {
-            return
-        }
-        redis.multi()
-            .srem("rooms", this.roomCode)
-            .del(`room:${this.roomCode}`)
-            .exec()
-
-        delete state.rooms[this.roomCode]
-    }
-
-
-    public playerLeft(player: Player) {
-
-    }
-
 }
+
+export interface Room {
+
+    roomCode?: string;
+    password?: string;
+
+    playerJoined(player: Player): Promise<Room>
+    playerLeft(player: Player): void
+}
+
+
+import { ProxyRoom } from "./proxyRoom";

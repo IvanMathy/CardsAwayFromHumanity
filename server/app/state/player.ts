@@ -1,7 +1,9 @@
-import { Room } from "./room";
+import { Room, RoomBase } from "./room";
+import { HostedRoom } from "./hostedRoom";
 import { RedisClient } from "redis";
 import { Events } from "../../../shared/events";
 import { isDate } from "util";
+import { redisClient } from "../lib/redis";
 
 export class Player {
     isHost: boolean = false
@@ -14,16 +16,16 @@ export class Player {
         this.socket = socket
     }
 
-    host(password: string, redis: RedisClient) {
+    host(password: string) {
 
-        if(this.isHost) {
+        if (this.isHost) {
             this.socket.emit(Events.alreadyHosting)
             return
         }
 
         this.isHost = true
 
-        let room = new Room(redis, password, (success, code) => {
+        let room = new HostedRoom(password, (success, code) => {
             if (!success) {
                 this.socket.emit(Events.roomCreationFailed)
                 this.isHost = false
@@ -37,24 +39,20 @@ export class Player {
 
     }
 
-    attemptJoining(roomName: string, redis: RedisClient) {
-        if(this.isHost) {
+    attemptJoining(roomName: string) {
+        if (this.isHost) {
             this.sendEvent(Events.alreadyHosting)
             return
         }
 
-
-
         let code = roomName.toUpperCase()
-
-
 
         if (code.length != 4 || !/[^A-Z]/.test(code)) {
             this.sendEvent(Events.invalidRoomCode)
             return
         }
 
-        redis.sismember("rooms", code, (err, number) => {
+        redisClient.sismember("rooms", code, (err, number) => {
             if (number != 1) {
                 this.sendEvent(Events.invalidRoomCode)
                 return
@@ -65,15 +63,29 @@ export class Player {
 
     }
 
-    private joinRoom(roomcode: String) {
+    private joinRoom(roomCode: string) {
         this.leaveRoom()
+
+        RoomBase.getRoom(roomCode)
+            .then((room) => {
+                return room.playerJoined(this)
+
+            }).then((room) => {
+                this.joinedRoom = room
+            })
+            .catch((error) => {
+                console.error(error)
+            })
     }
 
     private leaveRoom() {
-        //this.joinedRoom?.playerLeft(this)
+        if (this.joinedRoom == null) {
+            return
+        }
+        this.joinedRoom.playerLeft(this)
     }
 
-    sendEvent(event:string) {
-        this.socket.emit(event) 
+    sendEvent(event: string) {
+        this.socket.emit(event)
     }
 }
