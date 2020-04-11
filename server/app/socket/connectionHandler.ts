@@ -1,44 +1,29 @@
 import {Player} from "../state/player"
-import {Events} from "../../../client/shared/events"
+import {Events, Commands} from "../../../client/shared/events"
 import { redisClient } from "../lib/redis";
 import { Socket } from "net";
+import { Session } from "../state/session";
 
 export function onConnection(socket:SocketIO.Socket) {
-    console.log("Hello!")
+    console.debug("Hello!")
 
-    console.log(socket.id)
-    var player = new Player(socket)
+    var session: Session | undefined = undefined
 
     socket.emit('test', 'toast')
     
     socket.on('disconnect', function () {
-        console.log('Goodbye!')
-    });
+        console.debug("Goodbye!")
+        session?.onDisconnect()
+    })
 
+    socket.on(Commands.authenticate, function (data, callback: Function) {
+        let player = Player.authenticate(data)
 
-    redisClient.set("test", "test")
+        session = new Session(socket, player)
 
-    socket.on(Events.hostGame, function (data) {
-        if(player == null) {
-            return 
-        }
-        player.host(data.password)
-    });
-
-    socket.on(Events.joinGame, function (data) {
-        try {
-            player.attemptJoining(data.gameId)
-        } catch (error) {
-            console.error("Error in joinGame: ", error)
-            player.sendEvent(Events.unknownError)
-        }
-    });
-
-    socket.on(Events.Commands.authenticate, function (data, callback: Function) {
-        player = player.authenticate(data)
+        player.connect(session)
+        session.registerEvents(socket)
 
         callback(player.id)
-    });
-
-
+    })
 }

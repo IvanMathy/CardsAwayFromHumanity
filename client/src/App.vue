@@ -15,7 +15,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "./components/HelloWorld.vue";
-import { Events } from "../shared/events";
+import { Events, Commands } from "../shared/events";
 
 @Component({
   components: {
@@ -37,15 +37,15 @@ import { Events } from "../shared/events";
 },
   methods: {
     hostGame() {
-      this.$socket.client.emit(Events.hostGame, { password: "test" });
+      this.$socket.client.emit(Commands.hostGame, { password: "test" });
       console.log("sent");
     },
     joinGame(gameId) {
-      this.$socket.client.emit(Events.joinGame, { gameId: gameId });
+      this.$socket.client.emit(Commands.joinGame, { gameId: gameId });
       console.log("sent");
     },
     authenticate() {
-      this.$socket.client.emit(Events.Commands.authenticate, this.$store.state.userId, (newId?: string) => {
+      this.$socket.client.emit(Commands.authenticate, this.$store.state.userId, (newId?: string) => {
         if(newId == undefined) {
           alert("Could not authenticate. Sorry!")
           return

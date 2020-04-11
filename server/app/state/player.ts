@@ -7,25 +7,29 @@ import { redisClient } from "../lib/redis";
 import { randomCode } from "../lib/generator";
 import { state } from "./state";
 import { Socket } from "socket.io";
+import { Session } from "./session";
 
 export class Player {
 
-    id?: String
+
+    id: string
 
     isHost: boolean = false
-    socket: Socket
+    session?: Session
+    lastSeen = new Date().getTime()
+    active = true
 
     hostedRoom?: Room
     joinedRoom?: Room
 
-    constructor(socket: Socket) {
-        this.socket = socket
+    constructor(id: string) {
+        this.id = id
     }
 
     host(password: string) {
 
         if (this.isHost) {
-            this.socket.emit(Events.alreadyHosting)
+            this.session?.emit(Events.alreadyHosting)
             return
         }
 
@@ -33,11 +37,11 @@ export class Player {
 
         let room = new HostedRoom(password, (success, code) => {
             if (!success) {
-                this.socket.emit(Events.roomCreationFailed)
+                this.session?.emit(Events.roomCreationFailed)
                 this.isHost = false
                 return
             }
-            this.socket.emit(Events.roomCreated, code)
+            this.session?.emit(Events.roomCreated, code)
 
             this.hostedRoom = room
 
@@ -87,51 +91,53 @@ export class Player {
     }
 
     private leaveRoom() {
-        if (this.joinedRoom == null) {
-            return
-        }
-        this.joinedRoom.playerLeft(this)
+        this.joinedRoom?.playerLeft(this)
     }
 
     sendEvent(event: string) {
-        this.socket.emit(event)
+        this.session?.emit(event)
     }
 
-    reconnect(socket: Socket) {
-
+    connect(session: Session) {
+        // To avoid multiple tabs logged in as the same user
+        this.session?.forceEnd()
+        this.active = true
+        this.session = session
+        console.log("connect")
     }
 
-    authenticate(id?: string): Player {
-        if (id !== undefined && id.length == 8 && !/[^A-Z]/.test(id)) {
+    disconnect(session: Session) {
+        if(session == this.session) {
+            this.active = false
+            this.lastSeen = new Date().getTime()
+            console.log("disconnect")
+        }
+    }
+
+    static authenticate(id?: string): Player {
+        if (id?.length != 8 || /[^A-Z]/.test(id)) {
+      
+            console.debug("New player")
+            id = randomCode(8)
+
+        } else {
 
             var local = state.players[id]
 
             if (local != null) {
                 console.debug("Recovering session")
-                local.reconnect(this.socket)
                 return local
             }
 
             // ID is valid, but unknown to this instance.
             console.debug("Returning player")
-
-        } else {
-            console.debug("New player")
-            id = randomCode(8)
+       
         }
 
-        this.id = id
-        state.players[id] = this
-        return this
+        let newPlayer = new Player(id)
 
-
-        if (local == null) {
-            this.id = id
-            state.players[id] = this
-            return this
-        }
-
-
+        state.players[id] = newPlayer
+        return newPlayer
 
     }
 }
