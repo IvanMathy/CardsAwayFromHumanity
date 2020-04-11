@@ -31,7 +31,7 @@ export class HostedRoom extends RoomBase implements Room {
     password?: string;
 
 
-    constructor(password: string, callback: (success: boolean, code?: string) => void) {
+    constructor(password: string | undefined, callback: (success: boolean, code?: string) => void) {
 
         super()
 
@@ -44,13 +44,19 @@ export class HostedRoom extends RoomBase implements Room {
 
             let key = `room:${code}`
 
+            var values = [RoomKeys.roomCode, code]
+
+            if(password == undefined) {
+                values.push(RoomKeys.passwordProtected, String(false))
+            } else {
+                values.push(RoomKeys.passwordProtected, String(true))
+                values.push(RoomKeys.password, password)
+            }
+
             redisClient.multi()
                 .sadd("rooms", code)
                 // Create the room, expire it in 24 hours
-                .hmset(key,
-                    RoomKeys.password, password,
-                    RoomKeys.roomCode, code
-                )
+                .hmset(key, values)
                 .expire(key, 60 * 60 * 24)
                 .exec(function (this: HostedRoom, err, success) {
                     if (err !== null) {

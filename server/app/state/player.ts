@@ -13,6 +13,7 @@ export class Player {
 
 
     id: string
+    name: string
 
     isHost: boolean = false
     session?: Session
@@ -22,11 +23,12 @@ export class Player {
     hostedRoom?: Room
     joinedRoom?: Room
 
-    constructor(id: string) {
+    constructor(id: string, name: string) {
         this.id = id
+        this.name = name
     }
 
-    host(password: string) {
+    host(password?: string) {
 
         if (this.isHost) {
             this.session?.emit(Events.alreadyHosting)
@@ -103,7 +105,6 @@ export class Player {
         this.session?.forceEnd()
         this.active = true
         this.session = session
-        console.log("connect")
     }
 
     disconnect(session: Session) {
@@ -114,7 +115,10 @@ export class Player {
         }
     }
 
-    static authenticate(id?: string): Player {
+    static authenticate(user?: Record<string, string>): Player {
+        var id = user?.id
+        var username = (user?.name as string) ?? "A dum dum with no name."
+
         if (id?.length != 8 || /[^A-Z]/.test(id)) {
       
             console.debug("New player")
@@ -134,7 +138,9 @@ export class Player {
        
         }
 
-        let newPlayer = new Player(id)
+        console.log(username)
+
+        let newPlayer = new Player(id, username)
 
         state.players[id] = newPlayer
         return newPlayer

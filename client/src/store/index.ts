@@ -8,18 +8,27 @@ const playerIdKey = "playerId"
 export default new Vuex.Store({
   state() {
     return {
-      userId: localStorage.getItem(playerIdKey)
+      user: {
+        userId: localStorage.getItem(playerIdKey),
+        username: ""
+      },
+      authenticated: false
     }
   },
   mutations: {
-    setId(state, newId: string) {
-      (state as any).userId = newId
-      localStorage.setItem(playerIdKey, newId)
+    authenticated(state, newUser: Record<string, string>) {
+
+      const anyState = state as any
+
+      anyState.user = newUser
+      anyState.authenticated = true
+
+      localStorage.setItem(playerIdKey, newUser.newId)
     }
   },
   actions: {
-    setId(context, newId: string) {
-      context.commit('setId', newId)
+    authenticated(context, newUser: Record<string, string>) {
+      context.commit('authenticated', newUser)
     }
   },
   modules: {

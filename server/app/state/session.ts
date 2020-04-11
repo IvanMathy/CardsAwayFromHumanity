@@ -12,23 +12,32 @@ export class Session {
     constructor(socket: Socket, player: Player) {
         this.socket = socket
         this.player = player
+
+        player.connect(this)
+        this.registerEvents(socket)
     }
 
     registerEvents(socket: Socket) {
 
-        socket.on(Commands.hostGame, function (this: Session, data) {
-            this.player.host(data.password)
+        const session = this
+
+        socket.on(Commands.hostGame, function (data) {
+            try {
+                session.player.host(data.password)
+            } catch (error) {
+                console.error("Error in joinGame: ", error)
+                session.player.sendEvent(Events.unknownError)
+            }
         });
 
         socket.on(Commands.joinGame, function (this: Session, data) {
             try {
-                this.player.attemptJoining(data.gameId)
+                session.player.attemptJoining(data.gameId)
             } catch (error) {
                 console.error("Error in joinGame: ", error)
-                this.player.sendEvent(Events.unknownError)
+                session.player.sendEvent(Events.unknownError)
             }
         });
-
     }
 
     emit(event: string | symbol, ...args: any[]): boolean {

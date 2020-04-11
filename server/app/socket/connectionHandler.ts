@@ -9,21 +9,27 @@ export function onConnection(socket:SocketIO.Socket) {
 
     var session: Session | undefined = undefined
 
-    socket.emit('test', 'toast')
-    
     socket.on('disconnect', function () {
         console.debug("Goodbye!")
         session?.onDisconnect()
     })
 
     socket.on(Commands.authenticate, function (data, callback: Function) {
-        let player = Player.authenticate(data)
 
-        session = new Session(socket, player)
-
-        player.connect(session)
-        session.registerEvents(socket)
-
-        callback(player.id)
+        try {
+            if(session !== undefined) {
+                return
+            }
+    
+            let player = Player.authenticate(data)
+    
+            session = new Session(socket, player)
+    
+            callback(player.id)
+        } catch (err) {
+            console.error(err)
+            socket.emit(Events.unknownError)
+        }
+       
     })
 }

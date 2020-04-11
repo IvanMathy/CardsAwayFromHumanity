@@ -6,62 +6,54 @@
     <div>
       <span>{{ $store.state.userId }}</span>
     </div>
-    <button v-on:click="hostGame()">Host</button>
-    <button v-on:click="joinGame('NKMV')">Join</button>
-    <button v-on:click="authenticate()">Authenticate</button>
+    <div v-if="$store.state.authenticated">
+      <p>Username: {{$store.state.user.username}}</p>
+      <Host/>
+      <button v-on:click="joinGame('VEAN')">Join</button>
+    </div>
+    <Welcome v-else></Welcome>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "./components/HelloWorld.vue";
+import Welcome from "./components/Welcome.vue";
+import Host from "./components/Host.vue";
 import { Events, Commands } from "../shared/events";
 
 @Component({
   components: {
-    HelloWorld
+    Welcome,
+    Host
   },
   sockets: {
-  connect() {
-    console.log("socket connected");
-  },
-  [Events.alreadyHosting]() {
-    alert("Already Hosting");
-  },
-  [Events.invalidRoomCode]() {
-    alert("Invalid Room Code");
-  },
-  [Events.unknownError]() {
-    alert("Unknown Error");
-  }
-},
-  methods: {
-    hostGame() {
-      this.$socket.client.emit(Commands.hostGame, { password: "test" });
-      console.log("sent");
+    connect() {
+      console.log("socket connected");
     },
-    joinGame(gameId) {
-      this.$socket.client.emit(Commands.joinGame, { gameId: gameId });
-      console.log("sent");
+    disconnect(whyyyyy) {
+      if (whyyyyy === "io server disconnect") {
+        alert("booted");
+      }
     },
-    authenticate() {
-      this.$socket.client.emit(Commands.authenticate, this.$store.state.userId, (newId?: string) => {
-        if(newId == undefined) {
-          alert("Could not authenticate. Sorry!")
-          return
-        }
-        this.$store.dispatch('setId', newId)
-      });
-      console.log("sent");
-    }
-  },
-  mounted() {
-    if (this.$store.state.userId == null) {
-      alert('empty')
+    [Events.invalidRoomCode]() {
+      alert("Invalid Room Code");
+    },
+    [Events.unknownError]() {
+      alert("Unknown Error");
     }
   }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  hostGame() {
+      this.$socket.client.emit(Commands.hostGame, {});
+      console.log("sent");
+  }
+  joinGame(gameId) {
+    this.$socket.client.emit(Commands.joinGame, { gameId: gameId });
+    console.log("sent");
+  }
+}
 </script>
 
 <style lang="scss">
