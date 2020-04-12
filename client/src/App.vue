@@ -9,7 +9,7 @@
     <div v-if="$store.state.authenticated">
       <p>Username: {{$store.state.user.username}}</p>
       <Host/>
-      <button v-on:click="joinGame('VEAN')">Join</button>
+      <Join/>
     </div>
     <Welcome v-else></Welcome>
   </div>
@@ -20,12 +20,14 @@ import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "./components/HelloWorld.vue";
 import Welcome from "./components/Welcome.vue";
 import Host from "./components/Host.vue";
+import Join from "./components/Join.vue";
 import { Events, Commands } from "../shared/events";
 
 @Component({
   components: {
     Welcome,
-    Host
+    Host,
+    Join
   },
   sockets: {
     connect() {
@@ -36,24 +38,12 @@ import { Events, Commands } from "../shared/events";
         alert("booted");
       }
     },
-    [Events.invalidRoomCode]() {
-      alert("Invalid Room Code");
-    },
     [Events.unknownError]() {
       alert("Unknown Error");
     }
   }
 })
-export default class App extends Vue {
-  hostGame() {
-      this.$socket.client.emit(Commands.hostGame, {});
-      console.log("sent");
-  }
-  joinGame(gameId) {
-    this.$socket.client.emit(Commands.joinGame, { gameId: gameId });
-    console.log("sent");
-  }
-}
+export default class App extends Vue {}
 </script>
 
 <style lang="scss">

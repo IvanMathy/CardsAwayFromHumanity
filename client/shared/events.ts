@@ -4,7 +4,9 @@ export enum Events {
     roomCreationFailed = "rf",
     alreadyHosting = "ah",
     invalidRoomCode = "ir",
-    unknownError = "e"
+    unknownError = "e",
+    passwordNeeded = "pw",
+    invalidPassword = "ip"
 }
 
 export enum Commands {

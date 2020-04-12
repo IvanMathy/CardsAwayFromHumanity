@@ -1,4 +1,4 @@
-import { Room, RoomBase } from "./room";
+import { Room, RoomBase, RoomKeys } from "./room";
 import { HostedRoom } from "./hostedRoom";
 import { RedisClient } from "redis";
 import { Events } from "../../../client/shared/events";
@@ -8,6 +8,12 @@ import { randomCode } from "../lib/generator";
 import { state } from "./state";
 import { Socket } from "socket.io";
 import { Session } from "./session";
+
+enum PlayerKeys {
+    name = "name",
+    id = "id",
+    lastSeen = "lastSeen"
+}
 
 export class Player {
 
@@ -26,6 +32,17 @@ export class Player {
     constructor(id: string, name: string) {
         this.id = id
         this.name = name
+
+        let key = `users:${id}`
+
+        redisClient.multi()
+            // Create the player, expire it in ten minutes
+            .hmset(key, 
+                PlayerKeys.id, id,
+                PlayerKeys.name, name,
+                PlayerKeys.lastSeen, new Date().getTime())
+            .expire(key, 60 * 10)
+            .exec()
     }
 
     host(password?: string) {
@@ -51,13 +68,9 @@ export class Player {
 
     }
 
-    attemptJoining(roomName: string) {
-        if (this.isHost) {
-            this.sendEvent(Events.alreadyHosting)
-            return
-        }
-
-        let code = roomName.toUpperCase()
+    attemptJoining(payload: Record<string, string>) {
+    
+        let code = payload.gameId.toUpperCase()
 
         if (code.length != 4 || /[^A-Z]/.test(code)) {
             console.debug("Invalid room code " + code)
@@ -65,19 +78,46 @@ export class Player {
             return
         }
 
-        redisClient.sismember("rooms", code, (err, number) => {
-            if (number != 1) {
+        redisClient.hgetall(`room:${code}`, (err, value) => {
+            if (err != null || value == null) {
                 this.sendEvent(Events.invalidRoomCode)
                 return
             }
 
-            this.joinRoom(code)
+            console.log(err)
+            console.log(value)
+
+            if(value[RoomKeys.passwordProtected] == String(false)) {
+                this.joinRoom(code)
+            }
+
+            // Password protected!
+            if(payload.password == null) {
+                this.sendEvent(Events.passwordNeeded)
+
+            } else if (value[RoomKeys.password] !== payload.password) {
+                // Bad way to prevent bruteforce
+                setTimeout(() => {
+                    this.sendEvent(Events.invalidPassword)
+                }, 1500)
+
+            } else {
+                // Good to go
+                this.joinRoom(code, payload.password)
+            }
+               
+            
         })
 
     }
 
-    private joinRoom(roomCode: string) {
+    private joinRoom(roomCode: string, password?: string) {
         this.leaveRoom()
+        this.isHost = false
+
+        console.log("joined")
+
+        return
 
         RoomBase.getRoom(roomCode)
             .then((room) => {
@@ -145,5 +185,21 @@ export class Player {
         state.players[id] = newPlayer
         return newPlayer
 
+    }
+
+    renew() {
+        let now = new Date().getTime()
+        // Reset the expiry timer
+        if (this.lastSeen < now - 300000) {
+            let key = `users:${this.id}`
+            redisClient.multi()
+                .expire(`users:${this.id}`, 60 * 10)
+                .hset(key, PlayerKeys.lastSeen, String(now))
+            this.lastSeen = now
+        }
+    }
+
+    clean() {
+        redisClient.del(`users:${this.id}`)
     }
 }

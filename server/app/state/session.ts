@@ -32,7 +32,7 @@ export class Session {
 
         socket.on(Commands.joinGame, function (this: Session, data) {
             try {
-                session.player.attemptJoining(data.gameId)
+                session.player.attemptJoining(data)
             } catch (error) {
                 console.error("Error in joinGame: ", error)
                 session.player.sendEvent(Events.unknownError)
