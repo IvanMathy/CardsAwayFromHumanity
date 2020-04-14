@@ -3,6 +3,9 @@ import { state } from "./state";
 import { Player } from "./player";
 import { redisClient } from "../lib/redis";
 import { randomCode } from "../lib/generator";
+import { CAFHGame } from "./game/CAFHGame";
+import { Game, GameMessage } from "./game/game";
+import { io } from "../lib/io";
 
 
 // This whole file should use promises.
@@ -27,11 +30,16 @@ function tryName(callback: (success: boolean, code?: string) => void, attempt: n
 }
 
 export class HostedRoom extends RoomBase implements Room {
-    roomCode?: string;
-    password?: string;
+    roomCode?: string
+    password?: string
+    host: Player
+
+    players: Record<string, Player> = {}
+
+    game: Game<any> = new CAFHGame(this)
 
 
-    constructor(password: string | undefined, callback: (success: boolean, code?: string) => void) {
+    constructor(host:Player, password: string | undefined, callback: (success: boolean, code?: string) => void) {
 
         super()
 
@@ -69,10 +77,13 @@ export class HostedRoom extends RoomBase implements Room {
                     state.rooms[code] = this
 
                     callback(true, code)
+
                 })
         }, 0)
 
         this.password = password
+        this.host = host
+        this.players[host.id] = host
     }
 
     clear() {
@@ -93,5 +104,12 @@ export class HostedRoom extends RoomBase implements Room {
     }
     playerLeft(player:Player): void {
         throw new Error("Method not implemented.");
+    }
+
+    send(event: string, data?: any) {
+        if(this.roomCode === undefined) {
+            return
+        }
+        io.to(`rooms:${this.roomCode}`).emit(event, data)
     }
 }

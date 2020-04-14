@@ -1,13 +1,12 @@
-import io from "socket.io";
+
 import {onConnection} from "./socket/connectionHandler";
-import redisAdapter from "socket.io-redis";
-
-
-const server = io.listen(process.env.PORT || 3000);
-
-server.adapter(redisAdapter({ host: 'localhost', port: 6379 }));
-
-server.on("connection", onConnection);
+import redisAdapter, { RedisAdapter } from "socket.io-redis";
+import { redisClient, redisPublisher } from "./lib/redis";
+import SocketIORedis from "socket.io-redis";
+import { io } from "./lib/io";
 
 
 
+io.adapter(redisAdapter({ host: 'localhost', port: 6379 }));
+
+io.on("connection", onConnection);

@@ -17,7 +17,6 @@ enum PlayerKeys {
 
 export class Player {
 
-
     id: string
     name: string
 
@@ -54,7 +53,7 @@ export class Player {
 
         this.isHost = true
 
-        let room = new HostedRoom(password, (success, code) => {
+        let room = new HostedRoom(this, password, (success, code) => {
             if (!success) {
                 this.session?.emit(Events.roomCreationFailed)
                 this.isHost = false
@@ -114,10 +113,6 @@ export class Player {
     private joinRoom(roomCode: string, password?: string) {
         this.leaveRoom()
         this.isHost = false
-
-        console.log("joined")
-
-        return
 
         RoomBase.getRoom(roomCode)
             .then((room) => {

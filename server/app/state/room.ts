@@ -10,6 +10,7 @@ export enum RoomKeys {
     passwordProtected = "protected"
 }
 
+
 export class RoomBase {
 
     static getRoom(roomCode: string) {
