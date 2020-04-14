@@ -12,9 +12,10 @@ export class ProxyRoom extends RoomBase implements Room {
         this.password = password
     }
 
-    playerJoined(player: Player): Promise<Room> {
+    tryJoining(player: Player): Promise<Room> {
         throw new Error("Method not implemented.");
     }
+
     playerLeft(player:Player): void {
         throw new Error("Method not implemented.");
     }

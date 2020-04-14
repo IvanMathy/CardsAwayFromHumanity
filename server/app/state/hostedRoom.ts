@@ -39,7 +39,7 @@ export class HostedRoom extends RoomBase implements Room {
     game: Game<any> = new CAFHGame(this)
 
 
-    constructor(host:Player, password: string | undefined, callback: (success: boolean, code?: string) => void) {
+    constructor(host: Player, password: string | undefined, callback: (success: boolean, code?: string) => void) {
 
         super()
 
@@ -54,7 +54,7 @@ export class HostedRoom extends RoomBase implements Room {
 
             var values = [RoomKeys.roomCode, code]
 
-            if(password == undefined) {
+            if (password == undefined) {
                 values.push(RoomKeys.passwordProtected, String(false))
             } else {
                 values.push(RoomKeys.passwordProtected, String(true))
@@ -87,7 +87,7 @@ export class HostedRoom extends RoomBase implements Room {
     }
 
     clear() {
-        if(this.roomCode == null) {
+        if (this.roomCode == null) {
             return
         }
         redisClient.multi()
@@ -98,16 +98,21 @@ export class HostedRoom extends RoomBase implements Room {
         delete state.rooms[this.roomCode]
     }
 
-      
-    playerJoined(player: Player): Promise<Room> {
-        throw new Error("Method not implemented.");
+
+    tryJoining(player: Player): Promise<Room> {
+        return new Promise((resolve, reject) => {
+            if (this.game.canPlayerJoin(player)) {
+                
+            }
+        })
     }
-    playerLeft(player:Player): void {
+
+    playerLeft(player: Player): void {
         throw new Error("Method not implemented.");
     }
 
     send(event: string, data?: any) {
-        if(this.roomCode === undefined) {
+        if (this.roomCode === undefined) {
             return
         }
         io.to(`rooms:${this.roomCode}`).emit(event, data)

@@ -45,9 +45,8 @@ export class CAFHGame implements Game<GameCommand> {
 
     }
 
-    private newRound() {
-        
-
+    private newRound() {    
+        this.blackCard = this.deck.getBlackCard()
     }
 
     private setState(newState: GameState) {

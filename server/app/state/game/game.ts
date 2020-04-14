@@ -1,7 +1,7 @@
 import { HostedRoom } from "../hostedRoom";
 import { Player } from "../player";
 
-export class GameMessage <GameCommandType>{
+export class GameMessage<GameCommandType>{
     userId: string
     command: GameCommandType
     message: any
@@ -14,9 +14,10 @@ export class GameMessage <GameCommandType>{
 }
 
 export interface Game<GameCommandType> {
-    room:HostedRoom
-    playerJoined(player: Player):void
-    playerLeft(player: Player):void
-    onMessage(message: GameMessage <GameCommandType>):void
-    clean():void
+    room: HostedRoom
+    canPlayerJoin(player: Player): boolean
+    playerJoined(player: Player): void
+    playerLeft(player: Player): void
+    onMessage(message: GameMessage<GameCommandType>): void
+    clean(): void
 }

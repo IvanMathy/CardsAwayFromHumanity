@@ -51,7 +51,7 @@ export interface Room {
     roomCode?: string;
     password?: string;
 
-    playerJoined(player: Player): Promise<Room>
+    tryJoining(player: Player): Promise<Room>
     playerLeft(player: Player): void
 }
 

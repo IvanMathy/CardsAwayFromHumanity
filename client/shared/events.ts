@@ -1,18 +1,20 @@
 export enum Events {
-    joinedGame = "s",
+    alreadyHosting = "ah",
+    cannotJoin = "cj",
+    unknownError = "e",
+    roomFull = "f",
+    invalidPassword = "ip",
+    invalidRoomCode = "ir",
+    passwordNeeded = "pw",
     roomCreated = "r",
     roomCreationFailed = "rf",
-    alreadyHosting = "ah",
-    invalidRoomCode = "ir",
-    unknownError = "e",
-    passwordNeeded = "pw",
-    invalidPassword = "ip",
+    joinedGame = "s",
     stateChanged = "sc"
 }
 
 export enum Commands {
-    hostGame= "host",
-    joinGame= "join",
+    hostGame = "host",
+    joinGame = "join",
     authenticate = "auth"
 }
 

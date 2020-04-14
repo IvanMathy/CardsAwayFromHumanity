@@ -36,7 +36,7 @@ export class Player {
 
         redisClient.multi()
             // Create the player, expire it in ten minutes
-            .hmset(key, 
+            .hmset(key,
                 PlayerKeys.id, id,
                 PlayerKeys.name, name,
                 PlayerKeys.lastSeen, new Date().getTime())
@@ -68,7 +68,7 @@ export class Player {
     }
 
     attemptJoining(payload: Record<string, string>) {
-    
+
         let code = payload.gameId.toUpperCase()
 
         if (code.length != 4 || /[^A-Z]/.test(code)) {
@@ -86,12 +86,12 @@ export class Player {
             console.log(err)
             console.log(value)
 
-            if(value[RoomKeys.passwordProtected] == String(false)) {
+            if (value[RoomKeys.passwordProtected] == String(false)) {
                 this.joinRoom(code)
             }
 
             // Password protected!
-            if(payload.password == null) {
+            if (payload.password == null) {
                 this.sendEvent(Events.passwordNeeded)
 
             } else if (value[RoomKeys.password] !== payload.password) {
@@ -104,8 +104,8 @@ export class Player {
                 // Good to go
                 this.joinRoom(code, payload.password)
             }
-               
-            
+
+
         })
 
     }
@@ -116,14 +116,20 @@ export class Player {
 
         RoomBase.getRoom(roomCode)
             .then((room) => {
-                return room.playerJoined(this)
+
+                return room.tryJoining(this)
 
             }).then((room) => {
                 this.joinedRoom = room
                 this.sendEvent(Events.joinedGame)
             })
             .catch((error) => {
-                console.error(error)
+                if (error == Events.roomFull) {
+                    this.sendEvent(Events.roomFull)
+                } else {
+                    this.sendEvent(Events.cannotJoin)
+                }
+
             })
     }
 
@@ -143,7 +149,7 @@ export class Player {
     }
 
     disconnect(session: Session) {
-        if(session == this.session) {
+        if (session == this.session) {
             this.active = false
             this.lastSeen = new Date().getTime()
             console.log("disconnect")
@@ -155,7 +161,7 @@ export class Player {
         var username = (user?.name as string) ?? "A dum dum with no name."
 
         if (id?.length != 8 || /[^A-Z]/.test(id)) {
-      
+
             console.debug("New player")
             id = randomCode(8)
 
@@ -170,7 +176,7 @@ export class Player {
 
             // ID is valid, but unknown to this instance.
             console.debug("Returning player")
-       
+
         }
 
         console.log(username)
