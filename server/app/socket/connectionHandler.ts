@@ -1,4 +1,4 @@
-import {Player} from "../state/player"
+import {Player} from "../state/players/player"
 import {Events, Commands} from "../../../client/shared/events"
 import { redisClient } from "../lib/redis";
 import { Socket } from "net";

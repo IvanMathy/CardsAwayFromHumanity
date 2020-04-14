@@ -1,5 +1,6 @@
 import { Room } from "./room";
-import { Player } from "./player";
+import { Player } from "./players/player";
+import { LocalPlayer } from "./players/localPlayer";
 
 // clean every 60 seconds
 const cleanInterval = 60000
@@ -23,7 +24,8 @@ class State {
         Object.keys(this.players).map((key) => {
             try {
                 let value = this.players[key] 
-                if (!value.active && value.lastSeen < cutoff) {
+                if (value instanceof LocalPlayer && !value.active && value.lastSeen < cutoff) {
+                    // TODO: clean up proxys
                     delete this.players[key] 
                 }
             } catch (err) {

@@ -1,7 +1,7 @@
 import { HostedRoom } from "../hostedRoom";
 import { Game, GameMessage } from "./game";
 import { GameState, GameCommand, Events } from "../../../../client/shared/events";
-import { Player } from "../player";
+import { Player } from "../players/player";
 
 const GameRules = {
     maxPlayers : 8

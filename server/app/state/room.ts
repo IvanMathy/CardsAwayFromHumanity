@@ -1,7 +1,7 @@
 import { RedisClient } from "redis";
 import { isNullOrUndefined } from "util";
 import { state } from "./state";
-import { Player } from "./player";
+import { Player } from "./players/player";
 import { redisClient } from "../lib/redis";
 
 export enum RoomKeys {
@@ -51,8 +51,22 @@ export interface Room {
     roomCode?: string;
     password?: string;
 
-    tryJoining(player: Player): Promise<Room>
+    tryJoining(player: Player): void
     playerLeft(player: Player): void
+
+    onMessage(message: RoomMessage): void
+
+    clean(): void
+}
+
+export class RoomMessage {
+    type: string
+    payload: any
+    
+    constructor(type: string, payload: any) {
+        this.type = type
+        this.payload = payload
+    }
 }
 
 

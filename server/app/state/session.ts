@@ -1,15 +1,16 @@
 import { Socket } from "socket.io";
-import { Player } from "./player";
+import { Player } from "./players/player";
 import { redisClient } from "../lib/redis";
 import { Events, Commands } from "../../../client/shared/events";
+import { LocalPlayer } from "./players/localPlayer";
 
 
 export class Session {
 
-    readonly player: Player
+    readonly player: LocalPlayer
     private socket?: Socket
 
-    constructor(socket: Socket, player: Player) {
+    constructor(socket: Socket, player: LocalPlayer) {
         this.socket = socket
         this.player = player
 

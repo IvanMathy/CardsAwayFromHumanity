@@ -1,11 +1,13 @@
-import { Room, RoomBase, RoomKeys } from "./room";
+import { Room, RoomBase, RoomKeys, RoomMessage } from "./room";
 import { state } from "./state";
-import { Player } from "./player";
-import { redisClient } from "../lib/redis";
+import { Player } from "./players/player";
+import { redisClient, redisSubscriber } from "../lib/redis";
 import { randomCode } from "../lib/generator";
 import { CAFHGame } from "./game/CAFHGame";
 import { Game, GameMessage } from "./game/game";
 import { io } from "../lib/io";
+import { eventEmitter } from "../lib/event";
+import { RoomCommands } from "./proxyRoom";
 
 
 // This whole file should use promises.
@@ -76,6 +78,13 @@ export class HostedRoom extends RoomBase implements Room {
 
                     state.rooms[code] = this
 
+                    // Set listeners
+
+                    let channelName = `events:to:${key}`
+
+                    eventEmitter.on(channelName, this.onMessage)
+                    redisSubscriber.subscribe(channelName)
+
                     callback(true, code)
 
                 })
@@ -86,7 +95,7 @@ export class HostedRoom extends RoomBase implements Room {
         this.players[host.id] = host
     }
 
-    clear() {
+    clean() {
         if (this.roomCode == null) {
             return
         }
@@ -98,8 +107,19 @@ export class HostedRoom extends RoomBase implements Room {
         delete state.rooms[this.roomCode]
     }
 
+    // Event Handling
 
-    tryJoining(player: Player): Promise<Room> {
+    onMessage(message: RoomMessage) {
+        switch(message.type) {
+            case RoomCommands.tryJoining:
+                
+                break
+        }
+    }
+
+    // Player management
+
+    tryJoining(player: Player) {
         return new Promise((resolve, reject) => {
             if (this.game.canPlayerJoin(player)) {
                 

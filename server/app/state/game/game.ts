@@ -1,5 +1,5 @@
 import { HostedRoom } from "../hostedRoom";
-import { Player } from "../player";
+import { Player } from "../players/player";
 
 export class GameMessage<GameCommandType>{
     userId: string

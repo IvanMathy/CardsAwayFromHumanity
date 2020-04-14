@@ -1,13 +1,14 @@
-import { Room, RoomBase, RoomKeys } from "./room";
-import { HostedRoom } from "./hostedRoom";
+import { Room, RoomBase, RoomKeys } from "../room";
+import { HostedRoom } from "../hostedRoom";
 import { RedisClient } from "redis";
-import { Events } from "../../../client/shared/events";
+import { Events } from "../../../../client/shared/events";
 import { isDate } from "util";
-import { redisClient } from "../lib/redis";
-import { randomCode } from "../lib/generator";
-import { state } from "./state";
+import { redisClient } from "../../lib/redis";
+import { randomCode } from "../../lib/generator";
+import { state } from "../state";
 import { Socket } from "socket.io";
-import { Session } from "./session";
+import { Session } from "../session";
+import { Player } from "./player";
 
 enum PlayerKeys {
     name = "name",
@@ -15,7 +16,7 @@ enum PlayerKeys {
     lastSeen = "lastSeen"
 }
 
-export class Player {
+export class LocalPlayer implements Player {
 
     id: string
     name: string
@@ -42,6 +43,8 @@ export class Player {
                 PlayerKeys.lastSeen, new Date().getTime())
             .expire(key, 60 * 10)
             .exec()
+
+        
     }
 
     host(password?: string) {
@@ -114,22 +117,16 @@ export class Player {
         this.leaveRoom()
         this.isHost = false
 
+        
+
         RoomBase.getRoom(roomCode)
             .then((room) => {
 
-                return room.tryJoining(this)
+                room.tryJoining(this)
 
-            }).then((room) => {
-                this.joinedRoom = room
-                this.sendEvent(Events.joinedGame)
             })
             .catch((error) => {
-                if (error == Events.roomFull) {
-                    this.sendEvent(Events.roomFull)
-                } else {
-                    this.sendEvent(Events.cannotJoin)
-                }
-
+                this.sendEvent(Events.cannotJoin)
             })
     }
 
@@ -154,38 +151,6 @@ export class Player {
             this.lastSeen = new Date().getTime()
             console.log("disconnect")
         }
-    }
-
-    static authenticate(user?: Record<string, string>): Player {
-        var id = user?.id
-        var username = (user?.name as string) ?? "A dum dum with no name."
-
-        if (id?.length != 8 || /[^A-Z]/.test(id)) {
-
-            console.debug("New player")
-            id = randomCode(8)
-
-        } else {
-
-            var local = state.players[id]
-
-            if (local != null) {
-                console.debug("Recovering session")
-                return local
-            }
-
-            // ID is valid, but unknown to this instance.
-            console.debug("Returning player")
-
-        }
-
-        console.log(username)
-
-        let newPlayer = new Player(id, username)
-
-        state.players[id] = newPlayer
-        return newPlayer
-
     }
 
     renew() {
