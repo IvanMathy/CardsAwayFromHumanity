@@ -34,7 +34,7 @@ export class ProxyRoom extends RoomBase implements Room {
 
     publish(message: RoomMessage) {
         if(this.roomCode === undefined) return
-        redisPublisher.publish(`events:to:${this.roomCode}`, JSON.stringify(message))
+        redisPublisher.publish(`events:to:room:${this.roomCode}`, JSON.stringify(message))
     }
 
     // Actions

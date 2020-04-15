@@ -78,6 +78,7 @@ export interface Player {
 
     sendEvent(event: string, payload?: any): void
     successfullyJoinedRoom(room: Room): void
+    onMessage(message: PlayerMessage): void
 }
 
 export class PlayerMessage {

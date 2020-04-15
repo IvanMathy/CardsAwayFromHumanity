@@ -3,12 +3,14 @@ import { HostedRoom } from "../hostedRoom";
 import { RedisClient } from "redis";
 import { Events } from "../../../../client/shared/events";
 import { isDate } from "util";
-import { redisClient } from "../../lib/redis";
+import { redisClient, redisSubscriber } from "../../lib/redis";
 import { randomCode } from "../../lib/generator";
 import { state } from "../state";
 import { Socket } from "socket.io";
 import { Session } from "../session";
-import { Player } from "./player";
+import { Player, PlayerMessage } from "./player";
+import { eventEmitter } from "../../lib/event";
+import { PlayerCommands } from "./proxyPlayer";
 
 enum PlayerKeys {
     name = "name",
@@ -33,7 +35,7 @@ export class LocalPlayer implements Player {
         this.id = id
         this.name = name
 
-        let key = `users:${id}`
+        let key = `user:${id}`
 
         redisClient.multi()
             // Create the player, expire it in ten minutes
@@ -44,7 +46,27 @@ export class LocalPlayer implements Player {
             .expire(key, 60 * 10)
             .exec()
 
-        
+        // Set listeners
+
+        let channelName = `events:to:${key}`
+
+        eventEmitter.on(channelName, this.onMessage)
+        redisSubscriber.subscribe(channelName)
+
+    }
+
+    onMessage(message: PlayerMessage) {
+        switch(message.type) {
+            case PlayerCommands.sendEvent:
+                this.sendEvent(message.payload.event, message.payload.payload)
+                break
+            case PlayerCommands.successfullyJoined:
+                RoomBase.getRoom(message.payload).then((room) => {
+                    this.successfullyJoinedRoom(room)
+                }).catch((err) => {
+                    console.error("Error finding room in remote join: ", err)
+                })
+        }
     }
 
     host(password?: string) {
@@ -131,7 +153,8 @@ export class LocalPlayer implements Player {
     }
 
     successfullyJoinedRoom(room: Room) {
-        
+        this.joinedRoom = room
+        this.session?.joinedRoom(room)
     }
 
     private leaveRoom() {

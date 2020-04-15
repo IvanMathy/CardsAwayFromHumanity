@@ -113,7 +113,7 @@ export class HostedRoom extends RoomBase implements Room {
     onMessage(message: RoomMessage) {
         switch(message.type) {
             case RoomCommands.tryJoining:
-                Player.getPlayer(message.payload).then((player)=> {
+                Player.getPlayer(message.payload).then((player) => {
                     this.tryJoining(player)
                 })
                 break

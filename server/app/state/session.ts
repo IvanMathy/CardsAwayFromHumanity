@@ -3,6 +3,7 @@ import { Player } from "./players/player";
 import { redisClient } from "../lib/redis";
 import { Events, Commands } from "../../../client/shared/events";
 import { LocalPlayer } from "./players/localPlayer";
+import { Room } from "./room";
 
 
 export class Session {
@@ -52,5 +53,9 @@ export class Session {
     onDisconnect() {
         this.socket = undefined
         this.player.disconnect(this)
+    }
+
+    joinedRoom(room: Room) {
+        this.socket?.join(`rooms:${room.roomCode}`)
     }
 }
