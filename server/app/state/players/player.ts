@@ -3,6 +3,7 @@ import { redisClient } from "../../lib/redis";
 import { LocalPlayer } from "./localPlayer";
 import { randomCode } from "../../lib/generator";
 import { ProxyPlayer } from "./proxyPlayer";
+import { Room } from "../room";
 
 
 export class Player {
@@ -74,4 +75,17 @@ export class Player {
 export interface Player {
 
     id: string
+
+    sendEvent(event: string, payload?: any): void
+    successfullyJoinedRoom(room: Room): void
+}
+
+export class PlayerMessage {
+    type: string
+    payload: any
+    
+    constructor(type: string, payload: any) {
+        this.type = type
+        this.payload = payload
+    }
 }

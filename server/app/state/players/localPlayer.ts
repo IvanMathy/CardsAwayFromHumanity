@@ -130,12 +130,16 @@ export class LocalPlayer implements Player {
             })
     }
 
+    successfullyJoinedRoom(room: Room) {
+        
+    }
+
     private leaveRoom() {
         this.joinedRoom?.playerLeft(this)
     }
 
-    sendEvent(event: string) {
-        this.session?.emit(event)
+    sendEvent(event: string, payload?: any) {
+        this.session?.emit(event, payload)
     }
 
     connect(session: Session) {

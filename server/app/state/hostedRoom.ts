@@ -8,6 +8,7 @@ import { Game, GameMessage } from "./game/game";
 import { io } from "../lib/io";
 import { eventEmitter } from "../lib/event";
 import { RoomCommands } from "./proxyRoom";
+import { Events } from "../../../client/shared/events";
 
 
 // This whole file should use promises.
@@ -112,7 +113,9 @@ export class HostedRoom extends RoomBase implements Room {
     onMessage(message: RoomMessage) {
         switch(message.type) {
             case RoomCommands.tryJoining:
-                
+                Player.getPlayer(message.payload).then((player)=> {
+                    this.tryJoining(player)
+                })
                 break
         }
     }
@@ -120,11 +123,13 @@ export class HostedRoom extends RoomBase implements Room {
     // Player management
 
     tryJoining(player: Player) {
-        return new Promise((resolve, reject) => {
-            if (this.game.canPlayerJoin(player)) {
-                
-            }
-        })
+        if (this.game.canPlayerJoin(player)) {
+           this.game.playerJoined(player)
+           player.successfullyJoinedRoom(this)
+        } else {
+            // For now that's the only good reason, but there might be more.
+            player.sendEvent(Events.roomFull)
+        }
     }
 
     playerLeft(player: Player): void {
