@@ -137,9 +137,6 @@ export class LocalPlayer implements Player {
     }
 
     private joinRoom(roomCode: string, password?: string) {
-        if(roomCode == this.joinedRoom?.roomCode) {
-            return
-        }
 
         this.leaveRoom()
         this.isHost = false
@@ -165,6 +162,7 @@ export class LocalPlayer implements Player {
 
     private leaveRoom() {
         this.joinedRoom?.playerLeft(this)
+        this.joinedRoom = undefined
     }
 
     sendEvent(event: string, payload?: any) {
@@ -183,6 +181,7 @@ export class LocalPlayer implements Player {
             this.active = false
             this.lastSeen = new Date().getTime()
             console.log("disconnect")
+            this.leaveRoom()
         }
     }
 
