@@ -9,6 +9,8 @@
     <input v-model="password" v-if="gameType == 'private'">
     <br>
     <button v-on:click="host()" :disabled="gameType == 'private' && password == ''">Host game</button>
+
+    <p>{{gameId}}</p>
   </div>
 </template>
 
@@ -25,8 +27,10 @@ import { Events, Commands } from "../../shared/events";
 })
 
 export default class Host extends Vue {
-  password = "";
-  gameType = "";
+  password = ""
+  gameType = ""
+
+  gameId = ""
 
   host() {
     const payload = {};
@@ -50,6 +54,8 @@ export default class Host extends Vue {
         if (gameId == undefined) {
           alert("Could not create game. Sorry!");
           return;
+        } else {
+          this.gameId = gameId
         }
       }
     );

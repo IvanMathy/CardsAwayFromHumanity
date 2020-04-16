@@ -17,8 +17,9 @@ export class RoomBase {
 
         return new Promise<Room>((resolve, reject) => {
             let localRoom = state.rooms[roomCode]
-            if (localRoom !== null) {
+            if (localRoom !== undefined) {
                 console.debug("Found Local Room")
+                console.debug(localRoom)
                 resolve(localRoom)
                 return 
             }

@@ -1,4 +1,4 @@
-class Deck {
+export class Deck {
 
     cardsInPlay: number[] = []
     usedCards: number[] = []

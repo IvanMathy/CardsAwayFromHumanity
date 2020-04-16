@@ -10,7 +10,7 @@ import io from 'socket.io-client';
 
 const socket = io(
   process.env.NODE_ENV === 'development'
-    ? 'ws://localhost:3000'
+    ? 'ws://localhost:4000'
     : 'wss://cafh.okat.best'
 );
 

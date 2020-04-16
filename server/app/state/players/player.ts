@@ -12,7 +12,7 @@ export class Player {
 
         return new Promise<Player>((resolve, reject) => {
             let localPlayer = state.players[playerId]
-            if (localPlayer !== null) {
+            if (localPlayer !== undefined) {
                 console.debug("Found Local Player")
                 resolve(localPlayer)
                 return
@@ -20,11 +20,13 @@ export class Player {
 
             // Player is on another server
 
-            redisClient.hgetall(`players:${playerId}`, (err, values) => {
+            redisClient.hgetall(`user:${playerId}`, (err, values) => {
                 if (err !== null) {
                     reject(err)
                     return
                 }
+
+                console.log(values)
 
                 try {
                     console.debug("Created Proxy Player")

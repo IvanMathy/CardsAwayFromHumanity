@@ -1,6 +1,7 @@
 <template>
   <div class="authenticate">
     <input v-model="username">
+    {{$store.state.userId}}
     <button v-on:click="authenticate()" :disabled="username == ''">Authenticate</button>
   </div>
 </template>
@@ -22,11 +23,11 @@ export default class Welcome extends Vue {
 
     this.$socket.client.emit(
       Commands.authenticate, {
-        id: this.$store.state.userId,
+        id: this.$store.state.user.userId,
         name: this.username
       },
       (newId?: string) => {
-        if (newId == undefined) {
+        if (newId == null || newId == undefined) {
           alert("Could not authenticate. Sorry!");
           return;
         }

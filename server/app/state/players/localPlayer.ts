@@ -110,9 +110,13 @@ export class LocalPlayer implements Player {
 
             console.log(err)
             console.log(value)
+            console.log(String(false))
+            console.log(value[RoomKeys.passwordProtected])
+            console.log(value[RoomKeys.passwordProtected] == String(false))
 
             if (value[RoomKeys.passwordProtected] == String(false)) {
                 this.joinRoom(code)
+                return
             }
 
             // Password protected!
@@ -143,6 +147,8 @@ export class LocalPlayer implements Player {
 
         RoomBase.getRoom(roomCode)
             .then((room) => {
+
+                console.log("joining")
 
                 room.tryJoining(this)
 

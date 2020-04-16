@@ -15,6 +15,7 @@ io.on("connection", onConnection);
 
 
 redisSubscriber.on("message", function(channel, message) {
+    console.log(channel, message)
     try {
         eventEmitter.emit(channel, JSON.parse(message))
     } catch (error) {

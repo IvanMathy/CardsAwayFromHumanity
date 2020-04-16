@@ -46,7 +46,9 @@ export class HostedRoom extends RoomBase implements Room {
 
         super()
 
-        tryName(function (this: HostedRoom, success, code) {
+        let room = this
+
+        tryName(function (success, code) {
 
             if (!success || code == null) {
                 callback(false)
@@ -64,26 +66,27 @@ export class HostedRoom extends RoomBase implements Room {
                 values.push(RoomKeys.password, password)
             }
 
+
             redisClient.multi()
                 .sadd("rooms", code)
                 // Create the room, expire it in 24 hours
                 .hmset(key, values)
                 .expire(key, 60 * 60 * 24)
-                .exec(function (this: HostedRoom, err, success) {
+                .exec(function (err, success) {
                     if (err !== null) {
                         callback(false)
                         return
                     }
-                    this.roomCode = code
-                    this.password = password
+                    room.roomCode = code
+                    room.password = password
 
-                    state.rooms[code] = this
+                    state.rooms[code] = room
 
                     // Set listeners
 
                     let channelName = `events:to:${key}`
 
-                    eventEmitter.on(channelName, this.onMessage)
+                    eventEmitter.on(channelName, room.onMessage)
                     redisSubscriber.subscribe(channelName)
 
                     callback(true, code)
@@ -110,11 +113,15 @@ export class HostedRoom extends RoomBase implements Room {
 
     // Event Handling
 
-    onMessage(message: RoomMessage) {
+    onMessage = (message: RoomMessage) => {
+        let room = this
         switch(message.type) {
             case RoomCommands.tryJoining:
+                console.log("remote join")
                 Player.getPlayer(message.payload).then((player) => {
-                    this.tryJoining(player)
+                    console.log(player)
+                    console.log(room)
+                    room.tryJoining(player)
                 })
                 break
         }

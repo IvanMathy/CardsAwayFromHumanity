@@ -3,9 +3,6 @@
     <div>
       <span>{{ $socket.connected ? 'Connected' : 'Disconnected' }}</span>
     </div>
-    <div>
-      <span>{{ $store.state.userId }}</span>
-    </div>
     <div v-if="$store.state.authenticated">
       <p>Username: {{$store.state.user.username}}</p>
       <Host/>
