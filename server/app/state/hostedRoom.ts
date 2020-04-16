@@ -114,12 +114,16 @@ export class HostedRoom extends RoomBase implements Room {
     // Event Handling
 
     onMessage = (message: RoomMessage) => {
-        let room = this
         switch(message.type) {
             case RoomCommands.tryJoining:
                 console.log("remote join")
                 Player.getPlayer(message.payload).then((player) => {
-                    room.tryJoining(player)
+                    this.tryJoining(player)
+                })
+                break
+            case RoomCommands.playerLeft:
+                Player.getPlayer(message.payload).then((player) => {
+                    this.playerLeft(player)
                 })
                 break
         }
@@ -130,15 +134,18 @@ export class HostedRoom extends RoomBase implements Room {
     tryJoining(player: Player) {
         if (this.game.canPlayerJoin(player)) {
            this.game.playerJoined(player)
+           console.log("success joining")
            player.successfullyJoinedRoom(this)
         } else {
+            console.log("room full")
             // For now that's the only good reason, but there might be more.
             player.sendEvent(Events.roomFull)
         }
     }
 
     playerLeft(player: Player): void {
-        throw new Error("Method not implemented.");
+        //
+        this.game.playerLeft(player)
     }
 
     send(event: string, data?: any) {

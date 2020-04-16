@@ -4,7 +4,8 @@ import { redisSubscriber, redisPublisher } from "../lib/redis";
 import { eventEmitter } from "../lib/event";
 
 export enum RoomCommands {
-    tryJoining = "tj"
+    tryJoining = "tj",
+    playerLeft = "pl"
 }
 
 export class ProxyRoom extends RoomBase implements Room {
@@ -44,7 +45,7 @@ export class ProxyRoom extends RoomBase implements Room {
     }
 
     playerLeft(player:Player): void {
-        throw new Error("Method not implemented.");
+        this.publish(new RoomMessage(RoomCommands.playerLeft, player.id))
     }
 
     clean() {

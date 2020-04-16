@@ -11,7 +11,7 @@ import io from 'socket.io-client';
 const socket = io(
   process.env.NODE_ENV === 'development'
     ? 'ws://localhost:3000'
-    : 'wss://cafh.okat.best'
+    : 'wss://play.cafh.okat.best'
 );
 
 Vue.use(VueSocketIOExt, socket, { store });

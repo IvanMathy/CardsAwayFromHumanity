@@ -5,6 +5,12 @@ Vue.use(Vuex)
 
 const playerIdKey = "playerId"
 
+export enum ClientState {
+  unauthenticated = "unauthenticated",
+  inLobby = "inLobby",
+  inRoom = "inRoom"
+}
+
 export default new Vuex.Store({
   state() {
     return {
@@ -12,7 +18,8 @@ export default new Vuex.Store({
         userId: localStorage.getItem(playerIdKey),
         username: ""
       },
-      authenticated: false
+      currentState: ClientState.unauthenticated,
+      joinedRoom: null
     }
   },
   mutations: {
@@ -21,16 +28,23 @@ export default new Vuex.Store({
       const anyState = state as any
 
       anyState.user = newUser
-      anyState.authenticated = true
+      anyState.currentState = ClientState.inLobby
 
       localStorage.setItem(playerIdKey, newUser.newId)
+    },
+
+    SOCKET_JOINED(state, roomId: string) {
+
+      const anyState = state as any
+
+      anyState.currentState = ClientState.inRoom
+      anyState.joinedRoom = roomId
     }
+
   },
   actions: {
     authenticated(context, newUser: Record<string, string>) {
       context.commit('authenticated', newUser)
     }
-  },
-  modules: {
   }
 })

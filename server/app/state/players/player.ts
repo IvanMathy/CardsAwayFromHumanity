@@ -23,14 +23,14 @@ export class Player {
             redisClient.hgetall(`user:${playerId}`, (err, values) => {
                 if (err !== null) {
                     reject(err)
-                    return
+                    return 
                 }
 
                 console.log(values)
 
                 try {
                     console.debug("Created Proxy Player")
-                    let newPlayer = new ProxyPlayer(values.playerId)
+                    let newPlayer = new ProxyPlayer(values.id)
                     state.players[values.id] = newPlayer
                     resolve(newPlayer)
 

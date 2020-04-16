@@ -16,8 +16,10 @@ export class ProxyPlayer implements Player {
         this.id = id
 
 
-        let key = `player:${this.id}`
+        let key = `user:${this.id}`
         let channelName = `events:from:${key}`
+
+        console.log(channelName)
 
         eventEmitter.on(channelName, this.onMessage)
         redisSubscriber.subscribe(channelName)
@@ -28,7 +30,9 @@ export class ProxyPlayer implements Player {
     }
 
     publish(message: PlayerMessage) {
-        redisPublisher.publish(`events:to:player:${this.id}`, JSON.stringify(message))
+        console.log(this)
+        console.log(`events:to:user:${this.id}`)
+        redisPublisher.publish(`events:to:user:${this.id}`, JSON.stringify(message))
     }
 
     sendEvent(event: string, payload?: any): void {

@@ -50,12 +50,15 @@ export class LocalPlayer implements Player {
 
         let channelName = `events:to:${key}`
 
+        console.log(channelName)
+
         eventEmitter.on(channelName, this.onMessage)
         redisSubscriber.subscribe(channelName)
 
     }
 
-    onMessage(message: PlayerMessage) {
+    onMessage = (message: PlayerMessage) => {
+        console.log(message)
         switch(message.type) {
             case PlayerCommands.sendEvent:
                 this.sendEvent(message.payload.event, message.payload.payload)
@@ -134,10 +137,12 @@ export class LocalPlayer implements Player {
     }
 
     private joinRoom(roomCode: string, password?: string) {
+        if(roomCode == this.joinedRoom?.roomCode) {
+            return
+        }
+
         this.leaveRoom()
         this.isHost = false
-
-        
 
         RoomBase.getRoom(roomCode)
             .then((room) => {
@@ -194,6 +199,6 @@ export class LocalPlayer implements Player {
     }
 
     clean() {
-        redisClient.del(`users:${this.id}`)
+        redisClient.del(`user:${this.id}`)
     }
 }

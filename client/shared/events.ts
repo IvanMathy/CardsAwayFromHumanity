@@ -8,7 +8,7 @@ export enum Events {
     passwordNeeded = "pw",
     roomCreated = "r",
     roomCreationFailed = "rf",
-    joinedGame = "s",
+    joinedGame = "joined",
     stateChanged = "sc"
 }
 
