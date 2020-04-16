@@ -108,12 +108,6 @@ export class LocalPlayer implements Player {
                 return
             }
 
-            console.log(err)
-            console.log(value)
-            console.log(String(false))
-            console.log(value[RoomKeys.passwordProtected])
-            console.log(value[RoomKeys.passwordProtected] == String(false))
-
             if (value[RoomKeys.passwordProtected] == String(false)) {
                 this.joinRoom(code)
                 return
@@ -161,6 +155,7 @@ export class LocalPlayer implements Player {
     successfullyJoinedRoom(room: Room) {
         this.joinedRoom = room
         this.session?.joinedRoom(room)
+        this.sendEvent(Events.joinedGame, room.roomCode)
     }
 
     private leaveRoom() {

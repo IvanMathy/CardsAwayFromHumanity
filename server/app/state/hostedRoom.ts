@@ -119,8 +119,6 @@ export class HostedRoom extends RoomBase implements Room {
             case RoomCommands.tryJoining:
                 console.log("remote join")
                 Player.getPlayer(message.payload).then((player) => {
-                    console.log(player)
-                    console.log(room)
                     room.tryJoining(player)
                 })
                 break

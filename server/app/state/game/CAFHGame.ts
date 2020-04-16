@@ -2,7 +2,7 @@ import { HostedRoom } from "../hostedRoom";
 import { Game, GameMessage } from "./game";
 import { GameState, GameCommand, Events } from "../../../../client/shared/events";
 import { Player } from "../players/player";
-import { Deck } from "./Deck";
+import { Deck } from "./deck";
 import { PlayerState } from "./playerState";
 
 const GameRules = {
