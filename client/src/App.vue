@@ -55,7 +55,7 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
-body {
+html, body {
   font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -64,4 +64,13 @@ body {
   margin-top: 60px;
   background-color: #242424;
 }
+
+@import "~bulma/sass/utilities/_all";
+
+// CAFH overrides:
+$body-background-color: #242424;
+$body-color: $white;
+
+@import "~bulma";
+@import "~buefy/src/scss/buefy";
 </style>

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@types/redis": "^2.8.17",
+    "buefy": "^0.8.0",
     "core-js": "^3.6.4",
     "socket.io-client": "^2.3.0",
     "vue": "^2.6.11",
@@ -32,6 +33,7 @@
     "node-sass": "^4.12.0",
     "sass-loader": "^8.0.2",
     "typescript": "~3.8.3",
+    "vue-cli-plugin-buefy": "^0.3.7",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {
