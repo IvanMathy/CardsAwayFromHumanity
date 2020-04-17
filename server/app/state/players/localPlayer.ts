@@ -1,27 +1,15 @@
 import { Room, RoomBase, RoomKeys } from "../room";
 import { HostedRoom } from "../hostedRoom";
-import { RedisClient } from "redis";
 import { Events } from "../../../../client/shared/events";
-import { isDate } from "util";
 import { redisClient, redisSubscriber } from "../../lib/redis";
-import { randomCode } from "../../lib/generator";
-import { state } from "../state";
-import { Socket } from "socket.io";
 import { Session } from "../session";
-import { Player, PlayerMessage } from "./player";
+import { Player, PlayerMessage, PlayerKeys } from "./player";
 import { eventEmitter } from "../../lib/event";
 import { PlayerCommands } from "./proxyPlayer";
 
-enum PlayerKeys {
-    name = "name",
-    id = "id",
-    lastSeen = "lastSeen"
-}
+
 
 export class LocalPlayer implements Player {
-
-    id: string
-    name: string
 
     isHost: boolean = false
     session?: Session
@@ -31,9 +19,7 @@ export class LocalPlayer implements Player {
     hostedRoom?: Room
     joinedRoom?: Room
 
-    constructor(id: string, name: string) {
-        this.id = id
-        this.name = name
+    constructor(public id: string, public name: string) {
 
         let key = `user:${id}`
 

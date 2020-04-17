@@ -72,3 +72,4 @@ export class RoomMessage {
 
 
 import { ProxyRoom } from "./proxyRoom";
+import { GameState } from "../../../client/shared/events";

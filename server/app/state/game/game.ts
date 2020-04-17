@@ -1,5 +1,6 @@
 import { HostedRoom } from "../hostedRoom";
 import { Player } from "../players/player";
+import { GameState } from "../../../../client/shared/events";
 
 export class GameMessage<GameCommandType>{
     userId: string
@@ -14,10 +15,14 @@ export class GameMessage<GameCommandType>{
 }
 
 export interface Game<GameCommandType> {
+    
     room: HostedRoom
+
     canPlayerJoin(player: Player): boolean
     playerJoined(player: Player): void
     playerLeft(player: Player): void
+
     onMessage(message: GameMessage<GameCommandType>): void
+
     clean(): void
 }

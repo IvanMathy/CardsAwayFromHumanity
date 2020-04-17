@@ -10,17 +10,11 @@ export enum PlayerCommands {
 
 export class ProxyPlayer implements Player {
 
-    id: string
-
-    constructor(id: string) {
-        this.id = id
-
+    constructor(public id: string, public name: string) {
 
         let key = `user:${this.id}`
         let channelName = `events:from:${key}`
-
-        console.log(channelName)
-
+        
         eventEmitter.on(channelName, this.onMessage)
         redisSubscriber.subscribe(channelName)
     }

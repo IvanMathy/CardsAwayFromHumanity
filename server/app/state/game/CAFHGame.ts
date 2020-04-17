@@ -1,6 +1,6 @@
 import { HostedRoom } from "../hostedRoom";
 import { Game, GameMessage } from "./game";
-import { GameState, GameCommand, Events } from "../../../../client/shared/events";
+import { GameState, GameCommand, Events, GameStage } from "../../../../client/shared/events";
 import { Player } from "../players/player";
 import { Deck } from "./deck";
 import { PlayerState } from "./playerState";
@@ -10,24 +10,24 @@ const GameRules = {
 }
 
 export class CAFHGame implements Game<GameCommand> {
-    room: HostedRoom
-    state: GameState = GameState.waitingToStart
+
+    stage: GameStage = GameStage.waitingToStart
 
     deck = new Deck()
     blackCard = 0
 
     playerStates: Record<string, PlayerState> = {}
 
-    constructor(room: HostedRoom) {
-        this.room = room
-    }
+    constructor(
+        public room: HostedRoom
+    ) {}
 
     // - Event Handling
 
     onMessage(message: GameMessage<GameCommand>): void {
         switch (message.command) {
             case GameCommand.startGame:
-                if (this.isHost(message) && this.state == GameState.waitingToStart) {
+                if (this.isHost(message) && this.stage == GameStage.waitingToStart) {
                     this.newRound()
                 }
                 break
@@ -51,9 +51,30 @@ export class CAFHGame implements Game<GameCommand> {
         this.blackCard = this.deck.getBlackCard()
     }
 
-    private setState(newState: GameState) {
-        this.state = newState
-        this.room.send(Events.stateChanged, newState)
+    private setStage(newState: GameStage) {
+        this.stage = newState
+        this.broadcastState()
+    }
+
+    private broadcastState() {
+        let state = new GameState(this.stage)
+
+        for (let playerId in this.playerStates) {
+            let playerState = this.playerStates[playerId]
+
+            state.players.push({
+                name: playerState.name,
+                id: playerState.id,
+                score: playerState.points,
+                host: (playerId == this.room.host.id) ? true : undefined
+            })
+        }
+
+        if(this.stage == GameStage.startingRound) {
+            state.gameInfo.blackCard = this.blackCard
+        }
+        
+        this.room.send(Events.stateChanged, state)
     }
 
     clean(): void {
@@ -64,7 +85,7 @@ export class CAFHGame implements Game<GameCommand> {
 
     playerJoined(player: Player): void {
         if (!this.playerStates.hasOwnProperty(player.id)) {
-            let state = new PlayerState()
+            let state = new PlayerState(player.name)
             state.hand = this.deck.pickCards(10)
             this.playerStates[player.id] = state
         } else {
@@ -78,7 +99,7 @@ export class CAFHGame implements Game<GameCommand> {
     canPlayerJoin(player: Player): boolean {
         let count = 0
         for (let playerId in this.playerStates) {
-            if (this.playerStates[playerId].active) {
+            if (this.playerStates[playerId].active && playerId !== player.id) {
                 count++
             }
         }

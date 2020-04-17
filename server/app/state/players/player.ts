@@ -5,6 +5,11 @@ import { randomCode } from "../../lib/generator";
 import { ProxyPlayer } from "./proxyPlayer";
 import { Room } from "../room";
 
+export enum PlayerKeys {
+    name = "name",
+    id = "id",
+    lastSeen = "lastSeen"
+}
 
 export class Player {
 
@@ -30,7 +35,7 @@ export class Player {
 
                 try {
                     console.debug("Created Proxy Player")
-                    let newPlayer = new ProxyPlayer(values.id)
+                    let newPlayer = new ProxyPlayer(values[PlayerKeys.id], values[PlayerKeys.name])
                     state.players[values.id] = newPlayer
                     resolve(newPlayer)
 
@@ -77,6 +82,7 @@ export class Player {
 export interface Player {
 
     id: string
+    name: string
 
     sendEvent(event: string, payload?: any): void
     successfullyJoinedRoom(room: Room): void
