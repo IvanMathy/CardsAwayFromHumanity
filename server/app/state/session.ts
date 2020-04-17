@@ -4,6 +4,7 @@ import { redisClient } from "../lib/redis";
 import { Events, Commands } from "../../../client/shared/events";
 import { LocalPlayer } from "./players/localPlayer";
 import { Room } from "./room";
+import { io } from "../lib/io";
 
 
 export class Session {

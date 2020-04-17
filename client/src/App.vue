@@ -1,18 +1,15 @@
 <template>
   <div id="app">
     <div>
-      <span>{{ $socket.connected ? 'Connected' : 'Disconnected' }}, </span>
-      <span>{{ $store.state.currentState }}</span>
+      <span>{{ $socket.connected ? 'Connected' : 'Disconnected' }},</span>
+      <span>{{ $store.state.currentState }} {{ClientState}}</span>
     </div>
     <div v-if="$store.state.currentState == 'inLobby'">
       <p>Username: {{$store.state.user.username}}</p>
-      <Host/>
-      <Join/>
+      <Host />
+      <Join />
     </div>
-    <div v-else-if="$store.state.currentState == 'inRoom'">
-      <p>In Room: {{$store.state.joinedRoom}}</p>
-      
-    </div>
+    <Game v-else-if="$store.state.currentState == ClientState.inRoom" />
     <Welcome v-else></Welcome>
   </div>
 </template>
@@ -23,14 +20,17 @@ import HelloWorld from "./components/HelloWorld.vue";
 import Welcome from "./components/Welcome.vue";
 import Host from "./components/Host.vue";
 import Join from "./components/Join.vue";
-import ClientState from "./store/index";
-import { Events, Commands } from "../shared/events";
+import Game from "./components/game/Game.vue";
+import { ClientState } from "./store/index";
+import { Events, Commands, GameEvents } from "../shared/events";
+import { Socket } from 'vue-socket.io-extended';
 
 @Component({
   components: {
     Welcome,
     Host,
-    Join
+    Join,
+    Game
   },
   sockets: {
     connect() {
@@ -49,7 +49,9 @@ import { Events, Commands } from "../shared/events";
    
   }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  ClientState = ClientState
+}
 </script>
 
 <style lang="scss">

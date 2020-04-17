@@ -133,9 +133,9 @@ export class HostedRoom extends RoomBase implements Room {
 
     tryJoining(player: Player) {
         if (this.game.canPlayerJoin(player)) {
-           this.game.playerJoined(player)
            console.log("success joining")
            player.successfullyJoinedRoom(this)
+           this.game.playerJoined(player)
         } else {
             console.log("room full")
             // For now that's the only good reason, but there might be more.
@@ -150,6 +150,7 @@ export class HostedRoom extends RoomBase implements Room {
 
     send(event: string, data?: any) {
         if (this.roomCode === undefined) {
+            console.error("room code unknown")
             return
         }
         io.to(`rooms:${this.roomCode}`).emit(event, data)

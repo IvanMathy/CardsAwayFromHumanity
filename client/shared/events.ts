@@ -8,8 +8,7 @@ export enum Events {
     passwordNeeded = "pw",
     roomCreated = "r",
     roomCreationFailed = "rf",
-    joinedGame = "joined",
-    stateChanged = "sc"
+    joinedGame = "joined"
 }
 
 export enum Commands {
@@ -23,6 +22,11 @@ export enum GameStage {
     startingRound = "s"
 }
 
+export enum GameEvents {
+    stateChanged = "sc",
+    updateHand = "uh"
+}
+
 export enum GameCommand {
     startGame = "sg",
     pickCard = "pc",
@@ -30,7 +34,7 @@ export enum GameCommand {
 }
 
 export class GameState {
-    players: {name: string; id: string; score: number, host?: boolean}[] = []
+    players: {name: string; id: string; score: number; host?: boolean}[] = []
     stage: GameStage
     gameInfo: any = {}
 

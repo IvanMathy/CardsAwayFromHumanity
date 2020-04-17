@@ -22,3 +22,13 @@ redisSubscriber.on("message", function(channel, message) {
         console.error(error)
     }
 })
+
+redisSubscriber.on('error', function(err){
+    console.error("Redis SUB: ", err)
+});
+redisPublisher.on('error', function(err){
+    console.error("Redis PUB: ", err)
+});
+redisClient.on('error', function(err){
+    console.error("Redis: ", err)
+});

@@ -19,7 +19,6 @@ export class RoomBase {
             let localRoom = state.rooms[roomCode]
             if (localRoom !== undefined) {
                 console.debug("Found Local Room")
-                console.debug(localRoom)
                 resolve(localRoom)
                 return 
             }

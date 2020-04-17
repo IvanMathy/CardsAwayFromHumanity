@@ -1,6 +1,6 @@
 import { HostedRoom } from "../hostedRoom";
 import { Game, GameMessage } from "./game";
-import { GameState, GameCommand, Events, GameStage } from "../../../../client/shared/events";
+import { GameState, GameCommand, Events, GameStage, GameEvents } from "../../../../client/shared/events";
 import { Player } from "../players/player";
 import { Deck } from "./deck";
 import { PlayerState } from "./playerState";
@@ -49,6 +49,12 @@ export class CAFHGame implements Game<GameCommand> {
 
     private newRound() {    
         this.blackCard = this.deck.getBlackCard()
+
+        for (let playerId in this.playerStates) {
+            if (this.playerStates[playerId].active) {
+                this.sendPlayerHand(this.playerStates[playerId].player)
+            }
+        }
     }
 
     private setStage(newState: GameStage) {
@@ -63,7 +69,7 @@ export class CAFHGame implements Game<GameCommand> {
             let playerState = this.playerStates[playerId]
 
             state.players.push({
-                name: playerState.name,
+                name: playerState.player.name,
                 id: playerState.id,
                 score: playerState.points,
                 host: (playerId == this.room.host.id) ? true : undefined
@@ -74,7 +80,11 @@ export class CAFHGame implements Game<GameCommand> {
             state.gameInfo.blackCard = this.blackCard
         }
         
-        this.room.send(Events.stateChanged, state)
+        this.room.send(GameEvents.stateChanged, state)
+    }
+
+    private sendPlayerHand(player: Player) {
+        player.sendEvent(GameEvents.updateHand, this.playerStates[player.id].hand)
     }
 
     clean(): void {
@@ -85,12 +95,15 @@ export class CAFHGame implements Game<GameCommand> {
 
     playerJoined(player: Player): void {
         if (!this.playerStates.hasOwnProperty(player.id)) {
-            let state = new PlayerState(player.name)
+            let state = new PlayerState(player)
             state.hand = this.deck.pickCards(10)
             this.playerStates[player.id] = state
         } else {
             this.playerStates[player.id].active = true
         }
+
+        this.sendPlayerHand(player)
+        this.broadcastState()
     }
     playerLeft(player: Player): void {
         this.playerStates[player.id].active = false

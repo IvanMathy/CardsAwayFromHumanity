@@ -1,4 +1,5 @@
 import { randomCode } from "../../lib/generator";
+import { Player } from "../players/player";
 
 export class PlayerState {
     hand: number[] = []
@@ -6,5 +7,5 @@ export class PlayerState {
     active = true
     id = randomCode(8)
     
-    constructor(public name: string) {}
+    constructor(public player: Player) {}
 } 
