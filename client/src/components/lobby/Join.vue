@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { Events, Commands } from "../../shared/events";
+import { Events, Commands } from "../../../shared/events";
 
 
 enum State {

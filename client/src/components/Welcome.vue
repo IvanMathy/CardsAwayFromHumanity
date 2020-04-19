@@ -1,8 +1,11 @@
 <template>
   <div class="authenticate">
-    <input v-model="username">
-    {{$store.state.userId}}
-    <button v-on:click="authenticate()" :disabled="username == ''">Authenticate</button>
+    <div class="box">
+      <b-field label="Username" type="is-success">
+        <b-input v-model="username"></b-input>
+        <b-button type="is-light" v-on:click="authenticate()" :disabled="username == ''">Authenticate</b-button>
+      </b-field>
+    </div>
   </div>
 </template>
 
@@ -15,14 +18,14 @@ export default class Welcome extends Vue {
   username = "";
 
   authenticate() {
-
     if (this.username.length == 0) {
-      alert("Please enter a username.")
-      return
+      alert("Please enter a username.");
+      return;
     }
 
     this.$socket.client.emit(
-      Commands.authenticate, {
+      Commands.authenticate,
+      {
         id: this.$store.state.user.userId,
         name: this.username
       },
@@ -31,7 +34,10 @@ export default class Welcome extends Vue {
           alert("Could not authenticate. Sorry!");
           return;
         }
-        this.$store.dispatch("authenticated", {newId: newId, username: this.username});
+        this.$store.dispatch("authenticated", {
+          newId: newId,
+          username: this.username
+        });
       }
     );
     console.log("sent");
@@ -39,5 +45,9 @@ export default class Welcome extends Vue {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+.authenticate {
+  max-width: 300px;
+  margin: auto;
+}
 </style>

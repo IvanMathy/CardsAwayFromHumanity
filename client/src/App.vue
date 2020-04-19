@@ -1,13 +1,7 @@
 <template>
   <div id="app">
-    <div>
-      <span>{{ $socket.connected ? 'Connected' : 'Disconnected' }},</span>
-      <span>{{ $store.state.currentState }} {{ClientState}}</span>
-    </div>
     <div v-if="$store.state.currentState == 'inLobby'">
-      <p>Username: {{$store.state.user.username}}</p>
-      <Host />
-      <Join />
+      <Home/>
     </div>
     <Game v-else-if="$store.state.currentState == ClientState.inRoom" />
     <Welcome v-else></Welcome>
@@ -18,8 +12,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "./components/HelloWorld.vue";
 import Welcome from "./components/Welcome.vue";
-import Host from "./components/Host.vue";
-import Join from "./components/Join.vue";
+import Home from "./components/lobby/Home.vue";
 import Game from "./components/game/Game.vue";
 import { ClientState } from "./store/index";
 import { Events, Commands, GameEvents } from "../shared/events";
@@ -28,9 +21,8 @@ import { Socket } from 'vue-socket.io-extended';
 @Component({
   components: {
     Welcome,
-    Host,
-    Join,
-    Game
+    Game,
+    Home
   },
   sockets: {
     connect() {
