@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { GameState, Events, GameEvents } from "../../shared/events";
 
 Vue.use(Vuex)
 
@@ -19,7 +20,8 @@ export default new Vuex.Store({
         username: ""
       },
       currentState: ClientState.unauthenticated,
-      joinedRoom: null
+      joinedRoom: null,
+      gameState: null as GameState | null
     }
   },
   mutations: {
@@ -39,6 +41,13 @@ export default new Vuex.Store({
 
       anyState.currentState = ClientState.inRoom
       anyState.joinedRoom = roomId
+    },
+
+    [`SOCKET_${GameEvents.stateChanged.toUpperCase()}`](state, newState) {
+
+      const anyState = state as any
+
+      anyState.gameState = newState
     }
 
   },

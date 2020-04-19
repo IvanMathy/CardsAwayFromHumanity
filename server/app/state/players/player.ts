@@ -50,7 +50,7 @@ export class Player {
 
     static authenticate(user?: Record<string, string>): LocalPlayer {
         var id = user?.id
-        var username = (user?.name as string) ?? "A dum dum with no name."
+        var username = user?.name
 
         if (id?.length != 8 || /[^A-Z]/.test(id)) {
 
@@ -63,6 +63,11 @@ export class Player {
 
             if (local != null && local instanceof LocalPlayer) {
                 console.debug("Recovering session")
+
+                if(username !== undefined) {
+                    local.name = username
+                }
+
                 return local
             }
 
@@ -71,7 +76,7 @@ export class Player {
 
         }
 
-        let newPlayer = new LocalPlayer(id, username)
+        let newPlayer = new LocalPlayer(id, username ?? "A dum dum with no name")
 
         state.players[id] = newPlayer
         return newPlayer

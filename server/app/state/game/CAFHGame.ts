@@ -107,6 +107,7 @@ export class CAFHGame implements Game<GameCommand> {
     }
     playerLeft(player: Player): void {
         this.playerStates[player.id].active = false
+        this.broadcastState()
     }
 
     canPlayerJoin(player: Player): boolean {
