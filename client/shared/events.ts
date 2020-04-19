@@ -14,7 +14,8 @@ export enum Events {
 export enum Commands {
     hostGame = "host",
     joinGame = "join",
-    authenticate = "auth"
+    authenticate = "auth",
+    gameCommand = "gc"
 }
 
 export enum GameStage {

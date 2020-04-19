@@ -55,6 +55,7 @@ export interface Room {
     playerLeft(player: Player): void
 
     onMessage(message: RoomMessage): void
+    onGameCommand(command: GameCommand, ...args: any[]): void
 
     clean(): void
 }
@@ -71,4 +72,4 @@ export class RoomMessage {
 
 
 import { ProxyRoom } from "./proxyRoom";
-import { GameState } from "../../../client/shared/events";
+import { GameState, GameCommand } from "../../../client/shared/events";

@@ -14,7 +14,7 @@ export class ProxyPlayer implements Player {
 
         let key = `user:${this.id}`
         let channelName = `events:from:${key}`
-        
+
         eventEmitter.on(channelName, this.onMessage)
         redisSubscriber.subscribe(channelName)
     }
@@ -33,7 +33,7 @@ export class ProxyPlayer implements Player {
         this.publish(new PlayerMessage(PlayerCommands.sendEvent, {event: event, payload: payload}))
     }
 
-    successfullyJoinedRoom(room: Room) {
-        this.publish(new PlayerMessage(PlayerCommands.successfullyJoined, room.roomCode))
+    successfullyJoinedRoom(room: Room, isHost: boolean) {
+        this.publish(new PlayerMessage(PlayerCommands.successfullyJoined, {code: room.roomCode, isHost: isHost}))
     }
 }

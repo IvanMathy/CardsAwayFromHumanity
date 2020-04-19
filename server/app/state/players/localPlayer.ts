@@ -50,8 +50,8 @@ export class LocalPlayer implements Player {
                 this.sendEvent(message.payload.event, message.payload.payload)
                 break
             case PlayerCommands.successfullyJoined:
-                RoomBase.getRoom(message.payload).then((room) => {
-                    this.successfullyJoinedRoom(room)
+                RoomBase.getRoom(message.payload.code).then((room) => {
+                    this.successfullyJoinedRoom(room, message.payload.isHost)
                 }).catch((err) => {
                     console.error("Error finding room in remote join: ", err)
                 })
@@ -142,10 +142,10 @@ export class LocalPlayer implements Player {
             })
     }
 
-    successfullyJoinedRoom(room: Room) {
+    successfullyJoinedRoom(room: Room, isHost: boolean) {
         this.joinedRoom = room
         this.session?.joinedRoom(room)
-        this.sendEvent(Events.joinedGame, room.roomCode)
+        this.sendEvent(Events.joinedGame, room.roomCode, isHost)
     }
 
     private leaveRoom() {
@@ -153,8 +153,8 @@ export class LocalPlayer implements Player {
         this.joinedRoom = undefined
     }
 
-    sendEvent(event: string, payload?: any) {
-        this.session?.emit(event, payload)
+    sendEvent(event: string, ...args: any[]) {
+        this.session?.emit(event, ...args)
     }
 
     connect(session: Session) {

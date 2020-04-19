@@ -2,10 +2,12 @@ import { Room, RoomBase, RoomMessage } from "./room";
 import { Player } from "./players/player";
 import { redisSubscriber, redisPublisher } from "../lib/redis";
 import { eventEmitter } from "../lib/event";
+import { GameCommand } from "../../../client/shared/events";
 
 export enum RoomCommands {
     tryJoining = "tj",
-    playerLeft = "pl"
+    playerLeft = "pl",
+    gameCommand = "gc"
 }
 
 export class ProxyRoom extends RoomBase implements Room {
@@ -31,6 +33,10 @@ export class ProxyRoom extends RoomBase implements Room {
 
     onMessage(message: RoomMessage) {
         
+    }
+
+    onGameCommand(command: GameCommand, ...args: any[]){
+        this.publish(new RoomMessage(RoomCommands.gameCommand, {command: command, args: args}))
     }
 
     publish(message: RoomMessage) {

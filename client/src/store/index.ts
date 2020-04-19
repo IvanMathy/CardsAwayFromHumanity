@@ -17,7 +17,8 @@ export default new Vuex.Store({
     return {
       user: {
         userId: localStorage.getItem(playerIdKey),
-        username: ""
+        username: "",
+        isRoomHost: false
       },
       currentState: ClientState.unauthenticated,
       joinedRoom: null,
@@ -35,12 +36,14 @@ export default new Vuex.Store({
       localStorage.setItem(playerIdKey, newUser.newId)
     },
 
-    SOCKET_JOINED(state, roomId: string) {
+    SOCKET_JOINED(state, payload: any) {
 
+      const [roomCode, isHost] = payload
       const anyState = state as any
 
       anyState.currentState = ClientState.inRoom
-      anyState.joinedRoom = roomId
+      anyState.joinedRoom = roomCode
+      anyState.user.isRoomHost = isHost
     },
 
     [`SOCKET_${GameEvents.stateChanged.toUpperCase()}`](state, newState) {
