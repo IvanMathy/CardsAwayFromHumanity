@@ -68,7 +68,6 @@ export class HostedRoom extends RoomBase implements Room {
 
 
             redisClient.multi()
-                .sadd("rooms", code)
                 // Create the room, expire it in 24 hours
                 .hmset(key, values)
                 .expire(key, 60 * 60 * 24)
@@ -104,7 +103,6 @@ export class HostedRoom extends RoomBase implements Room {
             return
         }
         redisClient.multi()
-            .srem("rooms", this.roomCode)
             .del(`room:${this.roomCode}`)
             .exec()
 

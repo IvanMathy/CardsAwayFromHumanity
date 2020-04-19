@@ -5,6 +5,7 @@ import { redisClient, redisPublisher, redisSubscriber } from "./lib/redis";
 import SocketIORedis from "socket.io-redis";
 import { io } from "./lib/io";
 import { eventEmitter } from "./lib/event";
+import { state } from "./state/state";
 
 
 
@@ -32,3 +33,20 @@ redisPublisher.on('error', function(err){
 redisClient.on('error', function(err){
     console.error("Redis: ", err)
 });
+
+process.on('SIGINT', function() {
+    console.log("Interrupt signal, cleaning up");
+    state.destroyAll().then(()=> {
+        
+        process.exit()
+    })
+});
+
+process.on('SIGTERM', function() {
+    console.log("Termination signal, cleaning up");
+    state.destroyAll().then(()=> {
+        process.exit()
+    })
+
+});
+

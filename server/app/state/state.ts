@@ -1,6 +1,8 @@
 import { Room } from "./room";
 import { Player } from "./players/player";
 import { LocalPlayer } from "./players/localPlayer";
+import { redisClient } from "../lib/redis";
+import { HostedRoom } from "./hostedRoom";
 
 // clean every 60 seconds
 const cleanInterval = 60000
@@ -31,6 +33,40 @@ class State {
             } catch (err) {
                 console.error(err)
             }
+        })
+    }
+
+    destroyAll(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            let multi = redisClient.multi()
+
+            // Delete all players on this server
+            Object.keys(this.players).map((key) => {
+                try {
+                    let value = this.players[key] 
+                    if(value instanceof LocalPlayer) {
+                        multi.del(`user:${this.players[key].id}`)
+                    }
+                } catch(err) {
+                    console.error(err)
+                }
+            })
+
+            // Then delete all rooms
+            Object.keys(this.rooms).map((key) => {
+                try {
+                    let value = this.rooms[key] 
+                    if(value instanceof HostedRoom) {
+                        multi.del(`room:${this.rooms[key].roomCode}`)
+                    }
+                } catch(err) {
+                    console.error(err)
+                }
+            })
+
+            multi.exec((err)=> {
+                resolve()
+            })
         })
     }
 }
