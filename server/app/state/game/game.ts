@@ -3,14 +3,8 @@ import { Player } from "../players/player";
 import { GameState } from "../../../../client/shared/events";
 
 export class GameMessage<GameCommandType>{
-    userId: string
-    command: GameCommandType
-    message: any
 
-    constructor(userId: string, command: GameCommandType, message: any) {
-        this.userId = userId
-        this.command = command
-        this.message = message
+    constructor(public playerId: string, public command: GameCommandType, public message: any) {
     }
 }
 

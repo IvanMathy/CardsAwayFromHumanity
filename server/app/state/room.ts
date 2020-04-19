@@ -55,7 +55,7 @@ export interface Room {
     playerLeft(player: Player): void
 
     onMessage(message: RoomMessage): void
-    onGameCommand(command: GameCommand, ...args: any[]): void
+    onGameCommand(playerId: string, command: GameCommand, ...args: any[]): void
 
     clean(): void
 }

@@ -41,6 +41,17 @@ export class Session {
                 session.player.sendEvent(Events.unknownError)
             }
         });
+
+
+
+        socket.on(Commands.gameCommand, function (this: Session, command, payload) {
+            try {
+                session.player.joinedRoom?.onGameCommand(session.player.id, command, payload)
+            } catch (error) {
+                console.error("Error in game command: ", error)
+                session.player.sendEvent(Events.unknownError)
+            }
+        });
     }
 
     emit(event: string | symbol, ...args: any[]): boolean {

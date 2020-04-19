@@ -25,9 +25,11 @@ export class CAFHGame implements Game<GameCommand> {
     // - Event Handling
 
     onMessage(message: GameMessage<GameCommand>): void {
+        console.log(message)
         switch (message.command) {
             case GameCommand.startGame:
                 if (this.isHost(message) && this.stage == GameStage.waitingToStart) {
+                    console.log("start game")
                     this.newRound()
                 }
                 break
@@ -37,7 +39,7 @@ export class CAFHGame implements Game<GameCommand> {
     }
 
     private isHost(message: GameMessage<GameCommand>) {
-        return message.userId == this.room.host.id
+        return message.playerId == this.room.host.id
     }
 
 

@@ -111,11 +111,12 @@ export class HostedRoom extends RoomBase implements Room {
 
     // Event Handling
 
-    onGameCommand(command: GameCommand, ...args: any[]){
+    onGameCommand(playerId: string, command: GameCommand, ...args: any[]) {
+        this.game.onMessage(new GameMessage(playerId, command, args))
     }
 
     onMessage = (message: RoomMessage) => {
-        switch(message.type) {
+        switch (message.type) {
             case RoomCommands.tryJoining:
                 console.log("remote join")
                 Player.getPlayer(message.payload).then((player) => {
@@ -128,18 +129,19 @@ export class HostedRoom extends RoomBase implements Room {
                 })
                 return
             case RoomCommands.gameCommand:
-                this.onGameCommand(message.payload.command, message.payload.args)
+                this.onGameCommand(message.payload.playerId, message.payload.command, message.payload.args)
                 break
         }
+
     }
 
     // Player management
 
     tryJoining(player: Player) {
         if (this.game.canPlayerJoin(player)) {
-           console.log("success joining")
-           player.successfullyJoinedRoom(this, player.id == this.host.id)
-           this.game.playerJoined(player)
+            console.log("success joining")
+            player.successfullyJoinedRoom(this, player.id == this.host.id)
+            this.game.playerJoined(player)
         } else {
             console.log("room full")
             // For now that's the only good reason, but there might be more.

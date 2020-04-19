@@ -21,7 +21,7 @@
           >
             <b-button type="is-primary" outlined disabled>Start Game</b-button>
           </b-tooltip>
-          <b-button v-else type="is-primary" outlined>Start Game</b-button>
+          <b-button v-else type="is-primary" outlined @click="startGame()">Start Game</b-button>
         </div>
       </div>
     </div>

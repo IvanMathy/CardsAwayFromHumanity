@@ -35,8 +35,8 @@ export class ProxyRoom extends RoomBase implements Room {
         
     }
 
-    onGameCommand(command: GameCommand, ...args: any[]){
-        this.publish(new RoomMessage(RoomCommands.gameCommand, {command: command, args: args}))
+    onGameCommand(playerId: string, command: GameCommand, ...args: any[]){
+        this.publish(new RoomMessage(RoomCommands.gameCommand, {playerId: playerId, command: command, args: args}))
     }
 
     publish(message: RoomMessage) {
