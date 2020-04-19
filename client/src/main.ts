@@ -7,10 +7,15 @@ Vue.config.productionTip = false
 
 import VueSocketIOExt from 'vue-socket.io-extended';
 import io from 'socket.io-client';
+import Buefy from 'buefy'
+
+Vue.use(Buefy, {
+  defaultIconPack: 'fas'
+})
 
 const socket = io(
   process.env.NODE_ENV === 'development'
-    ? 'ws://localhost:3000'
+    ? `ws://${window.location.hostname}:3000`
     : 'wss://play.cafh.okat.best'
 );
 

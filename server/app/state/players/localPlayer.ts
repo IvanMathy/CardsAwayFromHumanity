@@ -60,10 +60,12 @@ export class LocalPlayer implements Player {
 
     host(password?: string) {
 
-        if (this.isHost) {
-            this.session?.emit(Events.alreadyHosting)
-            return
-        }
+        // Should we block hosting a new game? Probably not
+
+        // if (this.isHost) {
+        //     this.session?.emit(Events.alreadyHosting)
+        //     return
+        // }
 
         this.isHost = true
 
