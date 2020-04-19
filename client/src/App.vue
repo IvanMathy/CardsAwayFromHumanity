@@ -48,13 +48,22 @@ export default class App extends Vue {
 
 <style lang="scss">
 html, body {
-  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: white;
   margin-top: 60px;
   background-color: #242424;
+  overflow: hidden;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+}
+
+.helvetica {
+  font-family: "HelveticaNeueBold", "HelveticaNeue-Bold", "Helvetica Neue Bold", "HelveticaNeue", "Helvetica Neue", 'TeXGyreHerosBold', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif; 
+  font-weight:600; 
+  font-stretch:normal;
 }
 
 @import "~bulma/sass/utilities/_all";
