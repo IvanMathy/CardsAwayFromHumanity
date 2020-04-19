@@ -61,7 +61,19 @@ html, body {
 
 // CAFH overrides:
 $body-background-color: #242424;
-$body-color: $white;
+$primary: #fa8b02;
+
+$colors: (
+    "white": ($white, $black),
+    "black": ($black, $white),
+    "light": ($light, $light-invert),
+    "dark": ($dark, $dark-invert),
+    "primary": ($primary, $primary-invert),
+    "info": ($info, $info-invert),
+    "success": ($success, $success-invert),
+    "warning": ($warning, $warning-invert),
+    "danger": ($danger, $danger-invert)
+);
 
 @import "~bulma";
 @import "~buefy/src/scss/buefy";

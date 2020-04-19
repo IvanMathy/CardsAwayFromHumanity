@@ -26,7 +26,7 @@ export default class Home extends Vue {
       component: Host,
       hasModalCard: true,
       trapFocus: true,
-      width: 400
+      width: 420
     });
   }
 }

@@ -72,16 +72,8 @@ export default class Join extends Vue {
 
     this.joinState = State.Joining
 
-    this.$socket.client.emit(
-      Commands.joinGame,
-      payload,
-      (gameId: string) => {
-        if (gameId == undefined) {
-          alert("Could not create game. Sorry!");
-          return;
-        }
-      }
-    );
+    this.$socket.client.emit(Commands.joinGame, payload);
+    
   }
 
   askPassword(isRetry: boolean) {
