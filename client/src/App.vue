@@ -54,10 +54,8 @@ html, body {
   color: white;
   margin-top: 60px;
   background-color: #242424;
-  overflow: hidden;
-  position: fixed;
-  height: 100%;
   width: 100%;
+  min-height: 100%;
 }
 
 .helvetica {

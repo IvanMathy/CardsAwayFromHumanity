@@ -96,6 +96,10 @@ export default class Game extends Vue {
 <style scoped lang="scss">
 .card-picker {
   color: white;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: absolute;
 }
 
 .cards {
@@ -164,7 +168,6 @@ export default class Game extends Vue {
   background-color: black;
   background: linear-gradient(135deg, #333333 0%, #000000 100%);
   border: 1px black solid;
-  transition: transform 0.3s;
   margin: auto;
   box-shadow: 0px 5px 3px 0px rgba(0, 0, 0, 0.75);
 }
