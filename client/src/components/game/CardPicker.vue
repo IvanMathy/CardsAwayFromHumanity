@@ -7,7 +7,7 @@
     <div class="cards" :class="{ picked: picked }">
       <flickity ref="flickity" :options="flickityOptions">
         <div class="card-container" v-for="card in hand" :key="card">
-          <p class="card white-card helvetica" v-html="card"></p>
+          <p class="white-card helvetica" v-html="card"></p>
           <div class="picker">
             <b-button
               type="is-dark"
@@ -65,6 +65,8 @@ export default class Game extends Vue {
 
 
 <style lang="scss">
+@import url("styles.scss");
+
 .flickity-viewport {
   overflow: visible;
 }
@@ -94,6 +96,8 @@ export default class Game extends Vue {
 </style>
 
 <style scoped lang="scss">
+
+
 .card-picker {
   color: white;
   height: 100%;
@@ -112,13 +116,13 @@ export default class Game extends Vue {
   height: 250px;
 }
 
-.card-container .card {
+.card-container .white-card {
   transition: 0.2s;
   transform: scale(0.9);
 }
 
 .card-container.is-selected {
-  .card {
+  .white-card {
     transform: scale(1);
     box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 1);
   }
@@ -128,10 +132,10 @@ export default class Game extends Vue {
 }
 
 .picked {
-  .card {
+  .white-card {
     transform: translate(0px, 300px) scale(0.9);
   }
-  .is-selected .card {
+  .is-selected .white-card {
     transform: translate(0px, -20px) scale(1.1);
   }
 }
