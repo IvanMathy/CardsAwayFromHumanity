@@ -1,34 +1,18 @@
 <template>
   <div class="scoreboard">
-    <div class="countdown helvetica">Next round in 5.</div>
-    <div class="columns">
-      <div class="column info helvetica">
-        <p>
-          Player One
-          <span class="muted">wins this round.</span>
-        </p>
-        <p>
-          Elwood Blues
-          <span class="muted">is the next Czar.</span>
-        </p>
-      </div>
-      <div class="column">
-        <h2 class="scores-title">Scores</h2>
-        <div v-for="player in scores" :key="player.id">
-          <div
-            class="player-score helvetica is-flex-touch"
-            :class="{czar: player.czar, winner: player.won}"
-          >
-            <b-tooltip label="Card Czar" type="is-light" class="player-icon" v-if="player.czar">
-              <b-icon size="is-small" icon="chess-king" class="has-text-grey" />
-            </b-tooltip>
-            <b-tooltip label="Round Winner" type="is-light" class="player-icon" v-if="player.won">
-              <b-icon size="is-small" icon="star" class="has-text-primary" />
-            </b-tooltip>
-            <span class="score">{{player.score}}</span>
-            {{player.name}}
-          </div>
-        </div>
+    <div v-for="player in scores" :key="player.id">
+      <div
+        class="player-score helvetica is-flex-touch"
+        :class="{czar: player.czar, winner: player.won}"
+      >
+        <b-tooltip label="Card Czar" type="is-light" class="player-icon" v-if="player.czar">
+          <b-icon size="is-small" icon="chess-king" class="has-text-grey" />
+        </b-tooltip>
+        <b-tooltip label="Round Winner" type="is-light" class="player-icon" v-if="player.won">
+          <b-icon size="is-small" icon="star" class="has-text-primary" />
+        </b-tooltip>
+        <span class="score">{{player.score}}</span>
+        {{player.name}}
       </div>
     </div>
   </div>
@@ -54,37 +38,14 @@ export default class Scoreboard extends Vue {
 
 
 <style scoped lang="scss">
-.columns {
-  margin: 0;
-  padding-top: 100px;
-}
 
 .scoreboard {
-  max-width: 600px;
+  max-width: 400px;
+  min-width: 300px;
   margin: auto;
 }
-.countdown {
-  background-color: black;
-  width: 300px;
-  height: 60px;
-  margin: auto;
-  margin-bottom: 60px;
-  font-size: 25px;
-  padding-top: 8px;
-  color: white;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-  position: fixed;
-  right: 0;
-  left: 0;
-  margin-right: auto;
-  margin-left: auto;
-  z-index: 1000;
-}
-
 .player-score {
   position: relative;
-  width: 300px;
   background-color: #444444;
   color: white;
   padding: 10px 35px;
@@ -126,35 +87,11 @@ export default class Scoreboard extends Vue {
   color: black;
 }
 
-.scores-title {
-  color: white;
-}
-.info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: right;
-  font-size: 35px;
-  color: white;
-  line-height: 35px;
-  padding-top: 25px;
-  p {
-    margin-bottom: 15px;
-  }
-  .muted {
-    color: #aaaaaa;
-  }
-}
 
 @media only screen and (max-width: 769px) {
   .player-score {
     margin: 0px auto;
     margin-top: 5px;
-  }
-
-  .info {
-    text-align: center;
-    font-size: 25px;
   }
 }
 </style>

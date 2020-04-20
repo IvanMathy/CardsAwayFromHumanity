@@ -7,7 +7,7 @@
     <div class="cards" :class="{ picked: picked }">
       <flickity ref="flickity" :options="flickityOptions">
         <div class="card-container" v-for="card in hand" :key="card">
-          <p class="card helvetica" v-html="card"></p>
+          <p class="card white-card helvetica" v-html="card"></p>
           <div class="picker">
             <b-button
               type="is-dark"
@@ -113,21 +113,8 @@ export default class Game extends Vue {
 }
 
 .card-container .card {
-  color: black;
-  width: 260px;
-  text-align: left;
-  font-weight: bold;
-  font-size: 28px;
-  line-height: 35px;
-  padding: 20px;
-  border-radius: 15px;
-  height: 400px;
-  background-color: white;
-  background: linear-gradient(135deg, #ffffff 0%, #bbbbbb 100%);
   transition: 0.2s;
   transform: scale(0.9);
-  border: 1px black solid;
-  box-shadow: 0px 10px 5px 0px rgba(0, 0, 0, 0.75);
 }
 
 .card-container.is-selected {
@@ -154,24 +141,6 @@ export default class Game extends Vue {
   bottom: 50px;
   width: 100%;
 }
-
-.black-card {
-  color: white;
-  width: 260px;
-  text-align: left;
-  font-weight: bold;
-  font-size: 20px;
-  line-height: 25px;
-  padding: 20px;
-  border-radius: 15px;
-  height: 400px;
-  background-color: black;
-  background: linear-gradient(135deg, #333333 0%, #000000 100%);
-  border: 1px black solid;
-  margin: auto;
-  box-shadow: 0px 5px 3px 0px rgba(0, 0, 0, 0.75);
-}
-
 .picker {
   position: absolute;
   bottom: 20px;
