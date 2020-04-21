@@ -26,12 +26,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    authenticated(state, newUser: Record<string, string>) {
-
-      const anyState = state as any
-
-      anyState.user = newUser
-      anyState.currentState = ClientState.inLobby
+    authenticated(state: any, newUser: Record<string, string>) {
+      state.user = newUser
+      state.currentState = ClientState.inLobby
 
       localStorage.setItem(playerIdKey, newUser.newId)
     },
@@ -46,11 +43,13 @@ export default new Vuex.Store({
       anyState.user.isRoomHost = isHost
     },
 
-    [`SOCKET_${GameEvents.stateChanged.toUpperCase()}`](state, newState) {
+    [`SOCKET_${GameEvents.stateChanged.toUpperCase()}`](state: any, newState) {
 
-      const anyState = state as any
+      state.gameState = newState
+    },
+    [`SOCKET_${GameEvents.timer.toUpperCase()}`](state: any, time) {
 
-      anyState.gameState = newState
+      (state.gameState as GameState).time = time
     }
 
   },

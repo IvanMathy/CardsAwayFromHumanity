@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <!-- <Spectator /> -->
     <div v-if="$store.state.currentState == 'inLobby'">
       <Home/>
     </div>
@@ -14,6 +15,7 @@ import HelloWorld from "./components/HelloWorld.vue";
 import Welcome from "./components/Welcome.vue";
 import Home from "./components/lobby/Home.vue";
 import Game from "./components/game/Game.vue";
+import Spectator from "./components/game/Spectator.vue";
 import { ClientState } from "./store/index";
 import { Events, Commands, GameEvents } from "../shared/events";
 import { Socket } from 'vue-socket.io-extended';
@@ -22,7 +24,8 @@ import { Socket } from 'vue-socket.io-extended';
   components: {
     Welcome,
     Game,
-    Home
+    Home,
+    Spectator
   },
   sockets: {
     connect() {

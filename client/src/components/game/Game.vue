@@ -9,12 +9,15 @@
         {{ player.name }}
         <span v-if="player.host">HOST</span>
       </p>
+      {{gameState.stage}}
+      <p>{{gameState}}</p>
+      <p>{{gameState.time}}</p>
       <div v-if="gameState.stage == Stage.waitingToStart">
         <p>Waiting to Start</p>
 
         <div v-if="this.$store.state.user.isRoomHost">
           <b-tooltip
-            v-if="gameState.players.length < 3"
+            v-if="gameState.players.length > 3"
             type="is-light"
             multilined
             label="You need at least 3 players to start a game."
@@ -49,7 +52,6 @@ export default class Game extends Vue {
   Stage = GameStage;
 
   startGame() {
-
     this.$socket.client.emit(Commands.gameCommand, GameCommand.startGame);
   }
 }
