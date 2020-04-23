@@ -1,17 +1,17 @@
-
 import {onConnection} from "./socket/connectionHandler";
 import redisAdapter, { RedisAdapter } from "socket.io-redis";
-import { redisClient, redisPublisher, redisSubscriber } from "./lib/redis";
-import SocketIORedis from "socket.io-redis";
+import { redisClient, redisPublisher, redisSubscriber, redisSettings } from "./lib/redis";
 import { io } from "./lib/io";
 import { eventEmitter } from "./lib/event";
 import { state } from "./state/state";
 
 
 
-io.adapter(redisAdapter({ host: 'localhost', port: 6379 }));
+io.adapter(redisAdapter(redisSettings));
 
 io.on("connection", onConnection);
+
+console.log("Howdy earth")
 
 
 

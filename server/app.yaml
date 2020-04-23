@@ -1,0 +1,15 @@
+runtime: nodejs12
+
+network:
+  session_affinity: true
+
+
+vpc_access_connector:
+#  name: 'projects/<PROJECT_ID>/locations/<REGION>/connectors/<CONNECTOR_NAME>'
+  
+
+env_variables:
+
+## You want to set up your variables like so:
+#  REDIS_IP: ...
+#  REDIS_PORT: .. 

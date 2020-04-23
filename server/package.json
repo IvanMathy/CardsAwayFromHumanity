@@ -2,7 +2,7 @@
   "name": "cafh-server",
   "version": "1.0.0",
   "description": "A horrible codebase for a horrible idea",
-  "main": "app.js",
+  "main": "./build/server/app/app.js",
   "author": "OKatBest",
   "dependencies": {
     "@types/redis": "^2.8.17",
@@ -14,7 +14,9 @@
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpileOnly ./app/app.ts",
-    "prod": "tsc && node ./build/server/app/app.js"
+    "prod": "tsc && node ./build/server/app/app.js",
+    "start": "node ./build/server/app/app.js",
+    "deploy": "tsc && gcloud app deploy"
   },
   "devDependencies": {
     "@types/node": "^13.11.0",
