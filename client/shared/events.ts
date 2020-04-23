@@ -20,11 +20,13 @@ export enum Commands {
 
 export enum GameStage {
     waitingToStart = "w",
-    startingRound = "s"
+    startingRound = "s",
+    pickingCards = "p"
 }
 
 export enum GameEvents {
     stateChanged = "sc",
+    timer = "t",
     updateHand = "uh"
 }
 
@@ -36,10 +38,10 @@ export enum GameCommand {
 
 export class GameState {
     players: {name: string; id: string; score: number; host?: boolean}[] = []
-    stage: GameStage
     gameInfo: any = {}
 
-    constructor(stage: GameStage) {
-        this.stage = stage
-    }
+    constructor(
+        public stage: GameStage, 
+        public time: number
+    ) {}
 }

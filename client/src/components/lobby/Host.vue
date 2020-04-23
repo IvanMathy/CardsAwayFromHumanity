@@ -100,7 +100,7 @@
           </p>
 
           <p class="has-text-centered is-size-7 has-text-grey success-text">
-            Playing on your phone means you can share this screen with other people as a scoreboard.
+            Playing on your phone means you can share this screen with other people as a scoreboard. This game is optimised to be played on a phone.
           </p>
         </div>
       </b-message>
