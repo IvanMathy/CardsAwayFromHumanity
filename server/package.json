@@ -21,5 +21,9 @@
   "devDependencies": {
     "@types/node": "^13.11.0",
     "@types/socket.io": "^2.1.4"
+  },
+  "engines": {
+    "node": "12.x"
   }
+
 }

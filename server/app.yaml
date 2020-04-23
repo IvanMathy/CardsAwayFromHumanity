@@ -1,12 +1,11 @@
-runtime: nodejs12
+runtime: nodejs
+env: flex
 
 network:
   session_affinity: true
-
-
 vpc_access_connector:
 #  name: 'projects/<PROJECT_ID>/locations/<REGION>/connectors/<CONNECTOR_NAME>'
-  
+  name: cafh
 
 env_variables:
 
