@@ -18,6 +18,11 @@ export class CAFHGame implements Game<GameCommand> {
 
     playerStates: Record<string, PlayerState> = {}
 
+    // State
+
+    timer?: NodeJS.Timeout
+    time = 0
+
     constructor(
         public room: HostedRoom
     ) {}
@@ -57,15 +62,28 @@ export class CAFHGame implements Game<GameCommand> {
                 this.sendPlayerHand(this.playerStates[playerId].player)
             }
         }
+
+        this.setStage(GameStage.startingRound)
     }
 
     private setStage(newState: GameStage) {
         this.stage = newState
+
+        switch (this.stage) {
+            case GameStage.startingRound:
+                this.startTimer(10)
+                break
+            case GameStage.pickingCards:
+                this.startTimer(30)
+                break
+        }
+
         this.broadcastState()
+
     }
 
     private broadcastState() {
-        let state = new GameState(this.stage)
+        let state = new GameState(this.stage, this.time)
 
         for (let playerId in this.playerStates) {
             let playerState = this.playerStates[playerId]
@@ -91,6 +109,51 @@ export class CAFHGame implements Game<GameCommand> {
 
     clean(): void {
 
+    }
+
+    // - Time management
+
+    startTimer(length: number) {
+        console.log("starting timer "+length)
+        if(this.timer !== undefined) {
+            clearInterval(this.timer)
+        }
+        this.time = length
+        this.timer = setInterval(() => { this.tick() }, 1000)
+        this.tick()
+    }
+
+    tick() {
+
+        let sendTimer = false
+
+        switch (this.stage) {
+            case GameStage.startingRound:
+            case GameStage.pickingCards:
+                sendTimer = true
+                break
+        }
+
+        if (sendTimer) {
+            this.room.send(GameEvents.timer, this.time)
+        }
+        
+        if(this.time-- <= 0) {
+            if (this.timer == undefined) {
+                console.error("Cannot find timer?!")
+                return
+            }
+            clearInterval(this.timer)
+            this.next()
+        }
+    }
+
+    next() {
+        switch (this.stage) {
+            case GameStage.startingRound:
+                this.setStage(GameStage.pickingCards)
+                break
+        }
     }
 
     // - Player Management
