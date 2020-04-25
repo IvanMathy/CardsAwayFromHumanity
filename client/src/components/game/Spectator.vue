@@ -1,32 +1,47 @@
 <template>
   <div class="spectator">
-    <div class="join helvetica">
-      Join at
-      <span class="has-text-info">away.game</span>
-      <br />with room code
-      <br />
-      <span class="room-code has-text-light">JEPS</span>
-    </div>
-    <div>
+    <Timer />
+
+    <transition name="fade">
+      <div class="join helvetica" v-if="showRoomCode">
+        Join at
+        <span class="has-text-info">away.game</span>
+        <br />with room code
+        <br />
+        <span class="room-code has-text-light">JEPS</span>
+      </div>
+    </transition>
+    <transition name="fade">
+      <Scoreboard class="scoreboard" v-if="showScoreboard" />
+    </transition>
+
+    <div class="hero">
       <p class="helvetica prompt">Pick an answer on your device.</p>
       <div class="black-card-container">
         <p class="black-card helvetica">What is Batman's guilty pleasure?</p>
       </div>
     </div>
-    <Scoreboard class="scoreboard" />
+    <Menu @toggleScoreboard="showScoreboard ^= true" @toggleRoomCode="showRoomCode ^= true" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import Scoreboard from "./Scoreboard.vue";
+import Timer from "./Timer.vue";
+import Menu from "./Menu.vue";
 
 @Component({
   components: {
-    Scoreboard
+    Scoreboard,
+    Timer,
+    Menu
   }
 })
-export default class Spectator extends Vue {}
+export default class Spectator extends Vue {
+  showScoreboard = true;
+  showRoomCode = true;
+}
 </script>
 
 <style scoped lang="scss">
@@ -42,11 +57,10 @@ export default class Spectator extends Vue {}
   position: absolute;
   .scoreboard {
     position: absolute;
-    top: 10px;
+    bottom: 10px;
     left: 10px;
-    transform-origin: top left;
+    transform-origin: bottom left;
     transform: scale(0.7);
-    height: 100%;
     opacity: 0.7;
   }
 
@@ -79,6 +93,26 @@ export default class Spectator extends Vue {}
 
   .black-card-container {
     height: 400px;
+  }
+
+  .menu {
+    top: 10px;
+    left: 10px;
+    position: fixed;
+  }
+
+  @media only screen and (max-height: 700px) {
+    .hero {
+      padding-top: 300px;
+    }
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.2s;
+  }
+  .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
   }
 }
 </style>

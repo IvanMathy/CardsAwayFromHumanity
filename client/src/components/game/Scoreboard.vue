@@ -27,18 +27,17 @@ export default class Scoreboard extends Vue {
     { id: "AA", name: "Elwood Blues", score: 1, host: true },
     { id: "BB", name: "Player One", score: 3, won: true },
     { id: "CC", name: "Somebody With a Name", score: 6 },
-    { id: "CC", name: "Mom", score: 2 },
-    { id: "CC", name: "HelloThere", score: 8, czar: true },
-    { id: "CC", name: "Test", score: 12 },
-    { id: "CC", name: "AAAAAAAAAA", score: 0 },
-    { id: "CC", name: "Me", score: 3 }
+    { id: "DD", name: "Mom", score: 2 },
+    { id: "EE", name: "HelloThere", score: 8, czar: true },
+    { id: "FF", name: "Test", score: 12 },
+    { id: "GG", name: "AAAAAAAAAA", score: 0 },
+    { id: "HH", name: "Me", score: 3 }
   ].sort((a, b) => b.score - a.score);
 }
 </script>
 
 
 <style scoped lang="scss">
-
 .scoreboard {
   max-width: 400px;
   min-width: 300px;
@@ -86,7 +85,6 @@ export default class Scoreboard extends Vue {
   background-color: white;
   color: black;
 }
-
 
 @media only screen and (max-width: 769px) {
   .player-score {
