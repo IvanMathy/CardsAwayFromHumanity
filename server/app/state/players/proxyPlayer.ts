@@ -29,8 +29,8 @@ export class ProxyPlayer implements Player {
         redisPublisher.publish(`events:to:user:${this.id}`, JSON.stringify(message))
     }
 
-    sendEvent(event: string, payload?: any): void {
-        this.publish(new PlayerMessage(PlayerCommands.sendEvent, {event: event, payload: payload}))
+    sendEvent(event: string, ...args: any[]): void {
+        this.publish(new PlayerMessage(PlayerCommands.sendEvent, {event: event, payload: args}))
     }
 
     successfullyJoinedRoom(room: Room, isHost: boolean) {

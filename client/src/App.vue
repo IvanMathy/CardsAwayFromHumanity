@@ -1,11 +1,12 @@
 <template>
   <div id="app">
-    <Spectator />
-    <!-- <div v-if="$store.state.currentState == 'inLobby'">
+    <!-- <Spectator /> -->
+    <div v-if="$store.state.currentState == ClientState.inLobby">
       <Home/>
     </div>
     <Game v-else-if="$store.state.currentState == ClientState.inRoom" />
-    <Welcome v-else></Welcome> -->
+    <Spectator v-else-if="$store.state.currentState == ClientState.spectating" />
+    <Welcome v-else></Welcome>
   </div>
 </template>
 

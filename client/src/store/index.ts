@@ -9,7 +9,12 @@ const playerIdKey = "playerId"
 export enum ClientState {
   unauthenticated = "unauthenticated",
   inLobby = "inLobby",
+  spectating = "spectating",
   inRoom = "inRoom"
+}
+
+function s(name: string) {
+  return `SOCKET_${name.toUpperCase()}`
 }
 
 export default new Vuex.Store({
@@ -43,11 +48,20 @@ export default new Vuex.Store({
       anyState.user.isRoomHost = isHost
     },
 
-    [`SOCKET_${GameEvents.stateChanged.toUpperCase()}`](state: any, newState) {
+    [s(Events.startedSpectating)](state: any, payload: any) {
+      const [roomCode, isHost] = payload
+      const anyState = state as any
+
+      anyState.currentState = ClientState.spectating
+      anyState.joinedRoom = roomCode
+      anyState.user.isRoomHost = isHost
+    },
+
+    [s(GameEvents.stateChanged.toUpperCase())](state: any, newState) {
 
       state.gameState = newState
     },
-    [`SOCKET_${GameEvents.timer.toUpperCase()}`](state: any, time) {
+    [s(GameEvents.timer.toUpperCase())](state: any, time) {
 
       (state.gameState as GameState).time = time
     }

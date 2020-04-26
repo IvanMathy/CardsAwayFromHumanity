@@ -89,7 +89,7 @@ export interface Player {
     id: string
     name: string
 
-    sendEvent(event: string, payload?: any): void
+    sendEvent(event: string, ...args: any[]): void
     successfullyJoinedRoom(room: Room, isHost: boolean): void
     onMessage(message: PlayerMessage): void
 }

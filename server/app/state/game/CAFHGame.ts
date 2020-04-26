@@ -3,10 +3,10 @@ import { Game, GameMessage } from "./game";
 import { GameState, GameCommand, Events, GameStage, GameEvents } from "../../../../client/shared/events";
 import { Player } from "../players/player";
 import { Deck } from "./deck";
-import { PlayerState } from "./playerState";
+import { PlayerState, SpectatorState } from "./playerState";
 
 const GameRules = {
-    maxPlayers : 8
+    maxPlayers: 8
 }
 
 export class CAFHGame implements Game<GameCommand> {
@@ -17,6 +17,7 @@ export class CAFHGame implements Game<GameCommand> {
     blackCard = 0
 
     playerStates: Record<string, PlayerState> = {}
+    spectatorStates: Record<string, SpectatorState> = {}
 
     // State
 
@@ -25,7 +26,7 @@ export class CAFHGame implements Game<GameCommand> {
 
     constructor(
         public room: HostedRoom
-    ) {}
+    ) { }
 
     // - Event Handling
 
@@ -54,7 +55,7 @@ export class CAFHGame implements Game<GameCommand> {
 
     }
 
-    private newRound() {    
+    private newRound() {
         this.blackCard = this.deck.getBlackCard()
 
         for (let playerId in this.playerStates) {
@@ -82,7 +83,7 @@ export class CAFHGame implements Game<GameCommand> {
 
     }
 
-    private broadcastState() {
+    private getState(): GameState {
         let state = new GameState(this.stage, this.time)
 
         for (let playerId in this.playerStates) {
@@ -96,11 +97,15 @@ export class CAFHGame implements Game<GameCommand> {
             })
         }
 
-        if(this.stage == GameStage.startingRound) {
+        if (this.stage == GameStage.startingRound) {
             state.gameInfo.blackCard = this.blackCard
         }
-        
-        this.room.send(GameEvents.stateChanged, state)
+
+        return state
+    }
+
+    private broadcastState() {
+        this.room.send(GameEvents.stateChanged, this.getState())
     }
 
     private sendPlayerHand(player: Player) {
@@ -114,8 +119,8 @@ export class CAFHGame implements Game<GameCommand> {
     // - Time management
 
     startTimer(length: number) {
-        console.log("starting timer "+length)
-        if(this.timer !== undefined) {
+        console.log("starting timer " + length)
+        if (this.timer !== undefined) {
             clearInterval(this.timer)
         }
         this.time = length
@@ -137,8 +142,8 @@ export class CAFHGame implements Game<GameCommand> {
         if (sendTimer) {
             this.room.send(GameEvents.timer, this.time)
         }
-        
-        if(this.time-- <= 0) {
+
+        if (this.time-- <= 0) {
             if (this.timer == undefined) {
                 console.error("Cannot find timer?!")
                 return
@@ -171,7 +176,13 @@ export class CAFHGame implements Game<GameCommand> {
         this.broadcastState()
     }
     playerLeft(player: Player): void {
-        this.playerStates[player.id].active = false
+        if (this.playerStates.hasOwnProperty(player.id)) {
+            console.log("Player Left")
+            this.playerStates[player.id].active = false
+        } else if (this.spectatorStates.hasOwnProperty(player.id)) {
+            console.log("Spectator Left")
+            delete this.spectatorStates[player.id]
+        }
         this.broadcastState()
     }
 
@@ -184,5 +195,19 @@ export class CAFHGame implements Game<GameCommand> {
         }
 
         return count < GameRules.maxPlayers
+    }
+
+    // - Spectators
+
+    spectatorJoined(player: Player) {
+        if (!this.playerStates.hasOwnProperty(player.id)) {
+            let state = new SpectatorState(player)
+            this.spectatorStates[player.id] = state
+        }
+
+        // Spectators don't broadcast state to everyone to avoid
+        // flooding players with updates if for some reason some
+        // game attracts a lot of peeps.
+        player.sendEvent(GameEvents.stateChanged, this.getState())
     }
 }

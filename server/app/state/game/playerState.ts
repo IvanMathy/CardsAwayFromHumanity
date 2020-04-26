@@ -9,3 +9,12 @@ export class PlayerState {
     
     constructor(public player: Player) {}
 } 
+
+export class SpectatorState {
+
+    id:String
+    
+    constructor(player: Player) {
+        this.id = player.id
+    }
+} 

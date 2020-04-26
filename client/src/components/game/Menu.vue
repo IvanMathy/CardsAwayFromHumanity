@@ -15,7 +15,7 @@
           </div>
         </div>
       </b-dropdown-item>
-
+      <hr class="dropdown-divider" aria-role="menuitem" />
       <b-dropdown-item @click="toggleScoreboard()" aria-role="listitem">
         <div class="media">
           <b-icon class="media-left" icon="trophy"></b-icon>
@@ -35,7 +35,7 @@
           </div>
         </div>
       </b-dropdown-item>
-
+      <hr class="dropdown-divider" aria-role="menuitem" />
       <b-dropdown-item :value="false" aria-role="listitem">
         <div class="media">
           <b-icon class="media-left" icon="sign-out-alt"></b-icon>

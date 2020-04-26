@@ -131,6 +131,9 @@ import { ModalConfig } from "buefy/types/components";
     },
     [Events.joinedGame](this: Host, roomId) {
       (this.$parent as any).close()
+    },
+    [Events.startedSpectating](this: Host, roomId) {
+      (this.$parent as any).close()
     }
   }
 })
@@ -163,23 +166,26 @@ export default class Host extends Vue {
   }
 
   join() {
+    this.tryjoining(Commands.joinGame)
+  }
+  spectate() {
+    this.tryjoining(Commands.spectate)
+  }
+
+  tryjoining(action: string) {
 
     if(this.gameId.length != 4) {
       alert("Cannot join room")
       return
     }
     
-    const payload = { gameId: this.gameId }
+    const payload = { gameId: this.gameId, action: action }
 
     if(this.gameType == 0) {
       payload['password'] = this.password 
     }
 
     this.$socket.client.emit(Commands.joinGame, payload);
-  }
-
-  spectate() {
-      this.join()
   }
 }
 </script>

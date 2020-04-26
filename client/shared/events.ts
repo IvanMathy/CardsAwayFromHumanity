@@ -8,12 +8,15 @@ export enum Events {
     passwordNeeded = "pw",
     roomCreated = "r",
     roomCreationFailed = "rf",
+    startedSpectating = "ss",
     joinedGame = "joined"
 }
 
 export enum Commands {
     hostGame = "host",
+    checkRoom = "check",
     joinGame = "join",
+    spectate = "spectate",
     authenticate = "auth",
     gameCommand = "gc"
 }

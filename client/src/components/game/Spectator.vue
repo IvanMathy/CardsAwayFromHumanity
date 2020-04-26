@@ -15,7 +15,7 @@
       <Scoreboard class="scoreboard" v-if="showScoreboard" />
     </transition>
 
-    <div class="hero">
+    <div class="hero" v-if="gameState.stage == Stage.pickingCards">
       <p class="helvetica prompt">Pick an answer on your device.</p>
       <div class="black-card-container">
         <p class="black-card helvetica">What is Batman's guilty pleasure?</p>
@@ -30,17 +30,24 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import Scoreboard from "./Scoreboard.vue";
 import Timer from "./Timer.vue";
 import Menu from "./Menu.vue";
+import { GameStage } from "../../../shared/events";
+import { mapState } from "vuex";
 
 @Component({
   components: {
     Scoreboard,
     Timer,
     Menu
+  },
+  computed: {
+    ...mapState(["gameState"])
   }
 })
 export default class Spectator extends Vue {
   showScoreboard = true;
   showRoomCode = true;
+
+  Stage = GameStage;
 }
 </script>
 
