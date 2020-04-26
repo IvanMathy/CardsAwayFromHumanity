@@ -15,10 +15,25 @@
       <Scoreboard class="scoreboard" v-if="showScoreboard" />
     </transition>
 
+    <WaitingRoom v-if="gameState.stage == Stage.waitingToStart" />
+
     <div class="hero" v-if="gameState.stage == Stage.pickingCards">
       <p class="helvetica prompt">Pick an answer on your device.</p>
       <div class="black-card-container">
-        <p class="black-card helvetica">What is Batman's guilty pleasure?</p>
+        <p class="black-card helvetica">{{ getBlackCard(gameState.gameInfo.blackCard) }}</p>
+      </div>
+    </div>
+
+    <div class="cards-container">
+      <div class="cards topCards">
+        <div class="card-container" v-for="card in topCards" :key="card">
+          <p class="white-card helvetica">{{ getWhiteCard(card)}}</p>
+        </div>
+      </div>
+      <div class="cards">
+        <div class="card-container" v-for="card in bottomCards" :key="card">
+          <p class="white-card helvetica">{{ getWhiteCard(card)}}</p>
+        </div>
       </div>
     </div>
     <Menu @toggleScoreboard="showScoreboard ^= true" @toggleRoomCode="showRoomCode ^= true" />
@@ -30,14 +45,17 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import Scoreboard from "./Scoreboard.vue";
 import Timer from "./Timer.vue";
 import Menu from "./Menu.vue";
+import WaitingRoom from "./WaitingRoom.vue";
 import { GameStage } from "../../../shared/events";
 import { mapState } from "vuex";
+import { blackCards, whiteCards } from "../meta/cards";
 
 @Component({
   components: {
     Scoreboard,
     Timer,
-    Menu
+    Menu,
+    WaitingRoom
   },
   computed: {
     ...mapState(["gameState"])
@@ -47,7 +65,18 @@ export default class Spectator extends Vue {
   showScoreboard = true;
   showRoomCode = true;
 
+  topCards = [1, 2, 3, 4];
+  bottomCards = [5, 6, 7, 8];
+
   Stage = GameStage;
+
+  getBlackCard(card: number) {
+    return blackCards[card];
+  }
+
+  getWhiteCard(card: number) {
+    return whiteCards[card];
+  }
 }
 </script>
 
@@ -88,6 +117,31 @@ export default class Spectator extends Vue {
       line-height: 44px;
     }
   }
+
+  .cards-container {
+
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: fixed;
+  }
+
+  .topCards {
+    margin-left: 50px !important;
+  }
+
+  .cards {
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    transform: scale(0.8);
+    height:150px;
+
+    .card-container {
+      margin: -5px;
+    }
+  }
+
 
   .prompt {
     color: white;

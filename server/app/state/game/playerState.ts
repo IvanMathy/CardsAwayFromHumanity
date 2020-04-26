@@ -6,6 +6,8 @@ export class PlayerState {
     points = 0
     active = true
     id = randomCode(8)
+
+    pickedcard?: number
     
     constructor(public player: Player) {}
 } 

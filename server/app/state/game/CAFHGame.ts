@@ -35,8 +35,7 @@ export class CAFHGame implements Game<GameCommand> {
         switch (message.command) {
             case GameCommand.startGame:
                 if (this.isHost(message) && this.stage == GameStage.waitingToStart) {
-                    console.log("start game")
-                    this.newRound()
+                    this.startGame()
                 }
                 break
             case GameCommand.pickCard:
@@ -52,7 +51,8 @@ export class CAFHGame implements Game<GameCommand> {
     // - Game Lifecycle
 
     private startGame() {
-
+        console.log("start game")
+        this.newRound()
     }
 
     private newRound() {
@@ -68,6 +68,7 @@ export class CAFHGame implements Game<GameCommand> {
     }
 
     private setStage(newState: GameStage) {
+        let previousStage = this.stage
         this.stage = newState
 
         switch (this.stage) {
@@ -75,7 +76,10 @@ export class CAFHGame implements Game<GameCommand> {
                 this.startTimer(10)
                 break
             case GameStage.pickingCards:
-                this.startTimer(30)
+                this.startTimer(90)
+                break
+            case GameStage.pickingWinner:
+                this.startTimer(45)
                 break
         }
 
@@ -93,11 +97,12 @@ export class CAFHGame implements Game<GameCommand> {
                 name: playerState.player.name,
                 id: playerState.id,
                 score: playerState.points,
-                host: (playerId == this.room.host.id) ? true : undefined
+                host: (playerId == this.room.host.id) ? true : undefined,
+                card: (this.stage == GameStage.pickingWinner) ? playerState.pickedcard : undefined
             })
         }
 
-        if (this.stage == GameStage.startingRound) {
+        if (this.stage == GameStage.startingRound || this.stage == GameStage.pickingCards) {
             state.gameInfo.blackCard = this.blackCard
         }
 
@@ -157,6 +162,10 @@ export class CAFHGame implements Game<GameCommand> {
         switch (this.stage) {
             case GameStage.startingRound:
                 this.setStage(GameStage.pickingCards)
+                break
+
+            case GameStage.pickingCards:
+                this.setStage(GameStage.pickingWinner)
                 break
         }
     }
