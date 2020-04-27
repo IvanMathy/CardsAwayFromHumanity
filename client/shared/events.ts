@@ -29,6 +29,7 @@ export enum GameStage {
 }
 
 export enum GameEvents {
+    becomeCzar = "bc",
     stateChanged = "sc",
     timer = "t",
     updateHand = "uh"
@@ -41,7 +42,7 @@ export enum GameCommand {
 }
 
 export class GameState {
-    players: {name: string; id: string; score: number; host?: boolean; card?: number}[] = []
+    players: {name: string; id: string; score: number; host?: boolean; czar?: boolean; card?: number}[] = []
     gameInfo: any = {}
 
     constructor(

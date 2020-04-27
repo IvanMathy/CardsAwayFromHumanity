@@ -24,6 +24,8 @@ export class CAFHGame implements Game<GameCommand> {
     timer?: NodeJS.Timeout
     time = 0
 
+    czar?: string = undefined
+
     constructor(
         public room: HostedRoom
     ) { }
@@ -56,13 +58,29 @@ export class CAFHGame implements Game<GameCommand> {
     }
 
     private newRound() {
-        this.blackCard = this.deck.getBlackCard()
 
-        for (let playerId in this.playerStates) {
-            if (this.playerStates[playerId].active) {
-                this.sendPlayerHand(this.playerStates[playerId].player)
-            }
+        let players = Object.values(this.playerStates).filter(state => state.active)
+        players.forEach(state => state.roundsSinceCzar++)
+        players.sort((a, b) => b.roundsSinceCzar - a.roundsSinceCzar);
+
+        let czar = players.shift()
+
+        if (czar == undefined) {
+            this.room.send(Events.unknownError)
+            return
         }
+
+
+        czar.player.sendEvent(GameEvents.becomeCzar)
+
+        czar.roundsSinceCzar = 0
+        this.czar = czar.id
+
+        players.forEach(state => {
+            this.sendPlayerHand(state.player)
+        })
+
+        this.blackCard = this.deck.getBlackCard()
 
         this.setStage(GameStage.startingRound)
     }
@@ -98,7 +116,8 @@ export class CAFHGame implements Game<GameCommand> {
                 id: playerState.id,
                 score: playerState.points,
                 host: (playerId == this.room.host.id) ? true : undefined,
-                card: (this.stage == GameStage.pickingWinner) ? playerState.pickedcard : undefined
+                card: (this.stage == GameStage.pickingWinner) ? playerState.pickedcard : undefined,
+                czar: this.czar == playerState.id
             })
         }
 

@@ -7,6 +7,8 @@ export class PlayerState {
     active = true
     id = randomCode(8)
 
+    roundsSinceCzar = 0
+
     pickedcard?: number
     
     constructor(public player: Player) {}
