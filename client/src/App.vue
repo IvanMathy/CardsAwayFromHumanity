@@ -3,13 +3,13 @@
     <transition name="slide-fade">
       <Error v-if="error" />
     </transition>
-    <!-- <Spectator />
+    <!-- <Spectator />-->
     <div v-if="$store.state.currentState == ClientState.inLobby">
       <Home/>
     </div>
     <Game v-else-if="$store.state.currentState == ClientState.inRoom" />
     <Spectator v-else-if="$store.state.currentState == ClientState.spectating" />
-    <Welcome v-else></Welcome>-->
+    <Welcome v-else></Welcome>
   </div>
 </template>
 
@@ -74,6 +74,7 @@ body {
   font-weight: 600;
   font-stretch: normal;
 }
+
 
 .slide-fade-enter-active {
   transition: all 0.2s ease;
