@@ -7,25 +7,27 @@
       <br />Humanity
     </h1>
 
-    <transition name="slide-fade">
-      <div class="box auth is-size-6 has-text-centered" v-if="accepted">
+    <transition-group name="fade-out-in" tag="div">
+      <div class="box auth is-size-6 has-text-centered" v-if="accepted" key="name">
         <p>
-          <strong class="helvetica">Welcome aboard!</strong><br/> What should we call you?
+          <strong class="helvetica">Welcome aboard!</strong>
+          <br />What should we call you?
         </p>
         <b-field>
           <b-input v-model="username" icon="user" size="is-medium" placeholder="Guest"></b-input>
           <p class="control">
-            <b-button type="is-primary" size="is-medium" v-on:click="authenticate()" :disabled="username == ''" :loading="buttonLoading">Next</b-button>
+            <b-button
+              type="is-primary"
+              size="is-medium"
+              v-on:click="authenticate()"
+              :disabled="username == ''"
+              :loading="buttonLoading"
+            >Next</b-button>
           </p>
         </b-field>
-        <b-message type="is-info" size="is-small">
-            Remember kids, it's cool to be kind!
-        </b-message>
+        <b-message type="is-info" size="is-small">Remember kids, it's cool to be kind!</b-message>
       </div>
-    </transition>
-
-    <transition name="slide-fade">
-      <div class="box is-size-6" v-if="!accepted">
+      <div class="box is-size-6" v-else key="intro">
         <p>
           Welcome!
           <i>Cards Away From Humanity</i> is an
@@ -67,7 +69,7 @@
           >Agree and Continue</b-button>
         </p>
       </div>
-    </transition>
+    </transition-group>
   </div>
 </template>
 
@@ -79,9 +81,9 @@ import Terms from "./meta/Terms.vue";
 
 @Component
 export default class Welcome extends Vue {
-  username = ""
-  accepted = false
-  buttonLoading = false
+  username = "";
+  accepted = false;
+  buttonLoading = false;
 
   authenticate() {
     if (this.username.length == 0) {
@@ -89,7 +91,7 @@ export default class Welcome extends Vue {
       return;
     }
 
-    this.buttonLoading = true
+    this.buttonLoading = true;
 
     this.$socket.client.emit(
       Commands.authenticate,
@@ -157,5 +159,23 @@ export default class Welcome extends Vue {
     width: 120px;
     margin: 20px auto;
   }
+}
+
+.fade-out-in-enter-active {
+  transition: opacity 0.5s;
+}
+.fade-out-in-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fade-out-in-enter-active {
+  transition-delay: 0.5s;
+}
+
+.fade-out-in-enter {
+  opacity: 0;
+}
+.fade-out-in-leave-to {
+  opacity: 0;
 }
 </style>
