@@ -2,12 +2,12 @@
   <div class="round-recap">
     <div class="columns">
       <div class="column info helvetica">
-        <p>
-          Player One
+        <p v-if="winner">
+          {{ winner }}
           <span class="muted">wins this round.</span>
         </p>
-        <p>
-          Elwood Blues
+        <p v-if="czar">
+           {{ czar }}
           <span class="muted">is the next Czar.</span>
         </p>
       </div>
@@ -22,13 +22,25 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import Scoreboard from "./Scoreboard.vue";
+import { mapState } from 'vuex';
 
 @Component({
   components: {
     Scoreboard
+  },
+  computed: {
+    ...mapState(["gameState"]),
+    czar() {
+      return (this as any).gameState.players.find((player) => player.czar === true)?.name
+    },
+    winner() {
+      return (this as any).gameState.players.find((player) => player.winner === true)?.name
+    }
   }
 })
-export default class RoundRecap extends Vue {}
+export default class RoundRecap extends Vue {
+  
+}
 </script>
 
 

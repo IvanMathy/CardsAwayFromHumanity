@@ -53,6 +53,7 @@ export class CAFHGame implements Game<GameCommand> {
     // - Game Lifecycle
 
     private startGame() {
+        // TODO: check player count
         console.log("start game")
         this.newRound()
     }
@@ -133,7 +134,11 @@ export class CAFHGame implements Game<GameCommand> {
     }
 
     private sendPlayerHand(player: Player) {
-        player.sendEvent(GameEvents.updateHand, this.playerStates[player.id].hand)
+        if (this.czar == player.id) {
+            player.sendEvent(GameEvents.becomeCzar)
+        } else {
+            player.sendEvent(GameEvents.updateHand, this.playerStates[player.id].hand)
+        }
     }
 
     clean(): void {
@@ -238,4 +243,15 @@ export class CAFHGame implements Game<GameCommand> {
         // game attracts a lot of peeps.
         player.sendEvent(GameEvents.stateChanged, this.getState())
     }
+
+    // - State Recovery
+
+
+    exportState(): string {
+        return ""
+    }
+    loadState(stateString: string) {
+
+    }
+
 }

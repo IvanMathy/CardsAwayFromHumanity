@@ -31,6 +31,7 @@ export default class Error extends Vue {}
   top: 0;
   bottom: 0;
   width: 100%;
+  z-index: 99999999;
 }
 .flex {
   display: flex;

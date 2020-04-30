@@ -42,7 +42,7 @@ export enum GameCommand {
 }
 
 export class GameState {
-    players: {name: string; id: string; score: number; host?: boolean; czar?: boolean; card?: number}[] = []
+    players: {name: string; id: string; score: number; host?: boolean; czar?: boolean; card?: number; winner?: boolean}[] = []
     gameInfo: any = {}
 
     constructor(

@@ -23,7 +23,9 @@ export default new Vuex.Store({
       user: {
         userId: localStorage.getItem(playerIdKey),
         username: "",
-        isRoomHost: false
+        isRoomHost: false,
+        isCzar: false,
+        hand: []
       },
       currentState: ClientState.unauthenticated,
       joinedRoom: null,
@@ -64,6 +66,13 @@ export default new Vuex.Store({
     [s(GameEvents.timer.toUpperCase())](state: any, time) {
 
       (state.gameState as GameState).time = time
+    },
+    [s(GameEvents.becomeCzar.toUpperCase())](state: any) {
+      state.gameState.user.isCzar = true
+    },
+    [s(GameEvents.updateHand.toUpperCase())](state: any, hand: number[]) {
+      state.gameState.user.isCzar = false
+      state.gameState.user.hand = hand
     }
 
   },

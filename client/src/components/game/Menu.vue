@@ -16,12 +16,22 @@
         </div>
       </b-dropdown-item>
       <hr class="dropdown-divider" aria-role="menuitem" />
+      <b-dropdown-item @click="toggleFullscreen()" aria-role="listitem">
+        <div class="media">
+          <b-icon class="media-left" icon="paper-plane"></b-icon>
+          <div class="media-content">
+            <h3>Share Room Link</h3>
+            <small>Invite more people to play or spectate.</small>
+          </div>
+        </div>
+      </b-dropdown-item>
+      <hr class="dropdown-divider" aria-role="menuitem" />
       <b-dropdown-item @click="toggleScoreboard()" aria-role="listitem">
         <div class="media">
           <b-icon class="media-left" icon="trophy"></b-icon>
           <div class="media-content">
             <h3>Toggle Scoreboard</h3>
-            <small>You were winning anyway, right?</small>
+            <small>Show or hide scoreboard.</small>
           </div>
         </div>
       </b-dropdown-item>
@@ -89,4 +99,7 @@ export default class Menu extends Vue {
 
 
 <style scoped lang="scss">
+.button {
+  color: #777777 !important;
+}
 </style>
