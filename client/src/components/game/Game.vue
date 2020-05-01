@@ -25,12 +25,13 @@
       <p>{{gameState.time}}</p>-->
 
       <div v-if="gameState == null">Loading.</div>
-      <CardPicker v-if="gameState.stage == Stage.pickingCards" />
-      <RoundRecap v-if="gameState.stage == Stage.startingRound" />
-      <div v-if="gameState.stage == Stage.waitingToStart">
+      <div v-if="gameState.stage == Stage.notEnoughPlayers" class="waiting">
+        <p>Not enough players.</p>
+      </div>
+      <div v-if="gameState.stage == Stage.waitingToStart" class="waiting">
         <p>Waiting to Start</p>
 
-        <div v-if="this.$store.state.user.isRoomHost">
+        <div v-if="user.isRoomHost">
           <b-tooltip
             v-if="gameState.players.length > 3"
             type="is-light"
@@ -41,6 +42,14 @@
           </b-tooltip>
           <b-button v-else type="is-primary" outlined @click="startGame()">Start Game</b-button>
         </div>
+      </div>
+      <div v-else-if="currentState == State.spectating"></div>
+      <div v-else>
+        <template v-if="gameState.stage == Stage.pickingCards">
+          <p  v-if="user.isCzar">You are the Czar</p>
+           <CardPicker  v-else/>
+        </template>
+        <RoundRecap v-if="gameState.stage == Stage.startingRound" />
       </div>
     </div>
   </div>
@@ -61,6 +70,7 @@ import {
 import { Socket } from "vue-socket.io-extended";
 import { mapState } from "vuex";
 import RoundRecap from "./RoundRecap.vue";
+import ClientState from "../../store/index";
 
 @Component({
   components: {
@@ -70,12 +80,13 @@ import RoundRecap from "./RoundRecap.vue";
     CardPicker
   },
   computed: {
-    ...mapState(["gameState"])
+    ...mapState(["gameState", "user", "currentState"])
   }
 })
 export default class Game extends Vue {
-  Stage = GameStage;
-  showRoomCode = true;
+  Stage = GameStage
+  State = ClientState
+  showRoomCode = true
 
   startGame() {
     this.$socket.client.emit(Commands.gameCommand, GameCommand.startGame);
@@ -108,6 +119,9 @@ export default class Game extends Vue {
     top: 10px;
     left: 10px;
     position: fixed;
+  }
+  .waiting {
+    padding-top: 50px;
   }
 }
 </style>

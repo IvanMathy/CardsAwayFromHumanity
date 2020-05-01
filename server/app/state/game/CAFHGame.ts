@@ -4,9 +4,11 @@ import { GameState, GameCommand, Events, GameStage, GameEvents } from "../../../
 import { Player } from "../players/player";
 import { Deck } from "./deck";
 import { PlayerState, SpectatorState } from "./playerState";
+import { maxHeaderSize } from "http";
 
 const GameRules = {
-    maxPlayers: 8
+    maxPlayers: 8,
+    minPlayers: 3
 }
 
 export class CAFHGame implements Game<GameCommand> {
@@ -112,14 +114,16 @@ export class CAFHGame implements Game<GameCommand> {
         for (let playerId in this.playerStates) {
             let playerState = this.playerStates[playerId]
 
-            state.players.push({
-                name: playerState.player.name,
-                id: playerState.id,
-                score: playerState.points,
-                host: (playerId == this.room.host.id) ? true : undefined,
-                card: (this.stage == GameStage.pickingWinner) ? playerState.pickedcard : undefined,
-                czar: this.czar == playerState.id
-            })
+            if (playerState.active) {
+                state.players.push({
+                    name: playerState.player.name,
+                    id: playerState.id,
+                    score: playerState.points,
+                    host: (playerId == this.room.host.id) ? true : undefined,
+                    card: (this.stage == GameStage.pickingWinner) ? playerState.pickedcard : undefined,
+                    czar: this.czar == playerState.id
+                })
+            }
         }
 
         if (this.stage == GameStage.startingRound || this.stage == GameStage.pickingCards) {
@@ -134,10 +138,11 @@ export class CAFHGame implements Game<GameCommand> {
     }
 
     private sendPlayerHand(player: Player) {
-        if (this.czar == player.id) {
+        let state = this.playerStates[player.id]
+        if (this.czar == state.id) {
             player.sendEvent(GameEvents.becomeCzar)
         } else {
-            player.sendEvent(GameEvents.updateHand, this.playerStates[player.id].hand)
+            player.sendEvent(GameEvents.updateHand, state.hand)
         }
     }
 
@@ -183,7 +188,28 @@ export class CAFHGame implements Game<GameCommand> {
     }
 
     next() {
+
+        let onlinePlayers = 0
+
+        for (let player in this.playerStates) {
+            if (this.playerStates[player].active) {
+                onlinePlayers++;
+            }
+        }
+
+
+        console.log(onlinePlayers)
+
+        if (onlinePlayers < GameRules.minPlayers) {
+            this.setStage(GameStage.notEnoughPlayers)
+            return
+        }
+
         switch (this.stage) {
+            case GameStage.notEnoughPlayers:
+                this.newRound()
+                break
+                
             case GameStage.startingRound:
                 this.setStage(GameStage.pickingCards)
                 break
@@ -207,6 +233,10 @@ export class CAFHGame implements Game<GameCommand> {
 
         this.sendPlayerHand(player)
         this.broadcastState()
+
+        if (this.stage == GameStage.notEnoughPlayers) {
+            this.next()
+        }
     }
     playerLeft(player: Player): void {
         if (this.playerStates.hasOwnProperty(player.id)) {

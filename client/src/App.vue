@@ -7,8 +7,7 @@
     <div v-if="$store.state.currentState == ClientState.inLobby">
       <Home/>
     </div>
-    <Game v-else-if="$store.state.currentState == ClientState.inRoom" />
-    <Spectator v-else-if="$store.state.currentState == ClientState.spectating" />
+    <Game v-else-if="currentState == ClientState.inRoom || currentState == ClientState.spectating" />
     <Welcome v-else></Welcome>
   </div>
 </template>
@@ -24,6 +23,7 @@ import Spectator from "./components/game/Spectator.vue";
 import { ClientState } from "./store/index";
 import { Events, Commands, GameEvents } from "../shared/events";
 import { Socket } from "vue-socket.io-extended";
+import { mapState } from 'vuex';
 
 @Component({
   components: {
@@ -46,7 +46,9 @@ import { Socket } from "vue-socket.io-extended";
       (this as App).error = true;
     }
   },
-  computed: {}
+  computed: {
+    ...mapState(["currentState"])
+  }
 })
 export default class App extends Vue {
   ClientState = ClientState;

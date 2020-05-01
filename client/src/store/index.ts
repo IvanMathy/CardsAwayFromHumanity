@@ -25,10 +25,10 @@ export default new Vuex.Store({
         username: "",
         isRoomHost: false,
         isCzar: false,
-        hand: []
+        hand: [],
       },
+      isPlayer: false,
       currentState: ClientState.unauthenticated,
-      joinedRoom: null,
       gameState: null as GameState | null
     }
   },
