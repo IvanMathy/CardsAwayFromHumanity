@@ -34,7 +34,8 @@ export default new Vuex.Store({
   },
   mutations: {
     authenticated(state: any, newUser: Record<string, string>) {
-      state.user = newUser
+      state.user.userId = newUser.newId
+      state.user.username = newUser.username
       state.currentState = ClientState.inLobby
 
       localStorage.setItem(playerIdKey, newUser.newId)
@@ -59,20 +60,20 @@ export default new Vuex.Store({
       anyState.user.isRoomHost = isHost
     },
 
-    [s(GameEvents.stateChanged.toUpperCase())](state: any, newState) {
+    [s(GameEvents.stateChanged)](state: any, newState) {
 
       state.gameState = newState
     },
-    [s(GameEvents.timer.toUpperCase())](state: any, time) {
+    [s(GameEvents.timer)](state: any, time) {
 
       (state.gameState as GameState).time = time
     },
-    [s(GameEvents.becomeCzar.toUpperCase())](state: any) {
-      state.gameState.user.isCzar = true
+    [s(GameEvents.becomeCzar)](state: any) {
+      state.user.isCzar = true
     },
-    [s(GameEvents.updateHand.toUpperCase())](state: any, hand: number[]) {
-      state.gameState.user.isCzar = false
-      state.gameState.user.hand = hand
+    [s(GameEvents.updateHand)](state: any, hand: number[]) {
+      state.user.isCzar = false
+      state.user.hand = hand
     }
 
   },

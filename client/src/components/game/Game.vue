@@ -1,8 +1,27 @@
 <template>
   <div class="game">
-    <Timer />
+    <Timer v-if="gameState.stage == Stage.pickingCards || gameState.stage == Stage.startingRound" />
 
     <Menu @toggleScoreboard="showScoreboard ^= true" @toggleRoomCode="showRoomCode ^= true" />
+
+    <div v-if="gameState == null">Loading.</div>
+    <div v-else>
+      <div
+        v-if="gameState.stage == Stage.waitingToStart || gameState.stage == Stage.notEnoughPlayers"
+        class="fullscreen centeredText"
+      >
+        <RoundRecap class="fullscreen" />
+      </div>
+      <div v-else-if="currentState == State.spectating"></div>
+      <template v-else-if="gameState.stage == Stage.pickingCards">
+        <div class="fullscreen centeredText" v-if="user.isCzar">
+          <p class="hero helvetica">You are the Czar.</p>
+          <p class="secondary">Wait for other players to pick their cards.</p>
+        </div>
+        <CardPicker v-else />
+      </template>
+      <RoundRecap v-else-if="gameState.stage == Stage.startingRound" />
+    </div>
     <transition name="fade">
       <div class="join helvetica is-hidden-mobile" v-if="showRoomCode">
         Join at
@@ -12,46 +31,6 @@
         <span class="room-code has-text-light">{{ this.$store.state.joinedRoom }}</span>
       </div>
     </transition>
-    <div>
-      <!-- <h1></h1>
-      <h1>Is Host: {{ this.$store.state.user.isRoomHost }}</h1>
-      <h2>Players</h2>
-      <p v-for="player in gameState.players" :key="player.id">
-        {{ player.name }}
-        <span v-if="player.host">HOST</span>
-      </p>
-      {{gameState.stage}}
-      <p>{{gameState}}</p>
-      <p>{{gameState.time}}</p>-->
-
-      <div v-if="gameState == null">Loading.</div>
-      <div v-if="gameState.stage == Stage.notEnoughPlayers" class="waiting">
-        <p>Not enough players.</p>
-      </div>
-      <div v-if="gameState.stage == Stage.waitingToStart" class="waiting">
-        <p>Waiting to Start</p>
-
-        <div v-if="user.isRoomHost">
-          <b-tooltip
-            v-if="gameState.players.length > 3"
-            type="is-light"
-            multilined
-            label="You need at least 3 players to start a game."
-          >
-            <b-button type="is-primary" outlined disabled>Start Game</b-button>
-          </b-tooltip>
-          <b-button v-else type="is-primary" outlined @click="startGame()">Start Game</b-button>
-        </div>
-      </div>
-      <div v-else-if="currentState == State.spectating"></div>
-      <div v-else>
-        <template v-if="gameState.stage == Stage.pickingCards">
-          <p  v-if="user.isCzar">You are the Czar</p>
-           <CardPicker  v-else/>
-        </template>
-        <RoundRecap v-if="gameState.stage == Stage.startingRound" />
-      </div>
-    </div>
   </div>
 </template>
 
@@ -84,13 +63,9 @@ import ClientState from "../../store/index";
   }
 })
 export default class Game extends Vue {
-  Stage = GameStage
-  State = ClientState
-  showRoomCode = true
-
-  startGame() {
-    this.$socket.client.emit(Commands.gameCommand, GameCommand.startGame);
-  }
+  Stage = GameStage;
+  State = ClientState;
+  showRoomCode = true;
 }
 </script>
 
@@ -122,6 +97,33 @@ export default class Game extends Vue {
   }
   .waiting {
     padding-top: 50px;
+  }
+
+  .fullscreen {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+  }
+
+  .centeredText {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .hero {
+      font-size: 35px;
+      padding: 10px;
+    }
+    .secondary {
+      color: #cccccc;
+      padding: 10px;
+    }
+    .button {
+      margin: 10px;
+    }
   }
 }
 </style>

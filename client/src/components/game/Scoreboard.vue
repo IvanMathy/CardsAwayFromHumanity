@@ -1,28 +1,44 @@
 <template>
   <div class="scoreboard">
-    <div v-for="player in scores" :key="player.id">
-      <div
-        class="player-score helvetica is-flex-touch"
-        :class="{czar: player.czar, winner: player.won}"
-      >
-        <b-tooltip label="Card Czar" type="is-light" class="player-icon" v-if="player.czar">
-          <b-icon size="is-small" icon="chess-king" class="has-text-grey" />
-        </b-tooltip>
-        <b-tooltip label="Round Winner" type="is-light" class="player-icon" v-if="player.won">
-          <b-icon size="is-small" icon="star" class="has-text-primary" />
-        </b-tooltip>
-        <span class="score">{{player.score}}</span>
-        {{player.name}}
+    <template v-if="gameState.players.length">
+      <div v-for="player in gameState.players" :key="player.id">
+        <div
+          class="player-score helvetica is-flex-touch"
+          :class="{czar: player.czar && gameState.stage !== Stage.notEnoughPlayers, winner: player.won && gameState.stage !== Stage.notEnoughPlayers}"
+        >
+          <b-tooltip label="Card Czar" type="is-light" class="player-icon" v-if="player.czar && gameState.stage !== Stage.notEnoughPlayers">
+            <b-icon size="is-small" icon="chess-king" class="has-text-grey" />
+          </b-tooltip>
+          <b-tooltip label="Round Winner" type="is-light" class="player-icon" v-else-if="player.won">
+            <b-icon size="is-small" icon="star" class="has-text-primary" />
+          </b-tooltip>
+          <b-tooltip label="Game Host" type="is-light" class="player-icon" v-else-if="player.host">
+            <b-icon size="is-small" icon="home" class="has-text-grey-light" />
+          </b-tooltip>
+          <span class="score" v-if="gameState.stage != Stage.waitingToStart">{{player.score}}</span>
+          {{player.name}}
+        </div>
       </div>
+    </template>
+    <div class="player-score helvetica is-flex-touch czar waiting" v-else>
+      No one has joined yet.
     </div>
+    <b-button type="is-dark" size="is-medium" outlined expanded inverted @click="startGame()" class="invite helvetica">Invite Players</b-button>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { mapState } from "vuex";
+import { GameStage } from "../../../shared/events";
 
-@Component
+@Component({
+  computed: {
+    ...mapState(["gameState"])
+  }
+})
 export default class Scoreboard extends Vue {
+  Stage = GameStage;
   scores = [
     { id: "AA", name: "Elwood Blues", score: 1, host: true },
     { id: "BB", name: "Player One", score: 3, won: true },
@@ -71,6 +87,14 @@ export default class Scoreboard extends Vue {
     left: 10px;
     top: 17px;
   }
+}
+
+.waiting {
+  text-align: center;
+}
+
+.invite {
+  margin-top: 5px;
 }
 
 .player-score.czar {

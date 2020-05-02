@@ -73,15 +73,13 @@ export class CAFHGame implements Game<GameCommand> {
             return
         }
 
-
-        czar.player.sendEvent(GameEvents.becomeCzar)
-
         czar.roundsSinceCzar = 0
         this.czar = czar.id
 
         players.forEach(state => {
             this.sendPlayerHand(state.player)
         })
+        this.sendPlayerHand(czar.player)
 
         this.blackCard = this.deck.getBlackCard()
 
