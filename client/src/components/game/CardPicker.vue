@@ -142,7 +142,7 @@ export default class Game extends Vue {
 
 .black-card-container {
   position: absolute;
-  bottom: 50px;
+  bottom: 150px;
   width: 100%;
 }
 .picker {

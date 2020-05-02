@@ -9,7 +9,12 @@ const playerIdKey = "playerId"
 export enum ClientState {
   unauthenticated = "unauthenticated",
   inLobby = "inLobby",
+  spectating = "spectating",
   inRoom = "inRoom"
+}
+
+function s(name: string) {
+  return `SOCKET_${name.toUpperCase()}`
 }
 
 export default new Vuex.Store({
@@ -18,16 +23,19 @@ export default new Vuex.Store({
       user: {
         userId: localStorage.getItem(playerIdKey),
         username: "",
-        isRoomHost: false
+        isRoomHost: false,
+        isCzar: false,
+        hand: [],
       },
+      isPlayer: false,
       currentState: ClientState.unauthenticated,
-      joinedRoom: null,
       gameState: null as GameState | null
     }
   },
   mutations: {
     authenticated(state: any, newUser: Record<string, string>) {
-      state.user = newUser
+      state.user.userId = newUser.newId
+      state.user.username = newUser.username
       state.currentState = ClientState.inLobby
 
       localStorage.setItem(playerIdKey, newUser.newId)
@@ -43,13 +51,29 @@ export default new Vuex.Store({
       anyState.user.isRoomHost = isHost
     },
 
-    [`SOCKET_${GameEvents.stateChanged.toUpperCase()}`](state: any, newState) {
+    [s(Events.startedSpectating)](state: any, payload: any) {
+      const [roomCode, isHost] = payload
+      const anyState = state as any
+
+      anyState.currentState = ClientState.spectating
+      anyState.joinedRoom = roomCode
+      anyState.user.isRoomHost = isHost
+    },
+
+    [s(GameEvents.stateChanged)](state: any, newState) {
 
       state.gameState = newState
     },
-    [`SOCKET_${GameEvents.timer.toUpperCase()}`](state: any, time) {
+    [s(GameEvents.timer)](state: any, time) {
 
       (state.gameState as GameState).time = time
+    },
+    [s(GameEvents.becomeCzar)](state: any) {
+      state.user.isCzar = true
+    },
+    [s(GameEvents.updateHand)](state: any, hand: number[]) {
+      state.user.isCzar = false
+      state.user.hand = hand
     }
 
   },

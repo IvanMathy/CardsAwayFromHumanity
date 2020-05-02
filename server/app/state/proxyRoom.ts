@@ -6,6 +6,7 @@ import { GameCommand } from "../../../client/shared/events";
 
 export enum RoomCommands {
     tryJoining = "tj",
+    spectate = "st",
     playerLeft = "pl",
     gameCommand = "gc"
 }
@@ -48,6 +49,10 @@ export class ProxyRoom extends RoomBase implements Room {
 
     tryJoining(player: Player){
         this.publish(new RoomMessage(RoomCommands.tryJoining, player.id))
+    }
+
+    spectate(player: Player){
+        this.publish(new RoomMessage(RoomCommands.spectate, player.id))
     }
 
     playerLeft(player:Player): void {

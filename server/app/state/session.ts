@@ -42,8 +42,6 @@ export class Session {
             }
         });
 
-
-
         socket.on(Commands.gameCommand, function (this: Session, command, payload) {
             try {
                 session.player.joinedRoom?.onGameCommand(session.player.id, command, payload)
@@ -67,7 +65,7 @@ export class Session {
         this.player.disconnect(this)
     }
 
-    joinedRoom(room: Room) {
+    watchRoom(room: Room) {
         this.socket?.join(`rooms:${room.roomCode}`)
     }
 }

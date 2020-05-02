@@ -123,6 +123,12 @@ export class HostedRoom extends RoomBase implements Room {
                     this.tryJoining(player)
                 })
                 return
+            case RoomCommands.spectate:
+                console.log("spectate join")
+                Player.getPlayer(message.payload).then((player) => {
+                    this.tryJoining(player)
+                })
+                return
             case RoomCommands.playerLeft:
                 Player.getPlayer(message.payload).then((player) => {
                     this.playerLeft(player)
@@ -148,6 +154,12 @@ export class HostedRoom extends RoomBase implements Room {
             player.sendEvent(Events.roomFull)
         }
     }
+
+    spectate(player: Player){
+        this.game.spectatorJoined(player)
+        player.sendEvent(Events.startedSpectating, this.roomCode, player.id == this.host.id)
+    }
+
 
     playerLeft(player: Player): void {
         //

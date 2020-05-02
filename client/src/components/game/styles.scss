@@ -3,15 +3,16 @@
   width: 260px;
   text-align: left;
   font-weight: bold;
-  font-size: 28px;
+  font-size: 26px;
   line-height: 35px;
   padding: 20px;
   border-radius: 15px;
   height: 400px;
   background-color: white;
   background: linear-gradient(135deg, #ffffff 0%, #bbbbbb 100%);
-  border: 1px black solid;
+  border: 1px #aaaaaa solid;
   box-shadow: 0px 10px 5px 0px rgba(0, 0, 0, 0.75);
+  cursor: default;
 }
 
 .black-card {
@@ -19,8 +20,8 @@
   width: 260px;
   text-align: left;
   font-weight: bold;
-  font-size: 20px;
-  line-height: 25px;
+  font-size: 24px;
+  line-height: 35px;
   padding: 20px;
   border-radius: 15px;
   height: 400px;
@@ -29,4 +30,5 @@
   border: 1px #444444 solid;
   margin: auto;
   box-shadow: 0px 5px 3px 0px rgba(0, 0, 0, 0.75);
+  cursor: default;
 }

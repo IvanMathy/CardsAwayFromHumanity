@@ -1,6 +1,6 @@
 import { Room, RoomBase, RoomKeys } from "../room";
 import { HostedRoom } from "../hostedRoom";
-import { Events } from "../../../../client/shared/events";
+import { Events, Commands } from "../../../../client/shared/events";
 import { redisClient, redisSubscriber } from "../../lib/redis";
 import { Session } from "../session";
 import { Player, PlayerMessage, PlayerKeys } from "./player";
@@ -99,6 +99,11 @@ export class LocalPlayer implements Player {
                 return
             }
 
+            if(payload.action == Commands.spectate) {
+                this.spectate(code)
+                return
+            }
+
             if (value[RoomKeys.passwordProtected] == String(false)) {
                 this.joinRoom(code)
                 return
@@ -124,6 +129,10 @@ export class LocalPlayer implements Player {
 
     }
 
+    private checkRoom(room: String) {
+
+    }
+
     private joinRoom(roomCode: string, password?: string) {
 
         this.leaveRoom()
@@ -142,9 +151,26 @@ export class LocalPlayer implements Player {
             })
     }
 
+    private spectate(roomCode: string) {
+
+        this.leaveRoom()
+        this.isHost = false
+
+        RoomBase.getRoom(roomCode)
+            .then((room) => {
+                console.log("spectating")
+                this.joinedRoom = room
+                room.spectate(this)
+                this.session?.watchRoom(room)
+            })
+            .catch((error) => {
+                this.sendEvent(Events.cannotJoin)
+            })
+    }
+
     successfullyJoinedRoom(room: Room, isHost: boolean) {
         this.joinedRoom = room
-        this.session?.joinedRoom(room)
+        this.session?.watchRoom(room)
         this.sendEvent(Events.joinedGame, room.roomCode, isHost)
     }
 

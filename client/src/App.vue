@@ -1,10 +1,13 @@
 <template>
   <div id="app">
-    <!-- <Spectator /> -->
-    <div v-if="$store.state.currentState == 'inLobby'">
+    <transition name="slide-fade">
+      <Error v-if="error" />
+    </transition>
+    <!-- <Spectator />-->
+    <div v-if="$store.state.currentState == ClientState.inLobby">
       <Home/>
     </div>
-    <Game v-else-if="$store.state.currentState == ClientState.inRoom" />
+    <Game v-else-if="currentState == ClientState.inRoom || currentState == ClientState.spectating" />
     <Welcome v-else></Welcome>
   </div>
 </template>
@@ -15,16 +18,19 @@ import HelloWorld from "./components/HelloWorld.vue";
 import Welcome from "./components/Welcome.vue";
 import Home from "./components/lobby/Home.vue";
 import Game from "./components/game/Game.vue";
+import Error from "./components/meta/Error.vue";
 import Spectator from "./components/game/Spectator.vue";
 import { ClientState } from "./store/index";
 import { Events, Commands, GameEvents } from "../shared/events";
-import { Socket } from 'vue-socket.io-extended';
+import { Socket } from "vue-socket.io-extended";
+import { mapState } from 'vuex';
 
 @Component({
   components: {
     Welcome,
     Game,
     Home,
+    Error,
     Spectator
   },
   sockets: {
@@ -37,20 +43,22 @@ import { Socket } from 'vue-socket.io-extended';
       }
     },
     [Events.unknownError]() {
-      alert("Unknown Error");
+      (this as App).error = true;
     }
   },
   computed: {
-   
+    ...mapState(["currentState"])
   }
 })
 export default class App extends Vue {
-  ClientState = ClientState
+  ClientState = ClientState;
+  error = false;
 }
 </script>
 
 <style lang="scss">
-html, body {
+html,
+body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -62,9 +70,21 @@ html, body {
 }
 
 .helvetica {
-  font-family: "HelveticaNeueBold", "HelveticaNeue-Bold", "Helvetica Neue Bold", "HelveticaNeue", "Helvetica Neue", 'TeXGyreHerosBold', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif; 
-  font-weight:600; 
-  font-stretch:normal;
+  font-family: "HelveticaNeueBold", "HelveticaNeue-Bold", "Helvetica Neue Bold",
+    "HelveticaNeue", "Helvetica Neue", "TeXGyreHerosBold", "Helvetica", "Tahoma",
+    "Geneva", "Arial", sans-serif;
+  font-weight: 600;
+  font-stretch: normal;
+}
+
+
+.slide-fade-enter-active {
+  transition: all 0.2s ease;
+}
+.slide-fade-enter,
+.slide-fade-leave-to {
+  padding-top: 40px;
+  opacity: 0;
 }
 
 @import "~bulma/sass/utilities/_all";
@@ -74,15 +94,42 @@ $body-background-color: #242424;
 $primary: #fa8b02;
 
 $colors: (
-    "white": ($white, $black),
-    "black": ($black, $white),
-    "light": ($light, $light-invert),
-    "dark": ($dark, $dark-invert),
-    "primary": ($primary, $primary-invert),
-    "info": ($info, $info-invert),
-    "success": ($success, $success-invert),
-    "warning": ($warning, $warning-invert),
-    "danger": ($danger, $danger-invert)
+  "white": (
+    $white,
+    $black
+  ),
+  "black": (
+    $black,
+    $white
+  ),
+  "light": (
+    $light,
+    $light-invert
+  ),
+  "dark": (
+    $dark,
+    $dark-invert
+  ),
+  "primary": (
+    $primary,
+    $primary-invert
+  ),
+  "info": (
+    $info,
+    $info-invert
+  ),
+  "success": (
+    $success,
+    $success-invert
+  ),
+  "warning": (
+    $warning,
+    $warning-invert
+  ),
+  "danger": (
+    $danger,
+    $danger-invert
+  )
 );
 
 @import "~bulma";

@@ -53,6 +53,7 @@ export interface Room {
 
     tryJoining(player: Player): void
     playerLeft(player: Player): void
+    spectate(player: Player): void
 
     onMessage(message: RoomMessage): void
     onGameCommand(playerId: string, command: GameCommand, ...args: any[]): void

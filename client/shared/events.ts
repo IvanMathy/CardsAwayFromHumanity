@@ -8,12 +8,15 @@ export enum Events {
     passwordNeeded = "pw",
     roomCreated = "r",
     roomCreationFailed = "rf",
+    startedSpectating = "ss",
     joinedGame = "joined"
 }
 
 export enum Commands {
     hostGame = "host",
+    checkRoom = "check",
     joinGame = "join",
+    spectate = "spectate",
     authenticate = "auth",
     gameCommand = "gc"
 }
@@ -21,10 +24,12 @@ export enum Commands {
 export enum GameStage {
     waitingToStart = "w",
     startingRound = "s",
-    pickingCards = "p"
+    pickingCards = "p",
+    pickingWinner = "c"
 }
 
 export enum GameEvents {
+    becomeCzar = "bc",
     stateChanged = "sc",
     timer = "t",
     updateHand = "uh"
@@ -37,7 +42,7 @@ export enum GameCommand {
 }
 
 export class GameState {
-    players: {name: string; id: string; score: number; host?: boolean}[] = []
+    players: {name: string; id: string; score: number; host?: boolean; czar?: boolean; card?: number; winner?: boolean}[] = []
     gameInfo: any = {}
 
     constructor(

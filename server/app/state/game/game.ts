@@ -16,6 +16,11 @@ export interface Game<GameCommandType> {
     playerJoined(player: Player): void
     playerLeft(player: Player): void
 
+    spectatorJoined(player: Player): void
+
+    exportState(): string
+    loadState(stateString: string): void
+
     onMessage(message: GameMessage<GameCommandType>): void
 
     clean(): void
