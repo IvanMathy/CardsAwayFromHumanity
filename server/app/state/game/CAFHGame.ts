@@ -275,11 +275,37 @@ export class CAFHGame implements Game<GameCommand> {
     // - State Recovery
 
 
+
+
+
     exportState(): string {
-        return ""
+
+        let currentState = new ExportableState(this.stage, this.blackCard)
+
+        for (let playerId in this.playerStates) {
+            const state = this.playerStates[playerId]
+            if (state.active) {
+                currentState.playerStates.push({
+                    id: state.id,
+                    playerId: state.player.id,
+                    hand: state.hand,
+                    points: state.points
+                })
+            }
+        }
+
+        return JSON.stringify(currentState)
     }
+
     loadState(stateString: string) {
-
+        console.debug(stateString)
     }
 
+}
+class ExportableState {
+    playerStates: any[] = []
+
+    constructor(public stage: GameStage, public blackCard: number) {
+
+    }
 }

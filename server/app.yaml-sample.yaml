@@ -1,0 +1,11 @@
+runtime: nodejs
+env: flex
+
+network:
+  session_affinity: true
+  name: cafh
+
+env_variables:
+## You want to set up your variables like so:
+#  REDIS_IP: ...
+#  REDIS_PORT: .. 

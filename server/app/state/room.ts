@@ -7,7 +7,9 @@ import { redisClient } from "../lib/redis";
 export enum RoomKeys {
     password = "password",
     roomCode = "roomCode",
-    passwordProtected = "protected"
+    passwordProtected = "protected",
+    hosted = "hosted",
+    gameState = "gameState"
 }
 
 

@@ -40,6 +40,8 @@ import { mapState } from 'vuex';
     disconnect(whyyyyy) {
       if (whyyyyy === "io server disconnect") {
         alert("booted");
+      } else {
+        console.log("deco")
       }
     },
     [Events.unknownError]() {

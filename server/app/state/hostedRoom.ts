@@ -66,6 +66,7 @@ export class HostedRoom extends RoomBase implements Room {
                 values.push(RoomKeys.password, password)
             }
 
+            values.push(RoomKeys.hosted, String(true))
 
             redisClient.multi()
                 // Create the room, expire it in 24 hours
@@ -107,6 +108,20 @@ export class HostedRoom extends RoomBase implements Room {
             .exec()
 
         delete state.rooms[this.roomCode]
+    }
+
+    disconnect() {
+        if (this.roomCode == null) {
+            return
+        }
+        console.debug("Saving Room State: " + this.roomCode)
+
+        redisClient.multi()
+            .hmset(`room:${this.roomCode}`, [
+                RoomKeys.hosted, String(false),
+                RoomKeys.gameState, this.game.exportState()
+            ])
+            .exec()
     }
 
     // Event Handling

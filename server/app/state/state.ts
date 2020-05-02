@@ -57,7 +57,7 @@ class State {
                 try {
                     let value = this.rooms[key] 
                     if(value instanceof HostedRoom) {
-                        multi.del(`room:${this.rooms[key].roomCode}`)
+                        (value as HostedRoom).disconnect()
                     }
                 } catch(err) {
                     console.error(err)
