@@ -69,7 +69,7 @@ export class LocalPlayer implements Player {
 
         this.isHost = true
 
-        let room = new HostedRoom(this, password, (success, code) => {
+        let room = new HostedRoom(this, password, undefined,(success, code) => {
             if (!success) {
                 this.session?.emit(Events.roomCreationFailed)
                 this.isHost = false

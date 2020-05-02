@@ -9,7 +9,8 @@ export enum RoomKeys {
     roomCode = "roomCode",
     passwordProtected = "protected",
     hosted = "hosted",
-    gameState = "gameState"
+    gameState = "gameState",
+    host = "host"
 }
 
 
@@ -34,6 +35,12 @@ export class RoomBase {
                 }
 
                 try {
+
+                    if(values.hosted == String(false)) {
+                        this.rehostRoom(values, resolve, reject)
+                        return
+                    }
+                    
                     console.debug("Created Proxy Room")
                     let newRoom = new ProxyRoom(values.roomCode, values.password)
                     state.rooms[values.roomCode] = newRoom
@@ -45,6 +52,25 @@ export class RoomBase {
                 
             })
         });
+    }
+
+    static rehostRoom(values: any, resolve: (room: Room) => void, reject: (reason: any) => void) {
+        
+        let room = new HostedRoom(values[RoomKeys.roomCode], values[RoomKeys.password], values, (success, code) => {
+
+            if (!success) {
+                reject("Cannot Find Room")
+                return
+            }
+
+            Player.getPlayer(values[RoomKeys.host]).then(player => {
+                room.host = player
+                resolve(room)
+            }).catch(reason => {
+                reject(reason)
+            })
+            
+        })
     }
 }
 
@@ -75,4 +101,5 @@ export class RoomMessage {
 
 
 import { ProxyRoom } from "./proxyRoom";
-import { GameState, GameCommand } from "../../../client/shared/events";
+import { GameState, GameCommand } from "../../../client/shared/events";import { HostedRoom } from "./hostedRoom";
+

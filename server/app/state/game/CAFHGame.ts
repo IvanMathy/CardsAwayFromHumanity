@@ -280,17 +280,14 @@ export class CAFHGame implements Game<GameCommand> {
 
     exportState(): string {
 
-        let currentState = new ExportableState(this.stage, this.blackCard)
+        let currentState = new ExportableState(this.stage, this.blackCard, this.stage != GameStage.waitingToStart)
 
         for (let playerId in this.playerStates) {
             const state = this.playerStates[playerId]
             if (state.active) {
-                currentState.playerStates.push({
-                    id: state.id,
-                    playerId: state.player.id,
-                    hand: state.hand,
-                    points: state.points
-                })
+                currentState.playerStates.push(
+                    new ExportablePlayerState(state.id, state.player.id, state.hand, state.points)
+                )
             }
         }
 
@@ -298,14 +295,35 @@ export class CAFHGame implements Game<GameCommand> {
     }
 
     loadState(stateString: string) {
-        console.debug(stateString)
+        let newState = JSON.parse(stateString) as ExportableState
+
+        console.log("Recovering game")
+
+        this.stage = newState.stage
+        this.blackCard = newState.blackCard
+
+        newState.playerStates.forEach(state => {
+            Player.getPlayer(state.playerId).then(player => {
+                let playerState = new PlayerState(player)
+                playerState.id = state.id
+                playerState.hand = state.hand
+                playerState.points = state.points
+                
+                this.playerStates[player.id] = playerState
+            })
+        })
     }
 
 }
-class ExportableState {
-    playerStates: any[] = []
 
-    constructor(public stage: GameStage, public blackCard: number) {
+class ExportablePlayerState {
+    constructor(public id: string, public playerId: string, public hand: number[], public points: number) {}
+}
+
+class ExportableState {
+    playerStates: ExportablePlayerState[] = []
+
+    constructor(public stage: GameStage, public blackCard: number, public started: boolean) {
 
     }
 }
