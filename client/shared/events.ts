@@ -25,7 +25,8 @@ export enum GameStage {
     waitingToStart = "w",
     startingRound = "s",
     pickingCards = "p",
-    pickingWinner = "c"
+    pickingWinner = "c",
+    notEnoughPlayers = "n"
 }
 
 export enum GameEvents {

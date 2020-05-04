@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "pack": "vue-cli-service build --dest ../server/dist",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

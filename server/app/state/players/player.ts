@@ -31,7 +31,7 @@ export class Player {
                     return 
                 }
 
-                console.log(values)
+                console.log("player:" + values)
 
                 try {
                     console.debug("Created Proxy Player")

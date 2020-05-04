@@ -16,7 +16,7 @@ Vue.use(Buefy, {
 const socket = io(
   process.env.NODE_ENV === 'development'
     ? `ws://${window.location.hostname}:3000`
-    : 'wss://play.cafh.okat.best'
+    : undefined as any
 );
 
 Vue.use(VueSocketIOExt, socket, { store });
