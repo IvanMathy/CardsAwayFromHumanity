@@ -43,6 +43,23 @@ export class CAFHGame implements Game<GameCommand> {
                 }
                 break
             case GameCommand.pickCard:
+                if(this.stage !== GameStage.pickingCards) {
+                    return
+                }
+
+                if(!this.playerStates.hasOwnProperty(message.playerId)) {
+                    // TODO: Handle spectator vote
+
+                    return
+                }
+
+                try {
+                    this.playerStates[message.playerId].pickedcard = message.message[0]
+                    console.log(this.playerStates[message.playerId])
+                } catch (error) {
+                    this.playerStates[message.playerId].player.sendEvent(Events.unknownError)
+                }
+                
                 break
         }
     }
@@ -124,7 +141,9 @@ export class CAFHGame implements Game<GameCommand> {
             }
         }
 
-        if (this.stage == GameStage.startingRound || this.stage == GameStage.pickingCards) {
+        if (this.stage == GameStage.startingRound || 
+            this.stage == GameStage.pickingCards ||
+            this.stage == GameStage.pickingWinner) {
             state.gameInfo.blackCard = this.blackCard
         }
 

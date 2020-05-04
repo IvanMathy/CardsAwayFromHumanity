@@ -14,7 +14,7 @@
               size="is-medium"
               outlined
               v-if="!picked"
-              @click="pick()"
+              @click="pick(card)"
             >Pick Card</b-button>
           </div>
         </div>
@@ -28,6 +28,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import Flickity from "vue-flickity";
 import { whiteCards, blackCards } from '../meta/cards';
 import { mapState } from 'vuex';
+import { Commands, GameCommand } from '../../../shared/events';
 
 @Component({
   components: {
@@ -56,9 +57,11 @@ export default class Game extends Vue {
     friction: 0.6
   };
 
-  pick() {
+  pick(card: number) {
     (this.$refs.flickity as any).disableDrag()
     this.picked = true
+
+    this.$socket.client.emit(Commands.gameCommand, GameCommand.pickCard, card);
   }
 }
 </script>
