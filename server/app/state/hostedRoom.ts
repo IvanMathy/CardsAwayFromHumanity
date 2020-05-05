@@ -82,7 +82,7 @@ export class HostedRoom extends RoomBase implements Room {
                     callback(true, roomCode)
 
                 })
-                
+
             return
         }
 
@@ -207,7 +207,7 @@ export class HostedRoom extends RoomBase implements Room {
         }
     }
 
-    spectate(player: Player){
+    spectate(player: Player) {
         this.game.spectatorJoined(player)
         player.sendEvent(Events.startedSpectating, this.roomCode, player.id == this.host.id)
     }

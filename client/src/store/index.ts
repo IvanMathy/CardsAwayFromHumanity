@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { GameState, Events, GameEvents } from "../../shared/events";
+import { GameState, Events, GameEvents, PlayerLocation } from "../../shared/events";
 
 Vue.use(Vuex)
 
@@ -10,7 +10,8 @@ export enum ClientState {
   unauthenticated = "unauthenticated",
   inLobby = "inLobby",
   spectating = "spectating",
-  inRoom = "inRoom"
+  inRoom = "inRoom",
+  disconnected = "disconnected"
 }
 
 function s(name: string) {
@@ -39,6 +40,28 @@ export default new Vuex.Store({
       state.currentState = ClientState.inLobby
 
       localStorage.setItem(playerIdKey, newUser.newId)
+    },
+
+    rejoined(state: any, userState: Record<string, string>) {
+      switch (userState.location as PlayerLocation) {
+        case PlayerLocation.inGame:
+
+          state.currentState = ClientState.inRoom
+          state.joinedRoom = userState.room
+          break;
+        case PlayerLocation.spectating:
+
+          state.currentState = ClientState.spectating
+          state.joinedRoom = userState.room
+          break;
+
+        default:
+          break;
+      }
+    },
+
+    disconnected(state: any) {
+      state.currentState = ClientState.disconnected
     },
 
     SOCKET_JOINED(state, payload: any) {
@@ -80,6 +103,12 @@ export default new Vuex.Store({
   actions: {
     authenticated(context, newUser: Record<string, string>) {
       context.commit('authenticated', newUser)
+    },
+    rejoined(context, userState: Record<string, string>) {
+      context.commit('rejoined', userState)
+    },
+    disconnected(context) {
+      context.commit('disconnected')
     }
   }
 })

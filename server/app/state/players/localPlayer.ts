@@ -1,11 +1,12 @@
 import { Room, RoomBase, RoomKeys } from "../room";
 import { HostedRoom } from "../hostedRoom";
-import { Events, Commands } from "../../../../client/shared/events";
-import { redisClient, redisSubscriber } from "../../lib/redis";
+import { Events, Commands, PlayerLocation } from "../../../../client/shared/events";
+import { redisClient, redisSubscriber, redisPublisher } from "../../lib/redis";
 import { Session } from "../session";
 import { Player, PlayerMessage, PlayerKeys } from "./player";
 import { eventEmitter } from "../../lib/event";
 import { PlayerCommands } from "./proxyPlayer";
+import { state } from "../state";
 
 
 
@@ -13,8 +14,6 @@ export class LocalPlayer implements Player {
 
     isHost: boolean = false
     session?: Session
-    lastSeen = new Date().getTime()
-    active = true
 
     hostedRoom?: Room
     joinedRoom?: Room
@@ -24,12 +23,12 @@ export class LocalPlayer implements Player {
         let key = `user:${id}`
 
         redisClient.multi()
-            // Create the player, expire it in ten minutes
+            // Create the player, expire it in four hours
             .hmset(key,
                 PlayerKeys.id, id,
                 PlayerKeys.name, name,
-                PlayerKeys.lastSeen, new Date().getTime())
-            .expire(key, 60 * 10)
+                PlayerKeys.hosted, String(true))
+            .expire(key, 60 * 60 * 4)
             .exec()
 
         // Set listeners
@@ -38,6 +37,8 @@ export class LocalPlayer implements Player {
 
         console.log(channelName)
 
+        this.broadcastDelete()
+
         eventEmitter.on(channelName, this.onMessage)
         redisSubscriber.subscribe(channelName)
 
@@ -45,7 +46,7 @@ export class LocalPlayer implements Player {
 
     onMessage = (message: PlayerMessage) => {
         console.log(message)
-        switch(message.type) {
+        switch (message.type) {
             case PlayerCommands.sendEvent:
                 this.sendEvent(message.payload.event, message.payload.payload)
                 break
@@ -55,6 +56,15 @@ export class LocalPlayer implements Player {
                 }).catch((err) => {
                     console.error("Error finding room in remote join: ", err)
                 })
+            case PlayerCommands.delete:
+
+                let key = `user:${this.id}`
+                let channelName = `events:to:${key}`
+
+                console.log("Got Proxy delete command for id:" + this.id)
+                eventEmitter.off(channelName, this.onMessage)
+                redisSubscriber.unsubscribe(channelName)
+                delete state.players[this.id]
         }
     }
 
@@ -69,7 +79,7 @@ export class LocalPlayer implements Player {
 
         this.isHost = true
 
-        let room = new HostedRoom(this, password, undefined,(success, code) => {
+        let room = new HostedRoom(this, password, undefined, (success, code) => {
             if (!success) {
                 this.session?.emit(Events.roomCreationFailed)
                 this.isHost = false
@@ -99,7 +109,7 @@ export class LocalPlayer implements Player {
                 return
             }
 
-            if(payload.action == Commands.spectate) {
+            if (payload.action == Commands.spectate) {
                 this.spectate(code)
                 return
             }
@@ -141,8 +151,6 @@ export class LocalPlayer implements Player {
         RoomBase.getRoom(roomCode)
             .then((room) => {
 
-                console.log("joining")
-
                 room.tryJoining(this)
 
             })
@@ -158,10 +166,10 @@ export class LocalPlayer implements Player {
 
         RoomBase.getRoom(roomCode)
             .then((room) => {
-                console.log("spectating")
                 this.joinedRoom = room
                 room.spectate(this)
                 this.session?.watchRoom(room)
+                this.setLocation(PlayerLocation.spectating, room.roomCode)
             })
             .catch((error) => {
                 this.sendEvent(Events.cannotJoin)
@@ -172,6 +180,7 @@ export class LocalPlayer implements Player {
         this.joinedRoom = room
         this.session?.watchRoom(room)
         this.sendEvent(Events.joinedGame, room.roomCode, isHost)
+        this.setLocation(PlayerLocation.inGame, room.roomCode)
     }
 
     private leaveRoom() {
@@ -186,32 +195,63 @@ export class LocalPlayer implements Player {
     connect(session: Session) {
         // To avoid multiple tabs logged in as the same user
         this.session?.forceEnd()
-        this.active = true
         this.session = session
     }
 
-    disconnect(session: Session) {
+    onDisconnect(session: Session) {
         if (session == this.session) {
-            this.active = false
-            this.lastSeen = new Date().getTime()
-            console.log("disconnect")
             this.leaveRoom()
+            delete state.players[this.id]
         }
     }
 
-    renew() {
-        let now = new Date().getTime()
-        // Reset the expiry timer
-        if (this.lastSeen < now - 300000) {
-            let key = `users:${this.id}`
-            redisClient.multi()
-                .expire(`users:${this.id}`, 60 * 10)
-                .hset(key, PlayerKeys.lastSeen, String(now))
-            this.lastSeen = now
+    setLocation(location: PlayerLocation, room?: string) {
+        let key = `user:${this.id}`
+
+        let payload: string[] = [
+            PlayerKeys.location, location
+        ]
+
+        if (room !== undefined) {
+            payload.push(PlayerKeys.room, room)
         }
+
+        redisClient.hmset(key, payload)
     }
 
-    clean() {
-        redisClient.del(`user:${this.id}`)
+    reloadState(): Promise<{location:PlayerLocation, room?: string}> {
+        return new Promise((resolve, reject) => {
+            redisClient.hgetall(`user:${this.id}`, (err, values) => {
+                if(err !== null) {
+                    return reject(err)
+                }
+
+                resolve({
+                    location: values[PlayerKeys.location] as PlayerLocation, 
+                    room: values[PlayerKeys.room]
+                })
+                
+            })
+        })
+    }
+
+    disconnect() {
+        console.debug("Saving Player State: " + this.id)
+
+        redisClient.multi()
+            .hmset(`user:${this.id}`, [
+                PlayerKeys.hosted, String(false)
+            ])
+            .exec()
+
+        this.broadcastDelete()
+    }
+
+    broadcastDelete() {
+        let key = `user:${this.id}`
+        let message = new PlayerMessage(PlayerCommands.delete, {})
+
+        redisPublisher.publish(`events:from:${key}`, JSON.stringify(message))
+        redisPublisher.publish(`events:to:${key}`, JSON.stringify(message))
     }
 }

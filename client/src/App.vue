@@ -1,11 +1,11 @@
 <template>
   <div id="app">
     <transition name="slide-fade">
-      <Error v-if="error" />
+      <Error v-if="error || $store.state.currentState == ClientState.disconnected" />
     </transition>
     <!-- <Spectator />-->
     <div v-if="$store.state.currentState == ClientState.inLobby">
-      <Home/>
+      <Home />
     </div>
     <Game v-else-if="currentState == ClientState.inRoom || currentState == ClientState.spectating" />
     <Welcome v-else></Welcome>
@@ -23,7 +23,7 @@ import Spectator from "./components/game/Spectator.vue";
 import { ClientState } from "./store/index";
 import { Events, Commands, GameEvents } from "../shared/events";
 import { Socket } from "vue-socket.io-extended";
-import { mapState } from 'vuex';
+import { mapState } from "vuex";
 
 @Component({
   components: {
@@ -35,13 +35,41 @@ import { mapState } from 'vuex';
   },
   sockets: {
     connect() {
+      // TODO: make this not burn my eyes
       console.log("socket connected");
+      // if ((this as App).reconnecting) {
+      //   console.log("Reconnecting");
+      //   setTimeout(() => {
+      //     this.$socket.client.emit(
+      //       Commands.rejoin,
+      //       {
+      //         id: this.$store.state.user.userId,
+      //         name: this.$store.state.user.username
+      //       },
+      //       (newId?: string, location?: string, room?: string) => {
+      //         if (newId == null || newId == undefined || location == null) {
+      //           alert("Could not authenticate. Sorry!");
+      //           return;
+      //         }
+      //         this.$store.dispatch("rejoined", {
+      //           location: location,
+      //           room: room
+      //         });
+      //       }
+      //     );
+      //   }, 2000);
+      // }
     },
     disconnect(whyyyyy) {
       if (whyyyyy === "io server disconnect") {
         alert("booted");
       } else {
-        console.log("deco")
+        // this.$buefy.toast.open({
+        //   message: `Lost connection, trying again...`,
+        //   type: "is-danger"
+        // })
+        this.$store.dispatch("disconnected");
+        // (this as App).reconnecting = true;
       }
     },
     [Events.unknownError]() {
@@ -55,6 +83,7 @@ import { mapState } from 'vuex';
 export default class App extends Vue {
   ClientState = ClientState;
   error = false;
+  reconnecting = false;
 }
 </script>
 
@@ -78,7 +107,6 @@ body {
   font-weight: 600;
   font-stretch: normal;
 }
-
 
 .slide-fade-enter-active {
   transition: all 0.2s ease;

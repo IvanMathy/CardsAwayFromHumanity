@@ -8,7 +8,9 @@ import { Room } from "../room";
 export enum PlayerKeys {
     name = "name",
     id = "id",
-    lastSeen = "lastSeen"
+    hosted = "hosted",
+    location = "location",
+    room = "room"
 }
 
 export class Player {

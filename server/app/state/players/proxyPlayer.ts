@@ -2,10 +2,12 @@ import { Player, PlayerMessage } from "./player";
 import { Room } from "../room";
 import { eventEmitter } from "../../lib/event";
 import { redisSubscriber, redisPublisher } from "../../lib/redis";
+import { state } from "../state";
 
 export enum PlayerCommands {
     successfullyJoined = "sj",
-    sendEvent = "se"
+    sendEvent = "se",
+    delete = "de"
 }
 
 export class ProxyPlayer implements Player {
@@ -19,13 +21,19 @@ export class ProxyPlayer implements Player {
         redisSubscriber.subscribe(channelName)
     }
     
-    onMessage(message: PlayerMessage) {
-        
+    onMessage = (message: PlayerMessage) => {
+        let key = `user:${this.id}`
+        let channelName = `events:from:${key}`
+
+        if(message.type == PlayerCommands.delete) {
+            console.log("Got Proxy delete command for id:" + this.id)
+            eventEmitter.off(channelName, this.onMessage)
+            redisSubscriber.unsubscribe(channelName)
+            delete state.players[this.id]
+        }
     }
 
     publish(message: PlayerMessage) {
-        console.log(this)
-        console.log(`events:to:user:${this.id}`)
         redisPublisher.publish(`events:to:user:${this.id}`, JSON.stringify(message))
     }
 

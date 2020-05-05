@@ -7,6 +7,7 @@ export enum Events {
     invalidRoomCode = "ir",
     passwordNeeded = "pw",
     roomCreated = "r",
+    rejoined = "re",
     roomCreationFailed = "rf",
     startedSpectating = "ss",
     joinedGame = "joined"
@@ -18,6 +19,7 @@ export enum Commands {
     joinGame = "join",
     spectate = "spectate",
     authenticate = "auth",
+    rejoin = "rejoin",
     gameCommand = "gc"
 }
 
@@ -40,6 +42,12 @@ export enum GameCommand {
     startGame = "sg",
     pickCard = "pc",
     pickBlackCard = "pb"
+}
+
+export enum PlayerLocation {
+    none = "n",
+    inGame = "i",
+    spectating = "s"
 }
 
 export class GameState {
