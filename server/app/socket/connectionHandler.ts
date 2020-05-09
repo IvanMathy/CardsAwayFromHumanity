@@ -32,31 +32,31 @@ export function onConnection(socket: SocketIO.Socket) {
         }
 
     })
-    // socket.on(Commands.rejoin, function (data, callback: Function) {
+    socket.on(Commands.rejoin, function (data, callback: Function) {
 
 
-    //     try {
-    //         if (session !== undefined) {
-    //             return
-    //         }
+        try {
+            if (session !== undefined) {
+                return
+            }
 
-    //         console.log("Player Rejoined: " + data.id)
+            console.log("Player Rejoined: " + data.id)
 
-    //         let player = Player.authenticate(data)
+            let player = Player.authenticate(data)
 
-    //         player.reloadState().then((location) => {
-    //             callback(player.id, location.location, location.room)
-    //         }).catch((err) => {
-    //             console.error(err)
-    //             socket.emit(Events.unknownError)
-    //         })
+            player.reloadState().then((location) => {
+                callback(player.id, location.location, location.room)
+            }).catch((err) => {
+                console.error(err)
+                socket.emit(Events.unknownError)
+            })
 
-    //         session = new Session(socket, player)
+            session = new Session(socket, player)
 
-    //     } catch (err) {
-    //         console.error(err)
-    //         socket.emit(Events.unknownError)
-    //     }
+        } catch (err) {
+            console.error(err)
+            socket.emit(Events.unknownError)
+        }
 
-    // })
+    })
 }

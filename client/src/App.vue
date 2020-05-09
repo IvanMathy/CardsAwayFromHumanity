@@ -37,39 +37,39 @@ import { mapState } from "vuex";
     connect() {
       // TODO: make this not burn my eyes
       console.log("socket connected");
-      // if ((this as App).reconnecting) {
-      //   console.log("Reconnecting");
-      //   setTimeout(() => {
-      //     this.$socket.client.emit(
-      //       Commands.rejoin,
-      //       {
-      //         id: this.$store.state.user.userId,
-      //         name: this.$store.state.user.username
-      //       },
-      //       (newId?: string, location?: string, room?: string) => {
-      //         if (newId == null || newId == undefined || location == null) {
-      //           alert("Could not authenticate. Sorry!");
-      //           return;
-      //         }
-      //         this.$store.dispatch("rejoined", {
-      //           location: location,
-      //           room: room
-      //         });
-      //       }
-      //     );
-      //   }, 2000);
-      // }
+      if ((this as App).reconnecting) {
+        console.log("Reconnecting");
+        setTimeout(() => {
+          this.$socket.client.emit(
+            Commands.rejoin,
+            {
+              id: this.$store.state.user.userId,
+              name: this.$store.state.user.username
+            },
+            (newId?: string, location?: string, room?: string) => {
+              if (newId == null || newId == undefined || location == null) {
+                alert("Could not authenticate. Sorry!");
+                return;
+              }
+              this.$store.dispatch("rejoined", {
+                location: location,
+                room: room
+              });
+            }
+          );
+        }, 2000);
+      }
     },
     disconnect(whyyyyy) {
       if (whyyyyy === "io server disconnect") {
         alert("booted");
       } else {
-        // this.$buefy.toast.open({
-        //   message: `Lost connection, trying again...`,
-        //   type: "is-danger"
-        // })
+        this.$buefy.toast.open({
+          message: `Lost connection, trying again...`,
+          type: "is-danger"
+        })
         this.$store.dispatch("disconnected");
-        // (this as App).reconnecting = true;
+        (this as App).reconnecting = true;
       }
     },
     [Events.unknownError]() {
