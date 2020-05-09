@@ -55,7 +55,6 @@ export class CAFHGame implements Game<GameCommand> {
 
                 try {
                     this.playerStates[message.playerId].pickedcard = message.message[0]
-                    console.log(this.playerStates[message.playerId])
                 } catch (error) {
                     this.playerStates[message.playerId].player.sendEvent(Events.unknownError)
                 }
@@ -317,9 +316,10 @@ export class CAFHGame implements Game<GameCommand> {
         let newState = JSON.parse(stateString) as ExportableState
 
         console.log("Recovering game")
-
-        this.stage = newState.stage
+        
         this.blackCard = newState.blackCard
+
+        this.setStage(newState.stage)
 
         newState.playerStates.forEach(state => {
             Player.getPlayer(state.playerId).then(player => {

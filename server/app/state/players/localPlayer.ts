@@ -226,10 +226,16 @@ export class LocalPlayer implements Player {
                     return reject(err)
                 }
 
+                let location = values[PlayerKeys.location] as PlayerLocation
+
                 resolve({
-                    location: values[PlayerKeys.location] as PlayerLocation, 
+                    location: location, 
                     room: values[PlayerKeys.room]
                 })
+
+                if(location == PlayerLocation.inGame) {
+                    this.joinRoom(values[PlayerKeys.room])
+                }
                 
             })
         })

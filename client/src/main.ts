@@ -15,7 +15,7 @@ Vue.use(Buefy, {
 
 const socket = io(
   process.env.NODE_ENV === 'development'
-    ? `ws://${window.location.hostname}:4000`
+    ? `ws://${window.location.hostname}:3000`
     : undefined as any
 );
 
