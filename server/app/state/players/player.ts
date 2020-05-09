@@ -8,7 +8,9 @@ import { Room } from "../room";
 export enum PlayerKeys {
     name = "name",
     id = "id",
-    lastSeen = "lastSeen"
+    hosted = "hosted",
+    location = "location",
+    room = "room"
 }
 
 export class Player {
@@ -31,7 +33,7 @@ export class Player {
                     return 
                 }
 
-                console.log(values)
+                console.log("player:" + values)
 
                 try {
                     console.debug("Created Proxy Player")

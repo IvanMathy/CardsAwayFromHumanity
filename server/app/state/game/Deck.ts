@@ -1,4 +1,5 @@
-const cardsCount = 300
+const whiteCardsCount = 460
+const blackCardsCount = 76
 
 export class Deck {
 
@@ -6,11 +7,13 @@ export class Deck {
     cardsInPlay = new Set<number>()
     cards: number[]
 
+    usedBlackCards: number[] = []
+
     constructor() {
         let cards: number[] = []
 
-        for (var i = 0; i < cardsCount; i++) {
-            cards.push(i);
+        for (var i = 0; i < whiteCardsCount - 1; i++) {
+            cards.push(i)
         }
 
         this.cards = this.shuffle(cards)
@@ -23,7 +26,7 @@ export class Deck {
         // Bootleg Fisher–Yates 
         for (let from = cards.length - 1; from > 0; from--) {
             const to = Math.floor(Math.random() * (from + 1));
-            [cards[to], cards[from]] = [cards[from], cards[to]];
+            [cards[to], cards[from]] = [cards[from], cards[to]]
         }
 
         return cards
@@ -55,7 +58,23 @@ export class Deck {
     }
 
     getBlackCard(): number {
-        return 0
+
+        if(this.usedBlackCards.length == blackCardsCount) {
+            this.usedBlackCards = []
+        }
+
+        let card:number | undefined = undefined
+
+        while(card === undefined){
+            var r = Math.floor(Math.random() * blackCardsCount);
+            if(this.usedBlackCards.indexOf(r) === -1) {
+                card = r
+                this.usedBlackCards.push(r);
+            }
+        }
+
+        return card
+
     }
 
     discard(card: number){

@@ -62,7 +62,7 @@ export class Session {
 
     onDisconnect() {
         this.socket = undefined
-        this.player.disconnect(this)
+        this.player.onDisconnect(this)
     }
 
     watchRoom(room: Room) {

@@ -43,6 +43,22 @@ export class CAFHGame implements Game<GameCommand> {
                 }
                 break
             case GameCommand.pickCard:
+                if(this.stage !== GameStage.pickingCards) {
+                    return
+                }
+
+                if(!this.playerStates.hasOwnProperty(message.playerId)) {
+                    // TODO: Handle spectator vote
+
+                    return
+                }
+
+                try {
+                    this.playerStates[message.playerId].pickedcard = message.message[0]
+                } catch (error) {
+                    this.playerStates[message.playerId].player.sendEvent(Events.unknownError)
+                }
+                
                 break
         }
     }
@@ -124,7 +140,9 @@ export class CAFHGame implements Game<GameCommand> {
             }
         }
 
-        if (this.stage == GameStage.startingRound || this.stage == GameStage.pickingCards) {
+        if (this.stage == GameStage.startingRound || 
+            this.stage == GameStage.pickingCards ||
+            this.stage == GameStage.pickingWinner) {
             state.gameInfo.blackCard = this.blackCard
         }
 
@@ -275,11 +293,56 @@ export class CAFHGame implements Game<GameCommand> {
     // - State Recovery
 
 
+
+
+
     exportState(): string {
-        return ""
+
+        let currentState = new ExportableState(this.stage, this.blackCard, this.stage != GameStage.waitingToStart)
+
+        for (let playerId in this.playerStates) {
+            const state = this.playerStates[playerId]
+            if (state.active) {
+                currentState.playerStates.push(
+                    new ExportablePlayerState(state.id, state.player.id, state.hand, state.points)
+                )
+            }
+        }
+
+        return JSON.stringify(currentState)
     }
+
     loadState(stateString: string) {
+        let newState = JSON.parse(stateString) as ExportableState
 
+        console.log("Recovering game")
+        
+        this.blackCard = newState.blackCard
+
+        this.setStage(newState.stage)
+
+        newState.playerStates.forEach(state => {
+            Player.getPlayer(state.playerId).then(player => {
+                let playerState = new PlayerState(player)
+                playerState.id = state.id
+                playerState.hand = state.hand
+                playerState.points = state.points
+                
+                this.playerStates[player.id] = playerState
+            })
+        })
     }
 
+}
+
+class ExportablePlayerState {
+    constructor(public id: string, public playerId: string, public hand: number[], public points: number) {}
+}
+
+class ExportableState {
+    playerStates: ExportablePlayerState[] = []
+
+    constructor(public stage: GameStage, public blackCard: number, public started: boolean) {
+
+    }
 }

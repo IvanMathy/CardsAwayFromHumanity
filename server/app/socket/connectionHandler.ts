@@ -1,10 +1,10 @@
-import {Player} from "../state/players/player"
-import {Events, Commands} from "../../../client/shared/events"
+import { Player } from "../state/players/player"
+import { Events, Commands } from "../../../client/shared/events"
 import { redisClient } from "../lib/redis";
 import { Socket } from "net";
 import { Session } from "../state/session";
 
-export function onConnection(socket:SocketIO.Socket) {
+export function onConnection(socket: SocketIO.Socket) {
     console.debug("Hello!")
 
     var session: Session | undefined = undefined
@@ -17,19 +17,46 @@ export function onConnection(socket:SocketIO.Socket) {
     socket.on(Commands.authenticate, function (data, callback: Function) {
 
         try {
-            if(session !== undefined) {
+            if (session !== undefined) {
                 return
             }
-    
+
             let player = Player.authenticate(data)
-    
+
             session = new Session(socket, player)
-    
+
             callback(player.id)
         } catch (err) {
             console.error(err)
             socket.emit(Events.unknownError)
         }
-       
+
+    })
+    socket.on(Commands.rejoin, function (data, callback: Function) {
+
+
+        try {
+            if (session !== undefined) {
+                return
+            }
+
+            console.log("Player Rejoined: " + data.id)
+
+            let player = Player.authenticate(data)
+
+            player.reloadState().then((location) => {
+                callback(player.id, location.location, location.room)
+            }).catch((err) => {
+                console.error(err)
+                socket.emit(Events.unknownError)
+            })
+
+            session = new Session(socket, player)
+
+        } catch (err) {
+            console.error(err)
+            socket.emit(Events.unknownError)
+        }
+
     })
 }

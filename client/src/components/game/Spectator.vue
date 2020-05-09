@@ -15,16 +15,7 @@
       </div>
     </div>
 
-    <div
-      class="cards-container"
-      :class="cards.length > 5 ? 'moreThan5Cards' : (cards.length > 2 ? 'lessThan5cards' : 'twocards')"
-    >
-      <div class="cards topCards">
-        <div class="card-container" v-for="card in cards" :key="card">
-          <p class="white-card helvetica">{{ getWhiteCard(card)}}</p>
-        </div>
-      </div>
-    </div>
+   <CardViewer />
   </div>
 </template>
 
@@ -32,14 +23,15 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import Scoreboard from "./Scoreboard.vue";
 import WaitingRoom from "./WaitingRoom.vue";
+import CardViewer from "./CardViewer.vue";
 import { GameStage, GameState } from "../../../shared/events";
 import { mapState } from "vuex";
-import { blackCards, whiteCards } from "../meta/cards";
 
 @Component({
   components: {
     Scoreboard,
-    WaitingRoom
+    WaitingRoom,
+    CardViewer
   },
   computed: {
     ...mapState(["gameState"])
@@ -49,17 +41,9 @@ export default class Spectator extends Vue {
   showScoreboard = false;
   showRoomCode = true;
 
-  cards = [7, 9, 87, 78];
-
   Stage = GameStage;
 
-  getBlackCard(card: number) {
-    return blackCards[card];
-  }
-
-  getWhiteCard(card: number) {
-    return whiteCards[card];
-  }
+  
   getCzarName(): string {
     return (
       ((this as any).gameState as GameState).players.find(p => p.czar === true)
@@ -89,96 +73,7 @@ export default class Spectator extends Vue {
     opacity: 0.7;
   }
 
-  .cards-container {
-    bottom: 0;
-    left: 0;
-    right: 50px;
-    position: fixed;
-  }
-
-  .topCards {
-    margin-left: 50px !important;
-  }
-
-  .cards {
-    margin: auto;
-    display: flex;
-    justify-content: center;
-    height: 180px;
-
-    @media (max-width: 1350px) {
-      transform: scale(0.8);
-    }
-
-    @media (max-width: 800px) {
-      transform: scale(0.7);
-    }
-
-    .card-container {
-      margin: -5px;
-      z-index: 10;
-      transition: 0.1s margin;
-      margin-left: -65px;
-      margin-right: -60px;
-      &:hover {
-        margin-top: -60px;
-      }
-    }
-  }
-
-  .moreThan5Cards {
-    @media (min-width: 1071px) {
-      .card-container:nth-child(2n-1) {
-        margin-top: -140px;
-
-        &:hover {
-          margin-top: -165px;
-        }
-        z-index: 9;
-      }
-    }
-
-    @media (max-width: 1070px) {
-      .card-container {
-        margin-left: -85px;
-        margin-right: -85px;
-      }
-
-      .card-container:nth-child(3n + 2) {
-        margin-top: -130px;
-
-        &:hover {
-          margin-top: -190px;
-        }
-        z-index: 9;
-      }
-      .card-container:nth-child(3n) {
-        margin-top: -260px;
-
-        &:hover {
-          margin-top: -320px;
-        }
-        z-index: 8;
-      }
-    }
-  }
-
-  .lessThan5cards {
-    .card-container:nth-child(2n) {
-      margin-top: -130px;
-
-      &:hover {
-        margin-top: -190px;
-      }
-      z-index: 9;
-    }
-  }
-
-  .twocards {
-    .card-container {
-      margin: 5px;
-    }
-  }
+  
   .prompt {
     color: white;
     width: 300px;
@@ -186,18 +81,6 @@ export default class Spectator extends Vue {
     font-size: 40px;
     line-height: 40px;
     margin-bottom: 60px;
-  }
-
-  .black-card-container {
-    height: 400px;
-
-    @media (max-width: 1350px) {
-      transform: scale(0.9);
-    }
-
-    @media (max-width: 800px) {
-      transform: scale(0.8);
-    }
   }
 
   @media only screen and (max-height: 700px) {

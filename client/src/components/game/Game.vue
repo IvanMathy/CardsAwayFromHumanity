@@ -20,6 +20,10 @@
         </div>
         <CardPicker v-else />
       </template>
+      <template v-else-if="gameState.stage == Stage.pickingWinner">
+        <CardPicker v-if="user.isCzar" />
+        <CardViewer v-else />
+      </template>
       <RoundRecap v-else-if="gameState.stage == Stage.startingRound" />
     </div>
     <transition name="fade">
@@ -39,6 +43,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import Timer from "./Timer.vue";
 import Menu from "./Menu.vue";
 import CardPicker from "./CardPicker.vue";
+import CardViewer from "./CardViewer.vue";
 import {
   Events,
   Commands,
@@ -56,7 +61,8 @@ import ClientState from "../../store/index";
     RoundRecap,
     Timer,
     Menu,
-    CardPicker
+    CardPicker,
+    CardViewer
   },
   computed: {
     ...mapState(["gameState", "user", "currentState"])

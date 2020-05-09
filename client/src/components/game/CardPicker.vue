@@ -2,19 +2,19 @@
   <div class="card-picker">
     <div v-if="picked">Waiting for other players.</div>
     <div class="black-card-container">
-      <p class="black-card helvetica">{{blackCard}}</p>
+      <p class="black-card helvetica">{{getBlackCard(gameState.gameInfo.blackCard)}}</p>
     </div>
     <div class="cards" :class="{ picked: picked }">
       <flickity ref="flickity" :options="flickityOptions">
-        <div class="card-container" v-for="card in hand" :key="card">
-          <p class="white-card helvetica" v-html="card"></p>
+        <div class="card-container" v-for="card in user.hand" :key="card">
+          <p class="white-card helvetica" v-html="getWhiteCard(card)"></p>
           <div class="picker">
             <b-button
               type="is-dark"
               size="is-medium"
               outlined
               v-if="!picked"
-              @click="pick()"
+              @click="pick(card)"
             >Pick Card</b-button>
           </div>
         </div>
@@ -26,28 +26,29 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import Flickity from "vue-flickity";
+import { whiteCards, blackCards } from '../meta/cards';
+import { mapState } from 'vuex';
+import { Commands, GameCommand } from '../../../shared/events';
 
 @Component({
   components: {
     Flickity
+  },
+  computed: {
+    ...mapState(["user", "gameState"])
   }
 })
 export default class Game extends Vue {
   picked = false;
 
-  blackCard =
-    "I do not know with which weapons World War III will be fought, but World War IV will be fought with _.";
-  hand = [
-    "A mopey zoo lion.",
-    "All-you-can-eat shrimp for $4.99.",
-    "Passive-agression.",
-    "A Bop It&trade;.",
-    "Saxophone solos.",
-    "Horrifying laser hair removal accidents.",
-    "Boogers.",
-    "Unfathomable stupidity.",
-    "Breaking out into song and dance."
-  ];
+
+  getBlackCard(card: number) {
+    return blackCards[card] ?? "Card not found?? Please tell the dev thank you!"
+  }
+
+  getWhiteCard(card: number) {
+    return whiteCards[card] ?? "Card not found?? Please tell the dev thank you!"
+  }
 
   isMoving = false;
 
@@ -56,9 +57,11 @@ export default class Game extends Vue {
     friction: 0.6
   };
 
-  pick() {
+  pick(card: number) {
     (this.$refs.flickity as any).disableDrag()
     this.picked = true
+
+    this.$socket.client.emit(Commands.gameCommand, GameCommand.pickCard, card);
   }
 }
 </script>

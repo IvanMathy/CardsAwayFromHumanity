@@ -45,7 +45,7 @@ class State {
                 try {
                     let value = this.players[key] 
                     if(value instanceof LocalPlayer) {
-                        multi.del(`user:${this.players[key].id}`)
+                        (value as LocalPlayer).disconnect()
                     }
                 } catch(err) {
                     console.error(err)
@@ -57,7 +57,7 @@ class State {
                 try {
                     let value = this.rooms[key] 
                     if(value instanceof HostedRoom) {
-                        multi.del(`room:${this.rooms[key].roomCode}`)
+                        (value as HostedRoom).disconnect()
                     }
                 } catch(err) {
                     console.error(err)

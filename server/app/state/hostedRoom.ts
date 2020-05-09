@@ -37,17 +37,56 @@ export class HostedRoom extends RoomBase implements Room {
     password?: string
     host: Player
 
-    players: Record<string, Player> = {}
-
     game: Game<any> = new CAFHGame(this)
 
-
-    constructor(host: Player, password: string | undefined, callback: (success: boolean, code?: string) => void) {
+    constructor(host: Player, password: string | undefined, data: any | undefined, callback: (success: boolean, code?: string) => void) {
 
         super()
 
-        let room = this
 
+        this.password = password
+        this.host = host
+
+        if (data !== undefined) {
+
+            let roomCode = data.roomCode
+
+            console.log(`Recovering ${roomCode}`)
+
+
+            this.roomCode = roomCode
+            this.password = password
+
+            state.rooms[roomCode] = this
+
+            let key = `room:${data.roomCode}`
+
+            // Set listeners
+
+            let channelName = `events:to:${key}`
+
+            eventEmitter.on(channelName, this.onMessage)
+            redisSubscriber.subscribe(channelName)
+
+            this.game.loadState(data.gameState)
+
+            redisClient.multi()
+                // Take ownership of the room, expire it in 24 hours
+                .hmset(key, RoomKeys.hosted, String(true))
+                .expire(key, 60 * 60 * 24)
+                .exec(function (err, success) {
+                    if (err !== null) {
+                        callback(false)
+                        return
+                    }
+                    callback(true, roomCode)
+
+                })
+
+            return
+        }
+
+        let room = this
         tryName(function (success, code) {
 
             if (!success || code == null) {
@@ -66,6 +105,8 @@ export class HostedRoom extends RoomBase implements Room {
                 values.push(RoomKeys.password, password)
             }
 
+            values.push(RoomKeys.hosted, String(true))
+            values.push(RoomKeys.host, room.host.id)
 
             redisClient.multi()
                 // Create the room, expire it in 24 hours
@@ -93,9 +134,6 @@ export class HostedRoom extends RoomBase implements Room {
                 })
         }, 0)
 
-        this.password = password
-        this.host = host
-        this.players[host.id] = host
     }
 
     clean() {
@@ -107,6 +145,20 @@ export class HostedRoom extends RoomBase implements Room {
             .exec()
 
         delete state.rooms[this.roomCode]
+    }
+
+    disconnect() {
+        if (this.roomCode == null) {
+            return
+        }
+        console.debug("Saving Room State: " + this.roomCode)
+
+        redisClient.multi()
+            .hmset(`room:${this.roomCode}`, [
+                RoomKeys.hosted, String(false),
+                RoomKeys.gameState, this.game.exportState()
+            ])
+            .exec()
     }
 
     // Event Handling
@@ -155,7 +207,7 @@ export class HostedRoom extends RoomBase implements Room {
         }
     }
 
-    spectate(player: Player){
+    spectate(player: Player) {
         this.game.spectatorJoined(player)
         player.sendEvent(Events.startedSpectating, this.roomCode, player.id == this.host.id)
     }
