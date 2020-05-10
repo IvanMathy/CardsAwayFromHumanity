@@ -298,7 +298,7 @@ export class CAFHGame implements Game<GameCommand> {
 
     exportState(): string {
 
-        let currentState = new ExportableState(this.stage, this.blackCard, this.stage != GameStage.waitingToStart)
+        let currentState = new ExportableState(this.stage, this.blackCard, this.stage != GameStage.waitingToStart, this.czar)
 
         for (let playerId in this.playerStates) {
             const state = this.playerStates[playerId]
@@ -318,6 +318,8 @@ export class CAFHGame implements Game<GameCommand> {
         console.log("Recovering game")
         
         this.blackCard = newState.blackCard
+
+        this.czar = newState.czar
 
         this.setStage(newState.stage)
 
@@ -342,7 +344,7 @@ class ExportablePlayerState {
 class ExportableState {
     playerStates: ExportablePlayerState[] = []
 
-    constructor(public stage: GameStage, public blackCard: number, public started: boolean) {
+    constructor(public stage: GameStage, public blackCard: number, public started: boolean, public czar?: string) {
 
     }
 }

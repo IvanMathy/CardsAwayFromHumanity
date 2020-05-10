@@ -7,7 +7,7 @@
     <b-field class="wide" expanded>
       <b-input
         v-model="roomCode"
-        size="is-medium"
+        size="is-large"
         placeholder="AAAH"
         @input="roomCode=$event.toUpperCase()"
         maxlength="4"
@@ -15,7 +15,7 @@
       <div class="control">
         <b-button
           type="is-info"
-          size="is-medium"
+          size="is-large"
           v-on:click="join(false)"
           :disabled="roomCode.length !== 4"
           :loading="buttonLoading"
@@ -97,7 +97,7 @@ export default class Join extends Vue {
 <style lang="scss">
 .join {
   .wide {
-    width: 155px;
+    width: 190px;
     margin: auto;
 
     input {

@@ -55,7 +55,7 @@ export class Player {
         var id = user?.id
         var username = user?.name ?? "Guest"
 
-        if (username == undefined || username.length > 14 || !/^[0-9a-zA-Z_.-]+$/.test(username)) {
+        if (username == undefined || !/^[0-9a-zA-Z_.-]{1,15}$/.test(username)) {
             console.debug("Invalid username")
             return undefined
         }

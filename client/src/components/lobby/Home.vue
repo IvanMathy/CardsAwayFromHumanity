@@ -10,10 +10,9 @@
     </div>
     <div class="column">
       <article class="panel is-primary">
-        <p class="panel-heading helvetica">Game Lobby</p>
         <b-tabs v-model="activeTab" position="is-centered">
-          <b-tab-item label="Welcome" icon="home">
-            <p>Welcome! What would you like to do?</p>
+          <b-tab-item label="Home" icon="home">
+            <p>Welcome. What would you like to do?</p>
 
             <p>
               <b-button
@@ -30,7 +29,6 @@
                 size="is-medium"
                 icon-left="plus-square"
                 expanded
-                
                 v-on:click="host()"
               >Host a new Game</b-button>
             </p>
@@ -92,21 +90,36 @@ export default class Home extends Vue {
 
   height: 100%;
   width: 100%;
-  overflow: hidden;
-  position: absolute;
+
+  @media (min-width: 769px) {
+    overflow: hidden;
+    position: absolute;
+  }
   left: 0;
   right: 0;
 
   height: 100%;
 
-  .smaller {
-    max-width: 300px;
-  }
-
   .column {
     display: flex;
     flex-direction: column;
     justify-content: center;
+
+    @media (max-width: 770px) {
+      margin: auto;
+      max-width: 400px;
+    }
+  }
+
+  .smaller {
+    max-width: 250px;
+    @media (max-width: 770px) {
+      margin: auto;
+      max-width: 200px;
+      h1 {
+        text-align: left !important;
+      }
+    }
   }
 
   h1 {
@@ -124,13 +137,16 @@ export default class Home extends Vue {
     background-color: white;
     margin-bottom: 0;
     padding-top: 3px;
-    border-radius: 0 0 4px 4px;
+    border-radius: 4px;
 
     p {
       margin-bottom: 15px;
     }
     .tabs {
       .icon {
+        @media (max-width: 380px) {
+          display: none;
+        }
         height: 1.1rem !important;
         width: 1.1rem !important;
         svg {

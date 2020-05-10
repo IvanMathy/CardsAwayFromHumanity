@@ -9,11 +9,11 @@
       :hoverable="true"
     >
       <template slot-scope="props">
-        <b-table-column field="host" label="Host" class="helvetica host">{{ props.row.host }}</b-table-column>
+        <b-table-column field="host" label="Host" class="helvetica bold">{{ props.row.host }}</b-table-column>
 
         <b-table-column field="date" label="Players" centered>
             <span
-              class="tag"
+              class="tag bold"
               :class="(props.row.playerCount > 7) ? 'is-warning' : 'is-success'"
             >{{ (props.row.playerCount > 7) ? 'Full' : props.row.playerCount + '/8' }}</span>
         </b-table-column>
@@ -108,7 +108,7 @@ export default class GameList extends Vue {
 .game-list {
   .b-table {
     width: 100%;
-    .host {
+    .bold {
       font-weight: bold;
     }
     .centered {
