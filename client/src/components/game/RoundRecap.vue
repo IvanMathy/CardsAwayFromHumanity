@@ -1,19 +1,21 @@
 <template>
   <div class="round-recap">
     <div class="columns">
-      <div class="column info">
+      <div class="column infoColumn">
         <div v-if="gameState.stage == Stage.waitingToStart">
           <div v-if="user.isRoomHost">
             <p class="hero helvetica">You are the host.</p>
 
+            
+
             <b-tooltip
-              v-if="gameState.players.length > 3"
+              v-if="gameState.players.length < 3"
               type="is-light"
               multilined
+              size="is-small"
               label="You need at least 3 players to start a game."
-              class="button"
             >
-              <b-button type="is-primary" outlined disabled>Start Game</b-button>
+              <b-button type="is-primary" size="is-medium" class="spaced helvetica" disabled>Start Game</b-button>
             </b-tooltip>
             <b-button
               v-else
@@ -121,17 +123,17 @@ export default class RoundRecap extends Vue {
   margin: auto;
 }
 
-.info {
+.infoColumn {
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: right;
   font-size: 35px;
   color: white;
-  line-height: 35px;
   padding-top: 25px;
   p {
     margin-bottom: 15px;
+    line-height: 35px;
   }
   .muted {
     color: #aaaaaa;
@@ -152,7 +154,7 @@ export default class RoundRecap extends Vue {
     margin-top: 5px;
   }
 
-  .info {
+  .infoColumn {
     text-align: center;
     font-size: 25px;
   }

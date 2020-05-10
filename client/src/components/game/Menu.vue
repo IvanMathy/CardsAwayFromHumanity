@@ -6,12 +6,21 @@
         <span>Menu</span>
       </button>
 
-      <b-dropdown-item @click="toggleFullscreen()" aria-role="listitem">
+      <b-dropdown-item @click="toggleFullscreen()" aria-role="listitem" v-if="canGoFullScreen">
         <div class="media">
           <b-icon class="media-left" icon="expand"></b-icon>
           <div class="media-content">
             <h3>Full Screen</h3>
             <small>Nobody needs browser bars.</small>
+          </div>
+        </div>
+      </b-dropdown-item>
+        <b-dropdown-item @click="toggleRoomCode()" aria-role="listitem">
+        <div class="media">
+          <b-icon class="media-left" icon="bullhorn"></b-icon>
+          <div class="media-content">
+            <h3>Toggle Room Code</h3>
+            <small>Other players will still be able to join.</small>
           </div>
         </div>
       </b-dropdown-item>
@@ -25,8 +34,7 @@
           </div>
         </div>
       </b-dropdown-item>
-      <hr class="dropdown-divider" aria-role="menuitem" />
-      <b-dropdown-item @click="toggleScoreboard()" aria-role="listitem">
+      <!-- <b-dropdown-item @click="toggleScoreboard()" aria-role="listitem">
         <div class="media">
           <b-icon class="media-left" icon="trophy"></b-icon>
           <div class="media-content">
@@ -34,17 +42,22 @@
             <small>Show or hide scoreboard.</small>
           </div>
         </div>
-      </b-dropdown-item>
+      </b-dropdown-item> -->
 
-      <b-dropdown-item @click="toggleRoomCode()" aria-role="listitem">
+
+      <hr class="dropdown-divider" aria-role="menuitem" />
+
+      <b-dropdown-item @click="toggleFullscreen()" aria-role="listitem">
         <div class="media">
-          <b-icon class="media-left" icon="bullhorn"></b-icon>
+          <b-icon class="media-left" icon="user"></b-icon>
           <div class="media-content">
-            <h3>Toggle Room Code</h3>
-            <small>Other players will still be able to join.</small>
+            <h3>Change Nickname</h3>
+            <small>What's in a name?</small>
           </div>
         </div>
       </b-dropdown-item>
+
+    
       <hr class="dropdown-divider" aria-role="menuitem" />
       <b-dropdown-item :value="false" aria-role="listitem">
         <div class="media">
@@ -93,6 +106,11 @@ export default class Menu extends Vue {
 
   toggleRoomCode() {
     this.$emit("toggleRoomCode");
+  }
+
+
+  get canGoFullScreen() {
+    return (typeof document.body.requestFullscreen) === 'function'
   }
 }
 </script>

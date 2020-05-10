@@ -58,6 +58,18 @@ export class CAFHGame implements Game<GameCommand> {
                 } catch (error) {
                     this.playerStates[message.playerId].player.sendEvent(Events.unknownError)
                 }
+
+                let remainingPlayers = 0 
+
+                for (let player in this.playerStates) {
+                    if (this.playerStates[player].active && this.czar !== this.playerStates[player].id && this.playerStates[player].pickedcard == undefined) {
+                        remainingPlayers++
+                    }
+                }
+
+                if(remainingPlayers === 0) {
+                    this.next()
+                }
                 
                 break
         }
@@ -185,6 +197,7 @@ export class CAFHGame implements Game<GameCommand> {
         switch (this.stage) {
             case GameStage.startingRound:
             case GameStage.pickingCards:
+            case GameStage.pickingWinner:
                 sendTimer = true
                 break
         }
@@ -203,8 +216,7 @@ export class CAFHGame implements Game<GameCommand> {
         }
     }
 
-    next() {
-
+    checkPlayerCount(): boolean {
         let onlinePlayers = 0
 
         for (let player in this.playerStates) {
@@ -213,13 +225,20 @@ export class CAFHGame implements Game<GameCommand> {
             }
         }
 
-
-        console.log(onlinePlayers)
-
         if (onlinePlayers < GameRules.minPlayers) {
             this.setStage(GameStage.notEnoughPlayers)
+            return false
+        }
+
+        return true
+    }
+
+    next() {
+        
+        if(!this.checkPlayerCount()) {
             return
         }
+
 
         switch (this.stage) {
             case GameStage.notEnoughPlayers:
@@ -233,6 +252,8 @@ export class CAFHGame implements Game<GameCommand> {
             case GameStage.pickingCards:
                 this.setStage(GameStage.pickingWinner)
                 break
+            case GameStage.pickingWinner:
+                this.setStage(GameStage.pickingWinner)
         }
     }
 

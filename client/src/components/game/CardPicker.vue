@@ -6,7 +6,7 @@
     </div>
     <div class="cards" :class="{ picked: picked }">
       <flickity ref="flickity" :options="flickityOptions">
-        <div class="card-container" v-for="card in user.hand" :key="card">
+        <div class="card-container" v-for="card in cards" :key="card">
           <p class="white-card helvetica" v-html="getWhiteCard(card)"></p>
           <div class="picker">
             <b-button
@@ -24,11 +24,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import Flickity from "vue-flickity";
 import { whiteCards, blackCards } from '../meta/cards';
 import { mapState } from 'vuex';
-import { Commands, GameCommand } from '../../../shared/events';
+import { Commands, GameCommand, GameState } from '../../../shared/events';
 
 @Component({
   components: {
@@ -44,6 +44,24 @@ export default class Game extends Vue {
 
   getBlackCard(card: number) {
     return blackCards[card] ?? "Card not found?? Please tell the dev thank you!"
+  }
+
+
+  @Watch('cards')
+  onCardsChanged() {
+    console.log(this.$refs.flickity);
+    (this.$refs.flickity as any).reloadCells()
+  }
+
+  get cards() {
+    const anyThis = this as any
+    if(anyThis.user.isCzar) {
+      return (anyThis.gameState as GameState).players.map((player) => 
+        player.card
+      ).filter(card => card !== undefined)
+    } else {
+      return anyThis.user.hand
+    }
   }
 
   getWhiteCard(card: number) {

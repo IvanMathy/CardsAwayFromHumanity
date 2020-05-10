@@ -2,7 +2,6 @@
   <div class="game">
     <Timer v-if="gameState.stage == Stage.pickingCards || gameState.stage == Stage.startingRound" />
 
-    <Menu @toggleScoreboard="showScoreboard ^= true" @toggleRoomCode="showRoomCode ^= true" />
 
     <div v-if="gameState == null">Loading.</div>
     <div v-else>
@@ -35,6 +34,8 @@
         <span class="room-code has-text-light">{{ this.$store.state.joinedRoom }}</span>
       </div>
     </transition>
+
+    <Menu @toggleScoreboard="showScoreboard ^= true" @toggleRoomCode="showRoomCode ^= true" />
   </div>
 </template>
 
