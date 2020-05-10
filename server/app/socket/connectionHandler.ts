@@ -23,6 +23,11 @@ export function onConnection(socket: SocketIO.Socket) {
 
             let player = Player.authenticate(data)
 
+            if (player == undefined) {
+                socket.emit(Events.invalidUsername)
+                return
+            }
+
             session = new Session(socket, player)
 
             callback(player.id)
@@ -44,8 +49,13 @@ export function onConnection(socket: SocketIO.Socket) {
 
             let player = Player.authenticate(data)
 
+            if (player == undefined) {
+                socket.emit(Events.invalidUsername)
+                return
+            }
+
             player.reloadState().then((location) => {
-                callback(player.id, location.location, location.room)
+                callback(player!.id, location.location, location.room)
             }).catch((err) => {
                 console.error(err)
                 socket.emit(Events.unknownError)

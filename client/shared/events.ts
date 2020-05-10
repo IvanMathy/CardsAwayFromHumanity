@@ -5,6 +5,7 @@ export enum Events {
     roomFull = "f",
     invalidPassword = "ip",
     invalidRoomCode = "ir",
+    invalidUsername = "iu",
     passwordNeeded = "pw",
     roomCreated = "r",
     rejoined = "re",

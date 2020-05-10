@@ -14,7 +14,12 @@
           <br />What should we call you?
         </p>
         <b-field>
-          <b-input v-model="username" icon="user" size="is-medium" placeholder="Guest"></b-input>
+          <b-input
+            v-model="username"
+            icon="user"
+            size="is-medium"
+            placeholder="Guest"
+          >></b-input>
           <p class="control">
             <b-button
               type="is-primary"
@@ -79,7 +84,17 @@ import { Events, Commands } from "../../shared/events";
 import PrivacyPolicy from "./meta/PrivacyPolicy.vue";
 import Terms from "./meta/Terms.vue";
 
-@Component
+@Component({
+  sockets: {
+    [Events.invalidUsername](this: Welcome) {
+      this.buttonLoading = false;
+      this.$buefy.toast.open({
+        message: "Invalid username. Please try again.",
+        type: "is-danger"
+      });
+    }
+  }
+})
 export default class Welcome extends Vue {
   username = "";
   accepted = false;
