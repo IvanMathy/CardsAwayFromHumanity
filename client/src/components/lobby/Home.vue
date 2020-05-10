@@ -50,6 +50,8 @@
           </b-tab-item>-->
         </b-tabs>
       </article>
+
+      <p class="name"> Playing as <strong class="has-text-white">{{ $store.state.user.username }}</strong>. <a>Change your name.</a></p>
     </div>
   </div>
 </template>
@@ -128,6 +130,7 @@ export default class Home extends Vue {
     font-size: 32px;
     text-align: right;
     margin: 20px;
+    padding-bottom: 30px;
   }
   .panel-block {
     background-color: white;
@@ -154,6 +157,16 @@ export default class Home extends Vue {
           width: 1.1rem !important;
         }
       }
+    }
+  }
+  .name {
+    color: white;
+
+    font-size: 12px;
+
+    a {
+      color: #ffe9c8;
+      border-bottom: 1px dashed gray;
     }
   }
 }

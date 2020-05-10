@@ -1,7 +1,7 @@
 <template>
   <div class="game-list columns">
     <b-table
-      :data="data"
+      :data="[]"
       :striped="true"
       :paginated="true"
       :per-page="5"
@@ -30,7 +30,7 @@
         <section class="section">
           <div class="content has-text-grey has-text-centered">
             <p>
-              <b-icon icon="emoticon-sad" size="is-large"></b-icon>
+              <b-icon icon="frown" size="is-large" custom-class="far" custom-size="fa-5x"></b-icon>
             </p>
             <p>Nothing here.</p>
           </div>

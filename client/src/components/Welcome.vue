@@ -96,7 +96,7 @@ import Terms from "./meta/Terms.vue";
   }
 })
 export default class Welcome extends Vue {
-  username = "";
+  username = "Guest";
   accepted = false;
   buttonLoading = false;
 

@@ -29,6 +29,9 @@
           </section>
         </article>
 
+        <b-collapse :open="false" aria-id="contentIdForA11y1">
+          <b-button type="is-text" slot="trigger" expanded aria-controls="contentIdForA11y1">Advanced Options</b-button>
+          
         <b-field label="Points to win">
           <b-slider size="is-medium" :min="4" :max="12" v-model="points">
             <template v-for="val in [4,5,6,7,8,9,10,11,12]">
@@ -49,16 +52,6 @@
             <b-icon size="is-small" icon="question-circle" class="has-text-grey" />
           </b-tooltip>
         </div>
-
-        <b-collapse :open="false" aria-id="contentIdForA11y1">
-          <b-button type="is-text" slot="trigger" expanded aria-controls="contentIdForA11y1">Advanced Options</b-button>
-          
-          <h3>Subtitle</h3>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            <br />Nulla accumsan, metus ultrices eleifend gravida, nulla nunc varius lectus, nec rutrum justo nibh eu lectus.
-            <br />Ut vulputate semper dui. Fusce erat odio, sollicitudin vel erat vel, interdum mattis neque.
-          </p>
         </b-collapse>
       </section>
       <footer class="modal-card-foot modal-buttons">
