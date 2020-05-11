@@ -5,6 +5,7 @@ import { GameState, Events, GameEvents, PlayerLocation } from "../../shared/even
 Vue.use(Vuex)
 
 const playerIdKey = "playerId"
+export const usernameStorageKey = "username"
 
 export enum ClientState {
   unauthenticated = "unauthenticated",
@@ -40,6 +41,7 @@ export default new Vuex.Store({
       state.currentState = ClientState.inLobby
 
       localStorage.setItem(playerIdKey, newUser.newId)
+      localStorage.setItem(usernameStorageKey, newUser.username)
     },
 
     rejoined(state: any, userState: Record<string, string>) {
