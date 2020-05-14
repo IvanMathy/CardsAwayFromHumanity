@@ -27,6 +27,7 @@ export class CAFHGame implements Game<GameCommand> {
     time = 0
 
     czar?: string = undefined
+    winner?: string = undefined
 
     constructor(
         public room: HostedRoom
@@ -43,6 +44,7 @@ export class CAFHGame implements Game<GameCommand> {
                 }
                 break
             case GameCommand.pickCard:
+
                 if(this.stage !== GameStage.pickingCards) {
                     return
                 }
@@ -52,6 +54,8 @@ export class CAFHGame implements Game<GameCommand> {
 
                     return
                 }
+
+                
 
                 try {
                     this.playerStates[message.playerId].pickedcard = message.message[0]
@@ -73,6 +77,16 @@ export class CAFHGame implements Game<GameCommand> {
                 
                 break
         }
+    }
+
+
+    pickWinner(message: GameMessage<GameCommand>): void {
+        if(this.czar !== message.playerId || !this.playerStates.hasOwnProperty(message.playerId)) {
+            return
+        }
+
+        this.winner
+
     }
 
     private isHost(message: GameMessage<GameCommand>) {
@@ -103,6 +117,8 @@ export class CAFHGame implements Game<GameCommand> {
 
         czar.roundsSinceCzar = 0
         this.czar = czar.id
+
+        this.winner = undefined
 
         players.forEach(state => {
             this.sendPlayerHand(state.player)
@@ -139,6 +155,10 @@ export class CAFHGame implements Game<GameCommand> {
 
         for (let playerId in this.playerStates) {
             let playerState = this.playerStates[playerId]
+
+            if(!playerState.connected) {
+                playerState.active = false
+            }
 
             if (playerState.active) {
                 state.players.push({
@@ -265,6 +285,7 @@ export class CAFHGame implements Game<GameCommand> {
             state.hand = this.deck.pickCards(10)
             this.playerStates[player.id] = state
         } else {
+            this.playerStates[player.id].connected = true
             this.playerStates[player.id].active = true
         }
 
@@ -278,7 +299,7 @@ export class CAFHGame implements Game<GameCommand> {
     playerLeft(player: Player): void {
         if (this.playerStates.hasOwnProperty(player.id)) {
             console.log("Player Left")
-            this.playerStates[player.id].active = false
+            this.playerStates[player.id].connected = false
         } else if (this.spectatorStates.hasOwnProperty(player.id)) {
             console.log("Spectator Left")
             delete this.spectatorStates[player.id]

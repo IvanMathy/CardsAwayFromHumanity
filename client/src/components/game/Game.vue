@@ -20,7 +20,7 @@
         <CardPicker v-else />
       </template>
       <template v-else-if="gameState.stage == Stage.pickingWinner">
-        <CardPicker v-if="user.isCzar" />
+        <CardPicker v-if="user.isCzar" :key="gameState.players"/>
         <CardViewer v-else />
       </template>
       <RoundRecap v-else-if="gameState.stage == Stage.startingRound" />
