@@ -1,6 +1,6 @@
 <template>
   <div class="game">
-    <Timer v-if="gameState.stage == Stage.pickingCards || gameState.stage == Stage.startingRound" />
+    <Timer v-if="gameState.stage == Stage.pickingCards || gameState.stage == Stage.startingRound || gameState.stage == Stage.pickingWinner || gameState.stage == Stage.celebratingWinner" />
 
 
     <div v-if="gameState == null">Loading.</div>
@@ -22,6 +22,9 @@
       <template v-else-if="gameState.stage == Stage.pickingWinner">
         <CardPicker v-if="user.isCzar" :key="gameState.players"/>
         <CardViewer v-else />
+      </template>
+      <template v-else-if="gameState.stage == Stage.pickingWinner || gameState.stage == Stage.celebratingWinner">
+        <CardViewer/>
       </template>
       <RoundRecap v-else-if="gameState.stage == Stage.startingRound" />
     </div>

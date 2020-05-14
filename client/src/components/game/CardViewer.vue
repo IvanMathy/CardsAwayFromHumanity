@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { GameStage, GameState } from "../../../shared/events";
+import { GameStage, GameState, GameStatePlayer } from "../../../shared/events";
 import { mapState } from "vuex";
 import { blackCards, whiteCards } from "../meta/cards";
 
@@ -28,9 +28,22 @@ export default class CardViewer extends Vue {
   showScoreboard = false;
   showRoomCode = true;
 
-  cards = [7, 9, 87, 78];
-
   Stage = GameStage;
+
+  get winner(this: any): GameStatePlayer | undefined {
+    return (this.gameState as GameState).players.find(player => player.winner)
+  }
+
+  get cards(this: any) {
+    const stage = (this.gameState as GameState).stage
+    if(stage == GameStage.celebratingWinner) {
+      return [(this.gameState as GameState).gameInfo.winningCard]
+    } else {
+      return (this.gameState as GameState).players.map((player) => 
+        player.card
+      ).filter(card => card !== undefined)
+    }
+  }
 
   getBlackCard(card: number) {
     return blackCards[card];
