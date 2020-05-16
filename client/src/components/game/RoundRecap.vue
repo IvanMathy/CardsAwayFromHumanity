@@ -40,7 +40,7 @@
           >The game will start again once another player joins.</p>
           <p class="muted smaller" v-else>You are alone in this room. That sounds awesome.</p>
         </div>
-        <div v-else class="fullscreen info centeredText">
+        <div v-else class="fullscreen info centeredText helvetica">
           <p v-if="winner">
             {{ winner }}
             <span class="muted">wins this round.</span>

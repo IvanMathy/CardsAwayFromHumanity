@@ -2,10 +2,9 @@
   <div class="card-viewer">
 
     <div
-      class="cards-container"
-      :class="cards.length > 5 ? 'moreThan5Cards' : (cards.length > 2 ? 'lessThan5cards' : 'twocards')"
-    >
-      <div class="cards topCards">
+      class="cards-container">
+      <div class="cards topCards" :class="cards.length > 5 ? 'moreThan5Cards' : (cards.length > 2 ? 'lessThan5cards' : (cards.length == 1 ? 'oneCard' : 'twocards'))"
+ >
         <div class="card-container" v-for="card in cards" :key="card">
           <p class="white-card helvetica">{{ getWhiteCard(card)}}</p>
         </div>
@@ -162,6 +161,16 @@ export default class CardViewer extends Vue {
   .twocards {
     .card-container {
       margin: 5px;
+    }
+  }
+
+
+
+  .oneCard {
+    transform: scale(1.1);
+
+    .white-card {
+      margin-top: -60px;
     }
   }
   .prompt {

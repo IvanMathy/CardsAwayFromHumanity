@@ -9,6 +9,7 @@
       <div v-if="picked">Waiting for other players.</div>
 
       <div class="black-card-container" v-if="showBlackCard">
+        <p class="hero helvetica">{{ heroText }}</p>
         <p class="black-card helvetica">{{getBlackCard(gameState.gameInfo.blackCard)}}</p>
       </div>
 
@@ -36,9 +37,12 @@
         <CardViewer />
       </template>
       <RoundRecap v-else-if="gameState.stage == Stage.startingRound" />
-      <div class="fullscreen centeredText" v-else-if="gameState.stage == Stage.notEnoughCardsPlayed" >
-          <p class="hero helvetica">Not enough cards played.</p>
-          <p class="secondary">Skipping to next round.</p>
+      <div
+        class="fullscreen centeredText"
+        v-else-if="gameState.stage == Stage.notEnoughCardsPlayed"
+      >
+        <p class="hero helvetica">Not enough cards played.</p>
+        <p class="secondary">Skipping to next round.</p>
       </div>
     </div>
     <transition name="fade">
@@ -106,6 +110,33 @@ export default class Game extends Vue {
     return true;
   }
 
+  get czar(this: any) {
+    return this.gameState.players.find(player => player.czar === true)
+      ?.name;
+  }
+  get winner(this: any) {
+    return this.gameState.players.find(
+      player => player.winner === true
+    )?.name;
+  }
+
+  get heroText(this: any): string {
+    switch (this.gameState.stage) {
+      case GameStage.pickingCards:
+        return "Pick a card.";
+      case GameStage.pickingWinner:
+        if (this.user.isCzar) {
+          return "Pick the winner.";
+        } else {
+          return `${this.czar} is picking a winner.`;
+        }
+      case GameStage.celebratingWinner:
+        return `${this.winner} is the winner.`
+      default:
+        return "";
+    }
+  }
+
   getBlackCard(card: number) {
     return (
       blackCards[card] ?? "Card not found?? Please tell the dev thank you!"
@@ -152,16 +183,17 @@ export default class Game extends Vue {
     bottom: 0;
   }
 
+  .hero {
+    font-size: 35px;
+    padding: 10px;
+  }
+
   .centeredText {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 
-    .hero {
-      font-size: 35px;
-      padding: 10px;
-    }
     .secondary {
       color: #cccccc;
       padding: 10px;
@@ -173,8 +205,12 @@ export default class Game extends Vue {
 
   .black-card-container {
     position: absolute;
-    bottom: 150px;
+    bottom: 100px;
     width: 100%;
+
+    .black-card {
+      transform: scale(0.9);
+    }
   }
 }
 </style>
