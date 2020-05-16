@@ -4,13 +4,14 @@
       <div v-for="player in gameState.players" :key="player.id">
         <div
           class="player-score helvetica is-flex-touch"
-          :class="{czar: player.czar && gameState.stage !== Stage.notEnoughPlayers, winner: player.won && gameState.stage !== Stage.notEnoughPlayers}"
+          :class="{czar: player.czar && gameState.stage !== Stage.notEnoughPlayers, winner: player.winner && gameState.stage !== Stage.notEnoughPlayers}"
         >
-          <b-tooltip label="Card Czar" type="is-light" class="player-icon" v-if="player.czar && gameState.stage !== Stage.notEnoughPlayers">
-            <b-icon size="is-small" icon="chess-king" class="has-text-grey" />
-          </b-tooltip>
-          <b-tooltip label="Round Winner" type="is-light" class="player-icon" v-else-if="player.won">
+
+          <b-tooltip label="Round Winner" type="is-light" class="player-icon" v-if="player.winner">
             <b-icon size="is-small" icon="star" class="has-text-primary" />
+          </b-tooltip>
+          <b-tooltip label="Card Czar" type="is-light" class="player-icon" v-else-if="player.czar && gameState.stage !== Stage.notEnoughPlayers">
+            <b-icon size="is-small" icon="chess-king" class="has-text-grey" />
           </b-tooltip>
           <b-tooltip label="Game Host" type="is-light" class="player-icon" v-else-if="player.host">
             <b-icon size="is-small" icon="home" class="has-text-grey-light" />
@@ -39,16 +40,6 @@ import { GameStage } from "../../../shared/events";
 })
 export default class Scoreboard extends Vue {
   Stage = GameStage;
-  scores = [
-    { id: "AA", name: "Elwood Blues", score: 1, host: true },
-    { id: "BB", name: "Player One", score: 3, won: true },
-    { id: "CC", name: "Somebody With a Name", score: 6 },
-    { id: "DD", name: "Mom", score: 2 },
-    { id: "EE", name: "HelloThere", score: 8, czar: true },
-    { id: "FF", name: "Test", score: 12 },
-    { id: "GG", name: "AAAAAAAAAA", score: 0 },
-    { id: "HH", name: "Me", score: 3 }
-  ].sort((a, b) => b.score - a.score);
 }
 </script>
 

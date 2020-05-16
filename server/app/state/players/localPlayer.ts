@@ -48,7 +48,7 @@ export class LocalPlayer implements Player {
         console.log(message)
         switch (message.type) {
             case PlayerCommands.sendEvent:
-                this.sendEvent(message.payload.event, message.payload.payload)
+                this.sendEvent(message.payload.event, ...message.payload.payload)
                 break
             case PlayerCommands.successfullyJoined:
                 RoomBase.getRoom(message.payload.code).then((room) => {

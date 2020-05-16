@@ -1,10 +1,17 @@
 <template>
   <div class="game">
-    <Timer v-if="gameState.stage == Stage.pickingCards || gameState.stage == Stage.startingRound || gameState.stage == Stage.pickingWinner || gameState.stage == Stage.celebratingWinner" />
-
+    <Timer
+      v-if="gameState.stage == Stage.pickingCards || gameState.stage == Stage.startingRound || gameState.stage == Stage.pickingWinner || gameState.stage == Stage.celebratingWinner"
+    />
 
     <div v-if="gameState == null">Loading.</div>
     <div v-else>
+      <div v-if="picked">Waiting for other players.</div>
+
+      <div class="black-card-container" v-if="showBlackCard">
+        <p class="black-card helvetica">{{getBlackCard(gameState.gameInfo.blackCard)}}</p>
+      </div>
+
       <div
         v-if="gameState.stage == Stage.waitingToStart || gameState.stage == Stage.notEnoughPlayers"
         class="fullscreen centeredText"
@@ -20,11 +27,13 @@
         <CardPicker v-else />
       </template>
       <template v-else-if="gameState.stage == Stage.pickingWinner">
-        <CardPicker v-if="user.isCzar" :key="gameState.players"/>
+        <CardPicker v-if="user.isCzar" :key="gameState.players" />
         <CardViewer v-else />
       </template>
-      <template v-else-if="gameState.stage == Stage.pickingWinner || gameState.stage == Stage.celebratingWinner">
-        <CardViewer/>
+      <template
+        v-else-if="gameState.stage == Stage.pickingWinner || gameState.stage == Stage.celebratingWinner"
+      >
+        <CardViewer />
       </template>
       <RoundRecap v-else-if="gameState.stage == Stage.startingRound" />
     </div>
@@ -59,6 +68,7 @@ import { Socket } from "vue-socket.io-extended";
 import { mapState } from "vuex";
 import RoundRecap from "./RoundRecap.vue";
 import ClientState from "../../store/index";
+import { blackCards } from "../meta/cards";
 
 @Component({
   components: {
@@ -76,6 +86,26 @@ export default class Game extends Vue {
   Stage = GameStage;
   State = ClientState;
   showRoomCode = true;
+
+  get showBlackCard(this: any): boolean {
+    if (
+      this.gameState.stage == GameStage.waitingToStart ||
+      this.gameState.stage == GameStage.notEnoughPlayers ||
+      this.gameState.stage == GameStage.startingRound
+    ) {
+      return false;
+    }
+    if (this.gameState.stage == GameStage.pickingCards) {
+      return !this.user.isCzar;
+    }
+    return true;
+  }
+
+  getBlackCard(card: number) {
+    return (
+      blackCards[card] ?? "Card not found?? Please tell the dev thank you!"
+    );
+  }
 }
 </script>
 
@@ -134,6 +164,12 @@ export default class Game extends Vue {
     .button {
       margin: 10px;
     }
+  }
+
+  .black-card-container {
+    position: absolute;
+    bottom: 150px;
+    width: 100%;
   }
 }
 </style>

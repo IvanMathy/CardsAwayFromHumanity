@@ -78,7 +78,6 @@ export class Deck {
     }
 
     discard(card: number){
-        console.log(this.cardsInPlay)
         if(this.cardsInPlay.has(card)) {
             this.cardsInPlay.delete(card)
             this.discardPile.push(card)
@@ -88,8 +87,10 @@ export class Deck {
     load(deck: Deck) {
         this.discardPile = deck.discardPile
         this.cardsInPlay.clear()
-        deck.cardsInPlay.forEach(card => this.cardsInPlay.add(card))
-        
+
+        for (const card in deck.cardsInPlay) {
+            this.cardsInPlay.add((deck.cardsInPlay as any)[card] as number)
+        }
         this.cards = deck.cards
     }
 }

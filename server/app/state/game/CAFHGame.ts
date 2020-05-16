@@ -53,7 +53,8 @@ export class CAFHGame implements Game<GameCommand> {
                 if (this.stage !== GameStage.pickingCards || 
                     typeof message.message[0] !== "number" ||
                     !this.playerStates.hasOwnProperty(message.playerId) ||
-                    this.czar == message.playerId
+                    this.czar == message.playerId ||
+                    !this.playerStates[message.playerId].hand.includes(message.message[0])
                 ) {
                     // TODO: Handle spectator vote
 
@@ -132,6 +133,12 @@ export class CAFHGame implements Game<GameCommand> {
 
                 state.hand.unshift(this.deck.pickCard())
             }
+
+
+            if (!state.connected) {
+                state.active = false
+            }
+
             state.pickedcard = undefined
             if (state.active) {
                 state.roundsSinceCzar++
@@ -194,10 +201,6 @@ export class CAFHGame implements Game<GameCommand> {
         for (let playerId in this.playerStates) {
             let playerState = this.playerStates[playerId]
 
-            if (!playerState.connected) {
-                playerState.active = false
-            }
-
             if (playerState.active) {
                 state.players.push({
                     name: playerState.player.name,
@@ -213,7 +216,8 @@ export class CAFHGame implements Game<GameCommand> {
 
         if (this.stage == GameStage.startingRound ||
             this.stage == GameStage.pickingCards ||
-            this.stage == GameStage.pickingWinner) {
+            this.stage == GameStage.pickingWinner ||
+            this.stage == GameStage.celebratingWinner) {
             state.gameInfo.blackCard = this.blackCard
         }
 
@@ -246,7 +250,6 @@ export class CAFHGame implements Game<GameCommand> {
     // - Time management
 
     startTimer(length: number) {
-        console.log("starting timer " + length)
         if (this.timer !== undefined) {
             clearInterval(this.timer)
         }
@@ -390,7 +393,7 @@ export class CAFHGame implements Game<GameCommand> {
 
     exportState(): string {
 
-        let currentState = new ExportableState(this.stage, this.blackCard, this.stage != GameStage.waitingToStart, this.deck, this.czar, this.winner)
+        let currentState = new ExportableState(this.stage, this.blackCard, this.deck, this.room.host.id, this.czar, this.winner)
 
         for (let playerId in this.playerStates) {
             const state = this.playerStates[playerId]
@@ -414,12 +417,9 @@ export class CAFHGame implements Game<GameCommand> {
 
         this.czar = newState.czar
         this.winner = newState.winner
-
-        console.log(this.deck)
+        console.log("test")
 
         this.deck.load(newState.deck)
-
-        console.log(this.deck)
 
         this.setStage(newState.stage)
 
@@ -438,7 +438,6 @@ export class CAFHGame implements Game<GameCommand> {
 
         console.log(this.playerStates)
     }
-
 }
 
 class ExportablePlayerState {
@@ -450,9 +449,9 @@ class ExportableState {
 
     constructor(
         public stage: GameStage, 
-        public blackCard: number, 
-        public started: boolean, 
+        public blackCard: number,
         public deck: Deck, 
+        public host: string, 
         public czar?: string, 
         public winner?: string) {
 

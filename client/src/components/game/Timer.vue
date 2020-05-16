@@ -18,6 +18,10 @@ import { GameStage } from "../../../shared/events";
           return "Round ends in";
         case GameStage.pickingWinner:
           return "Selection ends in";
+        case GameStage.celebratingWinner:
+          return "Round ends in";
+        default:
+          return "Next stage in"
       }
     }
   }

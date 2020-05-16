@@ -1,9 +1,5 @@
 <template>
   <div class="card-picker">
-    <div v-if="picked">Waiting for other players.</div>
-    <div class="black-card-container">
-      <p class="black-card helvetica">{{getBlackCard(gameState.gameInfo.blackCard)}}</p>
-    </div>
     <div class="cards" :class="{ picked: picked }">
       <flickity ref="flickity" :options="flickityOptions">
         <div class="card-container" v-for="card in cards" :key="card">
@@ -26,7 +22,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import Flickity from "vue-flickity";
-import { whiteCards, blackCards } from '../meta/cards';
+import { whiteCards } from '../meta/cards';
 import { mapState } from 'vuex';
 import { Commands, GameCommand, GameState } from '../../../shared/events';
 
@@ -40,11 +36,6 @@ import { Commands, GameCommand, GameState } from '../../../shared/events';
 })
 export default class Game extends Vue {
   picked = false;
-
-
-  getBlackCard(card: number) {
-    return blackCards[card] ?? "Card not found?? Please tell the dev thank you!"
-  }
 
 
   @Watch('cards')
@@ -161,11 +152,6 @@ export default class Game extends Vue {
   }
 }
 
-.black-card-container {
-  position: absolute;
-  bottom: 150px;
-  width: 100%;
-}
 .picker {
   position: absolute;
   bottom: 20px;
