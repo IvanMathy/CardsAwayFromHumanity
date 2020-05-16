@@ -30,7 +30,8 @@ export enum GameStage {
     pickingCards = "p",
     pickingWinner = "c",
     celebratingWinner = "a",
-    notEnoughPlayers = "n"
+    notEnoughPlayers = "n",
+    notEnoughCardsPlayed = "l"
 }
 
 export enum GameEvents {

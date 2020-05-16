@@ -1,7 +1,7 @@
 <template>
   <div class="game">
     <Timer
-      v-if="gameState.stage == Stage.pickingCards || gameState.stage == Stage.startingRound || gameState.stage == Stage.pickingWinner || gameState.stage == Stage.celebratingWinner"
+      v-if="gameState.stage == Stage.pickingCards || gameState.stage == Stage.startingRound || gameState.stage == Stage.pickingWinner || gameState.stage == Stage.celebratingWinner || gameState.stage == Stage.notEnoughCardsPlayed"
     />
 
     <div v-if="gameState == null">Loading.</div>
@@ -36,6 +36,10 @@
         <CardViewer />
       </template>
       <RoundRecap v-else-if="gameState.stage == Stage.startingRound" />
+      <div class="fullscreen centeredText" v-else-if="gameState.stage == Stage.notEnoughCardsPlayed" >
+          <p class="hero helvetica">Not enough cards played.</p>
+          <p class="secondary">Skipping to next round.</p>
+      </div>
     </div>
     <transition name="fade">
       <div class="join helvetica is-hidden-mobile" v-if="showRoomCode">
@@ -91,7 +95,8 @@ export default class Game extends Vue {
     if (
       this.gameState.stage == GameStage.waitingToStart ||
       this.gameState.stage == GameStage.notEnoughPlayers ||
-      this.gameState.stage == GameStage.startingRound
+      this.gameState.stage == GameStage.startingRound ||
+      this.gameState.stage == GameStage.notEnoughCardsPlayed
     ) {
       return false;
     }

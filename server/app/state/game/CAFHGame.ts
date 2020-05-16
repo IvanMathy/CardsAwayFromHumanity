@@ -184,9 +184,19 @@ export class CAFHGame implements Game<GameCommand> {
                 this.startTimer(90)
                 break
             case GameStage.pickingWinner:
+
+                if(Object.values(this.playerStates).filter(state => state.pickedcard !== undefined).length < 2) {
+                    this.setStage(GameStage.notEnoughCardsPlayed)
+                    return
+                }
+
                 this.startTimer(45)
                 break
             case GameStage.celebratingWinner:
+                this.startTimer(10)
+                break
+            
+            case GameStage.notEnoughCardsPlayed:
                 this.startTimer(10)
                 break
         }
@@ -307,10 +317,6 @@ export class CAFHGame implements Game<GameCommand> {
         }
 
         switch (this.stage) {
-            case GameStage.notEnoughPlayers:
-                this.newRound()
-                break
-
             case GameStage.startingRound:
 
                 this.winner = undefined
@@ -325,6 +331,8 @@ export class CAFHGame implements Game<GameCommand> {
                 this.setStage(GameStage.celebratingWinner)
                 break
             case GameStage.celebratingWinner:
+            case GameStage.notEnoughPlayers:
+            case GameStage.notEnoughCardsPlayed:
                 this.newRound()
                 break
         }
