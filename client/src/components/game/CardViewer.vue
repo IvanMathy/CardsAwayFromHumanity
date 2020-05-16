@@ -1,5 +1,7 @@
 <template>
   <div class="card-viewer">
+
+    {{winner.name}} wins.
     <div
       class="cards-container"
       :class="cards.length > 5 ? 'moreThan5Cards' : (cards.length > 2 ? 'lessThan5cards' : 'twocards')"

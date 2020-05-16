@@ -50,11 +50,11 @@ export class CAFHGame implements Game<GameCommand> {
                     return
                 }
 
-                if (this.stage !== GameStage.pickingCards) {
-                    return
-                }
-
-                if (!this.playerStates.hasOwnProperty(message.playerId) || typeof message.message[0] !== "number") {
+                if (this.stage !== GameStage.pickingCards || 
+                    typeof message.message[0] !== "number" ||
+                    !this.playerStates.hasOwnProperty(message.playerId) ||
+                    this.czar == message.playerId
+                ) {
                     // TODO: Handle spectator vote
 
                     return
@@ -97,6 +97,8 @@ export class CAFHGame implements Game<GameCommand> {
             return
         }
 
+        winner.points++
+
         this.winner = winner?.player.id
 
         this.next()
@@ -118,8 +120,27 @@ export class CAFHGame implements Game<GameCommand> {
 
     private newRound() {
 
-        let players = Object.values(this.playerStates).filter(state => state.active)
-        players.forEach(state => state.roundsSinceCzar++)
+        let players = Object.values(this.playerStates).filter(state => {
+            if (state.pickedcard !== undefined) {
+                // Delete the card from the hand
+                const index = state.hand.indexOf(state.pickedcard);
+                if (index > -1) {
+                    state.hand.splice(index, 1);
+                }
+                
+                this.deck.discard(state.pickedcard)
+
+                state.hand.unshift(this.deck.pickCard())
+            }
+            state.pickedcard = undefined
+            if (state.active) {
+                state.roundsSinceCzar++
+                return true
+            } else {
+                return false
+            }
+        })
+
         players.sort((a, b) => b.roundsSinceCzar - a.roundsSinceCzar);
 
         let czar = players.shift()
@@ -132,11 +153,11 @@ export class CAFHGame implements Game<GameCommand> {
         czar.roundsSinceCzar = 0
         this.czar = czar.player.id
 
-        this.winner = undefined
 
         players.forEach(state => {
             this.sendPlayerHand(state.player)
         })
+
         this.sendPlayerHand(czar.player)
 
         this.blackCard = this.deck.getBlackCard()
@@ -159,7 +180,7 @@ export class CAFHGame implements Game<GameCommand> {
                 this.startTimer(45)
                 break
             case GameStage.celebratingWinner:
-                this.startTimer(100)
+                this.startTimer(10)
                 break
         }
 
@@ -195,6 +216,8 @@ export class CAFHGame implements Game<GameCommand> {
             this.stage == GameStage.pickingWinner) {
             state.gameInfo.blackCard = this.blackCard
         }
+
+        console.log(this.winner)
 
         if (this.stage == GameStage.celebratingWinner && this.winner !== undefined) {
             state.gameInfo.winningCard = this.playerStates[this.winner].pickedcard
@@ -286,6 +309,9 @@ export class CAFHGame implements Game<GameCommand> {
                 break
 
             case GameStage.startingRound:
+
+                this.winner = undefined
+
                 this.setStage(GameStage.pickingCards)
                 break
 
@@ -364,7 +390,7 @@ export class CAFHGame implements Game<GameCommand> {
 
     exportState(): string {
 
-        let currentState = new ExportableState(this.stage, this.blackCard, this.stage != GameStage.waitingToStart, this.czar, this.winner)
+        let currentState = new ExportableState(this.stage, this.blackCard, this.stage != GameStage.waitingToStart, this.deck, this.czar, this.winner)
 
         for (let playerId in this.playerStates) {
             const state = this.playerStates[playerId]
@@ -382,11 +408,18 @@ export class CAFHGame implements Game<GameCommand> {
         let newState = JSON.parse(stateString) as ExportableState
 
         console.log("Recovering game")
+        console.log(newState)
 
         this.blackCard = newState.blackCard
 
         this.czar = newState.czar
         this.winner = newState.winner
+
+        console.log(this.deck)
+
+        this.deck.load(newState.deck)
+
+        console.log(this.deck)
 
         this.setStage(newState.stage)
 
@@ -402,6 +435,8 @@ export class CAFHGame implements Game<GameCommand> {
                 this.playerStates[player.id] = playerState
             })
         })
+
+        console.log(this.playerStates)
     }
 
 }
@@ -413,7 +448,13 @@ class ExportablePlayerState {
 class ExportableState {
     playerStates: ExportablePlayerState[] = []
 
-    constructor(public stage: GameStage, public blackCard: number, public started: boolean, public czar?: string, public winner?: string) {
+    constructor(
+        public stage: GameStage, 
+        public blackCard: number, 
+        public started: boolean, 
+        public deck: Deck, 
+        public czar?: string, 
+        public winner?: string) {
 
     }
 }
