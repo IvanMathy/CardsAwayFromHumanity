@@ -29,9 +29,13 @@ export class CAFHGame implements Game<GameCommand> {
     czar?: string = undefined
     winner?: string = undefined
 
+    options: GameOptions
+
     constructor(
         public room: HostedRoom
-    ) { }
+    ) {
+        this.options = new GameOptions(4)
+    }
 
     // - Event Handling
 
@@ -50,7 +54,7 @@ export class CAFHGame implements Game<GameCommand> {
                     return
                 }
 
-                if (this.stage !== GameStage.pickingCards || 
+                if (this.stage !== GameStage.pickingCards ||
                     typeof message.message[0] !== "number" ||
                     !this.playerStates.hasOwnProperty(message.playerId) ||
                     this.czar == message.playerId ||
@@ -128,7 +132,7 @@ export class CAFHGame implements Game<GameCommand> {
                 if (index > -1) {
                     state.hand.splice(index, 1);
                 }
-                
+
                 this.deck.discard(state.pickedcard)
 
                 state.hand.unshift(this.deck.pickCard())
@@ -185,7 +189,7 @@ export class CAFHGame implements Game<GameCommand> {
                 break
             case GameStage.pickingWinner:
 
-                if(Object.values(this.playerStates).filter(state => state.pickedcard !== undefined).length < 2) {
+                if (Object.values(this.playerStates).filter(state => state.pickedcard !== undefined).length < 2) {
                     this.setStage(GameStage.notEnoughCardsPlayed)
                     return
                 }
@@ -195,7 +199,7 @@ export class CAFHGame implements Game<GameCommand> {
             case GameStage.celebratingWinner:
                 this.startTimer(10)
                 break
-            
+
             case GameStage.notEnoughCardsPlayed:
                 this.startTimer(10)
                 break
@@ -230,8 +234,6 @@ export class CAFHGame implements Game<GameCommand> {
             this.stage == GameStage.celebratingWinner) {
             state.gameInfo.blackCard = this.blackCard
         }
-
-        console.log(this.winner)
 
         if (this.stage == GameStage.celebratingWinner && this.winner !== undefined) {
             state.gameInfo.winningCard = this.playerStates[this.winner].pickedcard
@@ -330,11 +332,24 @@ export class CAFHGame implements Game<GameCommand> {
             case GameStage.pickingWinner:
                 this.setStage(GameStage.celebratingWinner)
                 break
-            case GameStage.celebratingWinner:
             case GameStage.notEnoughPlayers:
             case GameStage.notEnoughCardsPlayed:
                 this.newRound()
                 break
+            case GameStage.celebratingWinner:
+                // Check if the game is over
+
+                let players = Object.values(this.playerStates)
+
+                players.sort((a, b) => b.points - a.points);
+
+                if ((players[0]?.points ?? 0) >= this.options.pointsToWin) {
+                    this.winner = players[0].player.id
+                    this.czar = undefined
+                    this.setStage(GameStage.gameOver)
+                } else {
+                    this.newRound()
+                }
         }
     }
 
@@ -456,12 +471,18 @@ class ExportableState {
     playerStates: ExportablePlayerState[] = []
 
     constructor(
-        public stage: GameStage, 
+        public stage: GameStage,
         public blackCard: number,
-        public deck: Deck, 
-        public host: string, 
-        public czar?: string, 
+        public deck: Deck,
+        public host: string,
+        public czar?: string,
         public winner?: string) {
 
     }
+}
+
+class GameOptions {
+    constructor(
+        public pointsToWin: number
+    ) { }
 }

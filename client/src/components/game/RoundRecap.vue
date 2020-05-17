@@ -6,8 +6,6 @@
           <div v-if="user.isRoomHost">
             <p class="hero helvetica">You are the host.</p>
 
-            
-
             <b-tooltip
               v-if="gameState.players.length < 3"
               type="is-light"
@@ -15,7 +13,12 @@
               size="is-small"
               label="You need at least 3 players to start a game."
             >
-              <b-button type="is-primary" size="is-medium" class="spaced helvetica" disabled>Start Game</b-button>
+              <b-button
+                type="is-primary"
+                size="is-medium"
+                class="spaced helvetica"
+                disabled
+              >Start Game</b-button>
             </b-tooltip>
             <b-button
               v-else
@@ -39,6 +42,13 @@
             v-if="gameState.players.length == 2"
           >The game will start again once another player joins.</p>
           <p class="muted smaller" v-else>You are alone in this room. That sounds awesome.</p>
+        </div>
+        <div v-else-if="gameState.stage == Stage.gameOver" class="fullscreen centeredText">
+          <p v-if="winner" class="helvetica">
+            {{ winner }}
+            <span class="muted">wins the game.</span>
+          </p>
+          <p class="smaller">Congratulations to all involved.</p>
         </div>
         <div v-else class="fullscreen info centeredText helvetica">
           <p v-if="winner">

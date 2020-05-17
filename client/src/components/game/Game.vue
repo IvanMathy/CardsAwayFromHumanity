@@ -14,7 +14,7 @@
       </div>
 
       <div
-        v-if="gameState.stage == Stage.waitingToStart || gameState.stage == Stage.notEnoughPlayers"
+        v-if="gameState.stage == Stage.waitingToStart || gameState.stage == Stage.notEnoughPlayers || gameState.stage == Stage.gameOver"
         class="fullscreen centeredText"
       >
         <RoundRecap class="fullscreen" />
@@ -100,7 +100,8 @@ export default class Game extends Vue {
       this.gameState.stage == GameStage.waitingToStart ||
       this.gameState.stage == GameStage.notEnoughPlayers ||
       this.gameState.stage == GameStage.startingRound ||
-      this.gameState.stage == GameStage.notEnoughCardsPlayed
+      this.gameState.stage == GameStage.notEnoughCardsPlayed ||
+      this.gameState.stage == GameStage.gameOver
     ) {
       return false;
     }
