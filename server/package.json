@@ -15,10 +15,9 @@
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpileOnly ./app/app.ts",
-    "prod": "tsc && node ./build/server/app/app.js",
+    "prod": "npm run build-client && tsc && npm run start",
     "start": "node ./build/server/app/app.js",
-    "build-client": "cd ../client && npm run pack",
-    "deploy": "npm run build-client && tsc && gcloud app deploy"
+    "build-client": "cd ../client && npm run pack"
   },
   "devDependencies": {
     "@types/express": "^4.17.6",
