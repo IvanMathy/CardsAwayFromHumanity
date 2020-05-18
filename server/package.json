@@ -15,7 +15,7 @@
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpileOnly ./app/app.ts",
-    "prod": "npm run build-client && tsc && npm run start",
+    "prod": "tsc && npm run start",
     "start": "node ./build/server/app/app.js",
     "build-client": "cd ../client && npm run pack"
   },
