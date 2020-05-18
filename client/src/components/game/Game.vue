@@ -14,10 +14,10 @@
       </div>
 
       <div
-        v-if="gameState.stage == Stage.waitingToStart || gameState.stage == Stage.notEnoughPlayers || gameState.stage == Stage.gameOver"
+        v-if="gameState.stage == Stage.waitingToStart || gameState.stage == Stage.startingRound || gameState.stage == Stage.notEnoughPlayers || gameState.stage == Stage.gameOver"
         class="fullscreen centeredText"
       >
-        <RoundRecap class="fullscreen" />
+        <RoundRecap class="fullscreen" @invite="invitePlayers()"/>
       </div>
       <div v-else-if="currentState == State.spectating"></div>
       <template v-else-if="gameState.stage == Stage.pickingCards">
@@ -36,7 +36,6 @@
       >
         <CardViewer />
       </template>
-      <RoundRecap v-else-if="gameState.stage == Stage.startingRound" />
       <div
         class="fullscreen centeredText"
         v-else-if="gameState.stage == Stage.notEnoughCardsPlayed"
@@ -77,6 +76,7 @@ import { mapState } from "vuex";
 import RoundRecap from "./RoundRecap.vue";
 import ClientState from "../../store/index";
 import { blackCards } from "../meta/cards";
+import Invite from './Invite.vue';
 
 @Component({
   components: {
@@ -112,13 +112,10 @@ export default class Game extends Vue {
   }
 
   get czar(this: any) {
-    return this.gameState.players.find(player => player.czar === true)
-      ?.name;
+    return this.gameState.players.find(player => player.czar === true)?.name;
   }
   get winner(this: any) {
-    return this.gameState.players.find(
-      player => player.winner === true
-    )?.name;
+    return this.gameState.players.find(player => player.winner === true)?.name;
   }
 
   get heroText(this: any): string {
@@ -132,7 +129,7 @@ export default class Game extends Vue {
           return `${this.czar} is picking a winner.`;
         }
       case GameStage.celebratingWinner:
-        return `${this.winner} is the winner.`
+        return `${this.winner} is the winner.`;
       default:
         return "";
     }
@@ -142,6 +139,16 @@ export default class Game extends Vue {
     return (
       blackCards[card] ?? "Card not found?? Please tell the dev thank you!"
     );
+  }
+
+  invitePlayers() {
+    this.$buefy.modal.open({
+      parent: this,
+      component: Invite,
+      hasModalCard: true,
+      trapFocus: true,
+      width: 400
+    });
   }
 }
 </script>

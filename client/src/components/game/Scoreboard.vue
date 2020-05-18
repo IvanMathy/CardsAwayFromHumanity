@@ -24,7 +24,7 @@
     <div class="player-score helvetica is-flex-touch czar waiting" v-else>
       No one has joined yet.
     </div>
-    <b-button type="is-dark" size="is-medium" outlined expanded inverted @click="startGame()" class="invite helvetica">Invite Players</b-button>
+    <b-button type="is-dark" size="is-medium" outlined expanded inverted @click="$emit('invite')" class="invite helvetica">Invite Players</b-button>
   </div>
 </template>
 

@@ -63,7 +63,7 @@
       </div>
       <div class="column">
         <h2 class="scores-title helvetica">{{ boardTitle }}</h2>
-        <Scoreboard />
+        <Scoreboard @invite="$emit('invite')"/>
       </div>
     </div>
   </div>

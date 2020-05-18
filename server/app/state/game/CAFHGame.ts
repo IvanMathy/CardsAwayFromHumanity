@@ -2,7 +2,7 @@ import { HostedRoom } from "../hostedRoom";
 import { Game, GameMessage } from "./game";
 import { GameState, GameCommand, Events, GameStage, GameEvents } from "../../../../client/shared/events";
 import { Player } from "../players/player";
-import { Deck } from "./deck";
+import { Deck } from "./CardDeck";
 import { PlayerState, SpectatorState } from "./playerState";
 import { maxHeaderSize } from "http";
 
