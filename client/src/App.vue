@@ -1,12 +1,14 @@
 <template>
   <div id="app">
     <transition name="slide-fade">
-      <Error v-if="error || $store.state.currentState == ClientState.disconnected" />
+      <Error v-if="error" />
+    </transition>
+    <transition name="slide-fade" v-if="$store.state.currentState == ClientState.disconnected">
+      <Disconnected />
     </transition>
     <!-- <Spectator />-->
-    <div v-if="$store.state.currentState == ClientState.inLobby">
-      <Home />
-    </div>
+    <Home v-else-if="$store.state.currentState == ClientState.inLobby" />
+
     <Game v-else-if="currentState == ClientState.inRoom || currentState == ClientState.spectating" />
     <Welcome v-else></Welcome>
   </div>
@@ -19,6 +21,7 @@ import Welcome from "./components/Welcome.vue";
 import Home from "./components/lobby/Home.vue";
 import Game from "./components/game/Game.vue";
 import Error from "./components/meta/Error.vue";
+import Disconnected from "./components/meta/Disconnected.vue";
 import Spectator from "./components/game/Spectator.vue";
 import { ClientState } from "./store/index";
 import { Events, Commands, GameEvents } from "../shared/events";
@@ -31,7 +34,8 @@ import { mapState } from "vuex";
     Game,
     Home,
     Error,
-    Spectator
+    Spectator,
+    Disconnected
   },
   sockets: {
     connect() {
@@ -67,7 +71,7 @@ import { mapState } from "vuex";
         this.$buefy.toast.open({
           message: `Lost connection, trying again...`,
           type: "is-danger"
-        })
+        });
         this.$store.dispatch("disconnected");
         (this as App).reconnecting = true;
       }

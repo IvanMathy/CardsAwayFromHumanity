@@ -5,6 +5,7 @@ export class PlayerState {
     hand: number[] = []
     points = 0
     active = true
+    connected = true
     id = randomCode(8)
 
     roundsSinceCzar = 0

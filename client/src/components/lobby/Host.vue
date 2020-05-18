@@ -36,19 +36,29 @@
             </template>
           </b-slider>
         </b-field>
-        <div class="field has-text-centered">
-          <b-switch type="is-info">Enable Streamer mode</b-switch>
 
-          <b-tooltip
-            multilined
-            size="is-small"
-            class="stream-tooltip"
-            label="Streamer mode extends game timers to account for stream delay."
-            type="is-dark"
-          >
-            <b-icon size="is-small" icon="question-circle" class="has-text-grey" />
-          </b-tooltip>
-        </div>
+        <b-collapse :open="false" aria-id="contentIdForA11y1">
+          <b-button
+            type="is-text"
+            slot="trigger"
+            expanded
+            aria-controls="contentIdForA11y1"
+          >Advanced Options</b-button>
+
+          <div class="field has-text-centered">
+            <b-switch type="is-info">Enable Streamer mode</b-switch>
+
+            <b-tooltip
+              multilined
+              size="is-small"
+              class="stream-tooltip"
+              label="Streamer mode extends game timers to account for stream delay."
+              type="is-dark"
+            >
+              <b-icon size="is-small" icon="question-circle" class="has-text-grey" />
+            </b-tooltip>
+          </div>
+        </b-collapse>
       </section>
       <footer class="modal-card-foot modal-buttons">
         <button class="button" type="button" @click="$parent.close()">Close</button>
@@ -99,9 +109,9 @@
             >Play on this device</b-button>
           </p>
 
-          <p class="has-text-centered is-size-7 has-text-grey success-text">
-            Playing on your phone means you can share this screen with other people as a scoreboard. This game is optimised to be played on a phone.
-          </p>
+          <p
+            class="has-text-centered is-size-7 has-text-grey success-text"
+          >Playing on your phone means you can share this screen with other people as a scoreboard. This game is optimised to be played on a phone.</p>
         </div>
       </b-message>
     </div>
@@ -130,10 +140,10 @@ import { ModalConfig } from "buefy/types/components";
       this.gameId = roomId;
     },
     [Events.joinedGame](this: Host, roomId) {
-      (this.$parent as any).close()
+      (this.$parent as any).close();
     },
     [Events.startedSpectating](this: Host, roomId) {
-      (this.$parent as any).close()
+      (this.$parent as any).close();
     }
   }
 })
@@ -166,23 +176,22 @@ export default class Host extends Vue {
   }
 
   join() {
-    this.tryjoining(Commands.joinGame)
+    this.tryjoining(Commands.joinGame);
   }
   spectate() {
-    this.tryjoining(Commands.spectate)
+    this.tryjoining(Commands.spectate);
   }
 
   tryjoining(action: string) {
-
-    if(this.gameId.length != 4) {
-      alert("Cannot join room")
-      return
+    if (this.gameId.length != 4) {
+      alert("Cannot join room");
+      return;
     }
-    
-    const payload = { gameId: this.gameId, action: action }
 
-    if(this.gameType == 0) {
-      payload['password'] = this.password 
+    const payload = { gameId: this.gameId, action: action };
+
+    if (this.gameType == 0) {
+      payload["password"] = this.password;
     }
 
     this.$socket.client.emit(Commands.joinGame, payload);

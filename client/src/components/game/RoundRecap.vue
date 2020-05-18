@@ -1,19 +1,24 @@
 <template>
   <div class="round-recap">
     <div class="columns">
-      <div class="column info">
+      <div class="column infoColumn">
         <div v-if="gameState.stage == Stage.waitingToStart">
           <div v-if="user.isRoomHost">
             <p class="hero helvetica">You are the host.</p>
 
             <b-tooltip
-              v-if="gameState.players.length > 3"
+              v-if="gameState.players.length < 3"
               type="is-light"
               multilined
+              size="is-small"
               label="You need at least 3 players to start a game."
-              class="button"
             >
-              <b-button type="is-primary" outlined disabled>Start Game</b-button>
+              <b-button
+                type="is-primary"
+                size="is-medium"
+                class="spaced helvetica"
+                disabled
+              >Start Game</b-button>
             </b-tooltip>
             <b-button
               v-else
@@ -38,7 +43,14 @@
           >The game will start again once another player joins.</p>
           <p class="muted smaller" v-else>You are alone in this room. That sounds awesome.</p>
         </div>
-        <div v-else class="fullscreen info centeredText">
+        <div v-else-if="gameState.stage == Stage.gameOver" class="fullscreen centeredText">
+          <p v-if="winner" class="helvetica">
+            {{ winner }}
+            <span class="muted">wins the game.</span>
+          </p>
+          <p class="smaller">Congratulations to all involved.</p>
+        </div>
+        <div v-else class="fullscreen info centeredText helvetica">
           <p v-if="winner">
             {{ winner }}
             <span class="muted">wins this round.</span>
@@ -51,7 +63,7 @@
       </div>
       <div class="column">
         <h2 class="scores-title helvetica">{{ boardTitle }}</h2>
-        <Scoreboard />
+        <Scoreboard @invite="$emit('invite')"/>
       </div>
     </div>
   </div>
@@ -121,17 +133,17 @@ export default class RoundRecap extends Vue {
   margin: auto;
 }
 
-.info {
+.infoColumn {
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: right;
   font-size: 35px;
   color: white;
-  line-height: 35px;
   padding-top: 25px;
   p {
     margin-bottom: 15px;
+    line-height: 35px;
   }
   .muted {
     color: #aaaaaa;
@@ -152,7 +164,7 @@ export default class RoundRecap extends Vue {
     margin-top: 5px;
   }
 
-  .info {
+  .infoColumn {
     text-align: center;
     font-size: 25px;
   }

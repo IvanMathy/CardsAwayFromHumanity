@@ -1,7 +1,5 @@
 <template>
   <div class="spectator">
-
-
     <transition name="fade">
       <Scoreboard class="scoreboard" v-if="showScoreboard" />
     </transition>
@@ -15,7 +13,7 @@
       </div>
     </div>
 
-   <CardViewer />
+    <CardViewer />
   </div>
 </template>
 
@@ -43,7 +41,6 @@ export default class Spectator extends Vue {
 
   Stage = GameStage;
 
-  
   getCzarName(): string {
     return (
       ((this as any).gameState as GameState).players.find(p => p.czar === true)
@@ -73,7 +70,6 @@ export default class Spectator extends Vue {
     opacity: 0.7;
   }
 
-  
   .prompt {
     color: white;
     width: 300px;

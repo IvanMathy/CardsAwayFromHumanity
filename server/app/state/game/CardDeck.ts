@@ -83,4 +83,14 @@ export class Deck {
             this.discardPile.push(card)
         }
     }
+
+    load(deck: Deck) {
+        this.discardPile = deck.discardPile
+        this.cardsInPlay.clear()
+
+        for (const card in deck.cardsInPlay) {
+            this.cardsInPlay.add((deck.cardsInPlay as any)[card] as number)
+        }
+        this.cards = deck.cards
+    }
 }

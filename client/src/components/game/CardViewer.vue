@@ -1,10 +1,10 @@
 <template>
   <div class="card-viewer">
+
     <div
-      class="cards-container"
-      :class="cards.length > 5 ? 'moreThan5Cards' : (cards.length > 2 ? 'lessThan5cards' : 'twocards')"
-    >
-      <div class="cards topCards">
+      class="cards-container">
+      <div class="cards topCards" :class="cards.length > 5 ? 'moreThan5Cards' : (cards.length > 2 ? 'lessThan5cards' : (cards.length == 1 ? 'oneCard' : 'twocards'))"
+ >
         <div class="card-container" v-for="card in cards" :key="card">
           <p class="white-card helvetica">{{ getWhiteCard(card)}}</p>
         </div>
@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { GameStage, GameState } from "../../../shared/events";
+import { GameStage, GameState, GameStatePlayer } from "../../../shared/events";
 import { mapState } from "vuex";
 import { blackCards, whiteCards } from "../meta/cards";
 
@@ -28,9 +28,22 @@ export default class CardViewer extends Vue {
   showScoreboard = false;
   showRoomCode = true;
 
-  cards = [7, 9, 87, 78];
-
   Stage = GameStage;
+
+  get winner(this: any): GameStatePlayer | undefined {
+    return (this.gameState as GameState).players.find(player => player.winner)
+  }
+
+  get cards(this: any) {
+    const stage = (this.gameState as GameState).stage
+    if(stage == GameStage.celebratingWinner) {
+      return [(this.gameState as GameState).gameInfo.winningCard]
+    } else {
+      return (this.gameState as GameState).players.map((player) => 
+        player.card
+      ).filter(card => card !== undefined)
+    }
+  }
 
   getBlackCard(card: number) {
     return blackCards[card];
@@ -148,6 +161,16 @@ export default class CardViewer extends Vue {
   .twocards {
     .card-container {
       margin: 5px;
+    }
+  }
+
+
+
+  .oneCard {
+    transform: scale(1.1);
+
+    .white-card {
+      margin-top: -60px;
     }
   }
   .prompt {

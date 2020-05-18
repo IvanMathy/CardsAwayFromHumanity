@@ -11,9 +11,9 @@ class State {
 
 
     constructor() {
-        setInterval(() => {
-            this.cleanPlayers()
-        }, cleanInterval);
+        // setInterval(() => {
+        //     this.cleanPlayers()
+        // }, cleanInterval);
     }
 
     rooms:  { [key: string]: Room } = {}
@@ -26,7 +26,7 @@ class State {
         Object.keys(this.players).map((key) => {
             try {
                 let value = this.players[key] 
-                if (value instanceof LocalPlayer && !value.active && value.lastSeen < cutoff) {
+                if (value instanceof LocalPlayer) {
                     // TODO: clean up proxys
                     delete this.players[key] 
                 }

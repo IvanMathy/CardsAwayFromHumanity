@@ -2,7 +2,7 @@ import { HostedRoom } from "../hostedRoom";
 import { Game, GameMessage } from "./game";
 import { GameState, GameCommand, Events, GameStage, GameEvents } from "../../../../client/shared/events";
 import { Player } from "../players/player";
-import { Deck } from "./deck";
+import { Deck } from "./CardDeck";
 import { PlayerState, SpectatorState } from "./playerState";
 import { maxHeaderSize } from "http";
 
@@ -27,10 +27,15 @@ export class CAFHGame implements Game<GameCommand> {
     time = 0
 
     czar?: string = undefined
+    winner?: string = undefined
+
+    options: GameOptions
 
     constructor(
         public room: HostedRoom
-    ) { }
+    ) {
+        this.options = new GameOptions(4)
+    }
 
     // - Event Handling
 
@@ -43,24 +48,66 @@ export class CAFHGame implements Game<GameCommand> {
                 }
                 break
             case GameCommand.pickCard:
-                if(this.stage !== GameStage.pickingCards) {
+
+                if (this.stage == GameStage.pickingWinner) {
+                    this.pickWinner(message)
                     return
                 }
 
-                if(!this.playerStates.hasOwnProperty(message.playerId)) {
+                if (this.stage !== GameStage.pickingCards ||
+                    typeof message.message[0] !== "number" ||
+                    !this.playerStates.hasOwnProperty(message.playerId) ||
+                    this.czar == message.playerId ||
+                    !this.playerStates[message.playerId].hand.includes(message.message[0])
+                ) {
                     // TODO: Handle spectator vote
 
                     return
                 }
+
+
 
                 try {
                     this.playerStates[message.playerId].pickedcard = message.message[0]
                 } catch (error) {
                     this.playerStates[message.playerId].player.sendEvent(Events.unknownError)
                 }
-                
+
+                let remainingPlayers = 0
+
+                for (let player in this.playerStates) {
+                    if (this.playerStates[player].active && this.czar !== player && this.playerStates[player].pickedcard == undefined) {
+                        remainingPlayers++
+                    }
+                }
+
+                if (remainingPlayers === 0) {
+                    this.next()
+                }
+
                 break
         }
+    }
+
+
+    pickWinner(message: GameMessage<GameCommand>): void {
+
+        if (this.czar !== message.playerId || !this.playerStates.hasOwnProperty(message.playerId) || typeof message.message[0] !== "number") {
+            return
+        }
+
+        let winner = Object.values(this.playerStates).find(playerState => playerState.pickedcard === message.message[0]);
+
+        if (winner === undefined) {
+            return
+        }
+
+        winner.points++
+
+        this.winner = winner?.player.id
+
+        this.next()
+
     }
 
     private isHost(message: GameMessage<GameCommand>) {
@@ -78,8 +125,33 @@ export class CAFHGame implements Game<GameCommand> {
 
     private newRound() {
 
-        let players = Object.values(this.playerStates).filter(state => state.active)
-        players.forEach(state => state.roundsSinceCzar++)
+        let players = Object.values(this.playerStates).filter(state => {
+            if (state.pickedcard !== undefined) {
+                // Delete the card from the hand
+                const index = state.hand.indexOf(state.pickedcard);
+                if (index > -1) {
+                    state.hand.splice(index, 1);
+                }
+
+                this.deck.discard(state.pickedcard)
+
+                state.hand.unshift(this.deck.pickCard())
+            }
+
+
+            if (!state.connected) {
+                state.active = false
+            }
+
+            state.pickedcard = undefined
+            if (state.active) {
+                state.roundsSinceCzar++
+                return true
+            } else {
+                return false
+            }
+        })
+
         players.sort((a, b) => b.roundsSinceCzar - a.roundsSinceCzar);
 
         let czar = players.shift()
@@ -90,11 +162,13 @@ export class CAFHGame implements Game<GameCommand> {
         }
 
         czar.roundsSinceCzar = 0
-        this.czar = czar.id
+        this.czar = czar.player.id
+
 
         players.forEach(state => {
             this.sendPlayerHand(state.player)
         })
+
         this.sendPlayerHand(czar.player)
 
         this.blackCard = this.deck.getBlackCard()
@@ -114,7 +188,20 @@ export class CAFHGame implements Game<GameCommand> {
                 this.startTimer(90)
                 break
             case GameStage.pickingWinner:
+
+                if (Object.values(this.playerStates).filter(state => state.pickedcard !== undefined).length < 2) {
+                    this.setStage(GameStage.notEnoughCardsPlayed)
+                    return
+                }
+
                 this.startTimer(45)
+                break
+            case GameStage.celebratingWinner:
+                this.startTimer(10)
+                break
+
+            case GameStage.notEnoughCardsPlayed:
+                this.startTimer(10)
                 break
         }
 
@@ -135,15 +222,21 @@ export class CAFHGame implements Game<GameCommand> {
                     score: playerState.points,
                     host: (playerId == this.room.host.id) ? true : undefined,
                     card: (this.stage == GameStage.pickingWinner) ? playerState.pickedcard : undefined,
-                    czar: this.czar == playerState.id
+                    czar: this.czar == playerId,
+                    winner: this.winner == playerId
                 })
             }
         }
 
-        if (this.stage == GameStage.startingRound || 
+        if (this.stage == GameStage.startingRound ||
             this.stage == GameStage.pickingCards ||
-            this.stage == GameStage.pickingWinner) {
+            this.stage == GameStage.pickingWinner ||
+            this.stage == GameStage.celebratingWinner) {
             state.gameInfo.blackCard = this.blackCard
+        }
+
+        if (this.stage == GameStage.celebratingWinner && this.winner !== undefined) {
+            state.gameInfo.winningCard = this.playerStates[this.winner].pickedcard
         }
 
         return state
@@ -154,10 +247,10 @@ export class CAFHGame implements Game<GameCommand> {
     }
 
     private sendPlayerHand(player: Player) {
-        let state = this.playerStates[player.id]
-        if (this.czar == state.id) {
+        if (this.czar == player.id) {
             player.sendEvent(GameEvents.becomeCzar)
         } else {
+            let state = this.playerStates[player.id]
             player.sendEvent(GameEvents.updateHand, state.hand)
         }
     }
@@ -169,7 +262,6 @@ export class CAFHGame implements Game<GameCommand> {
     // - Time management
 
     startTimer(length: number) {
-        console.log("starting timer " + length)
         if (this.timer !== undefined) {
             clearInterval(this.timer)
         }
@@ -180,12 +272,12 @@ export class CAFHGame implements Game<GameCommand> {
 
     tick() {
 
-        let sendTimer = false
+        let sendTimer = true
 
         switch (this.stage) {
-            case GameStage.startingRound:
-            case GameStage.pickingCards:
-                sendTimer = true
+            case GameStage.notEnoughPlayers:
+            case GameStage.waitingToStart:
+                sendTimer = false
                 break
         }
 
@@ -203,8 +295,7 @@ export class CAFHGame implements Game<GameCommand> {
         }
     }
 
-    next() {
-
+    checkPlayerCount(): boolean {
         let onlinePlayers = 0
 
         for (let player in this.playerStates) {
@@ -213,26 +304,52 @@ export class CAFHGame implements Game<GameCommand> {
             }
         }
 
-
-        console.log(onlinePlayers)
-
         if (onlinePlayers < GameRules.minPlayers) {
             this.setStage(GameStage.notEnoughPlayers)
+            return false
+        }
+
+        return true
+    }
+
+    next() {
+
+        if (!this.checkPlayerCount()) {
             return
         }
 
         switch (this.stage) {
-            case GameStage.notEnoughPlayers:
-                this.newRound()
-                break
-                
             case GameStage.startingRound:
+
+                this.winner = undefined
+
                 this.setStage(GameStage.pickingCards)
                 break
 
             case GameStage.pickingCards:
                 this.setStage(GameStage.pickingWinner)
                 break
+            case GameStage.pickingWinner:
+                this.setStage(GameStage.celebratingWinner)
+                break
+            case GameStage.notEnoughPlayers:
+            case GameStage.notEnoughCardsPlayed:
+                this.newRound()
+                break
+            case GameStage.celebratingWinner:
+                // Check if the game is over
+
+                let players = Object.values(this.playerStates)
+
+                players.sort((a, b) => b.points - a.points);
+
+                if ((players[0]?.points ?? 0) >= this.options.pointsToWin) {
+                    this.winner = players[0].player.id
+                    this.czar = undefined
+                    this.setStage(GameStage.gameOver)
+                } else {
+                    this.newRound()
+                }
         }
     }
 
@@ -244,6 +361,7 @@ export class CAFHGame implements Game<GameCommand> {
             state.hand = this.deck.pickCards(10)
             this.playerStates[player.id] = state
         } else {
+            this.playerStates[player.id].connected = true
             this.playerStates[player.id].active = true
         }
 
@@ -257,7 +375,7 @@ export class CAFHGame implements Game<GameCommand> {
     playerLeft(player: Player): void {
         if (this.playerStates.hasOwnProperty(player.id)) {
             console.log("Player Left")
-            this.playerStates[player.id].active = false
+            this.playerStates[player.id].connected = false
         } else if (this.spectatorStates.hasOwnProperty(player.id)) {
             console.log("Spectator Left")
             delete this.spectatorStates[player.id]
@@ -298,13 +416,13 @@ export class CAFHGame implements Game<GameCommand> {
 
     exportState(): string {
 
-        let currentState = new ExportableState(this.stage, this.blackCard, this.stage != GameStage.waitingToStart)
+        let currentState = new ExportableState(this.stage, this.blackCard, this.deck, this.room.host.id, this.czar, this.winner)
 
         for (let playerId in this.playerStates) {
             const state = this.playerStates[playerId]
             if (state.active) {
                 currentState.playerStates.push(
-                    new ExportablePlayerState(state.id, state.player.id, state.hand, state.points)
+                    new ExportablePlayerState(state.id, state.player.id, state.hand, state.points, state.pickedcard)
                 )
             }
         }
@@ -316,8 +434,15 @@ export class CAFHGame implements Game<GameCommand> {
         let newState = JSON.parse(stateString) as ExportableState
 
         console.log("Recovering game")
-        
+        console.log(newState)
+
         this.blackCard = newState.blackCard
+
+        this.czar = newState.czar
+        this.winner = newState.winner
+        console.log("test")
+
+        this.deck.load(newState.deck)
 
         this.setStage(newState.stage)
 
@@ -327,22 +452,37 @@ export class CAFHGame implements Game<GameCommand> {
                 playerState.id = state.id
                 playerState.hand = state.hand
                 playerState.points = state.points
-                
+
+                playerState.pickedcard = state.card
+
                 this.playerStates[player.id] = playerState
             })
         })
-    }
 
+        console.log(this.playerStates)
+    }
 }
 
 class ExportablePlayerState {
-    constructor(public id: string, public playerId: string, public hand: number[], public points: number) {}
+    constructor(public id: string, public playerId: string, public hand: number[], public points: number, public card?: number) { }
 }
 
 class ExportableState {
     playerStates: ExportablePlayerState[] = []
 
-    constructor(public stage: GameStage, public blackCard: number, public started: boolean) {
+    constructor(
+        public stage: GameStage,
+        public blackCard: number,
+        public deck: Deck,
+        public host: string,
+        public czar?: string,
+        public winner?: string) {
 
     }
+}
+
+class GameOptions {
+    constructor(
+        public pointsToWin: number
+    ) { }
 }

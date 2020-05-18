@@ -14,7 +14,12 @@
           <br />What should we call you?
         </p>
         <b-field>
-          <b-input v-model="username" icon="user" size="is-medium" placeholder="Guest"></b-input>
+          <b-input
+            v-model="username"
+            icon="user"
+            size="is-medium"
+            placeholder="Guest"
+          >></b-input>
           <p class="control">
             <b-button
               type="is-primary"
@@ -65,7 +70,8 @@
             type="is-primary"
             size="is-medium"
             expanded
-            @click="accepted = true"
+            @click="next(true)"
+            :loading="buttonLoading"
           >Agree and Continue</b-button>
         </p>
       </div>
@@ -78,12 +84,37 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { Events, Commands } from "../../shared/events";
 import PrivacyPolicy from "./meta/PrivacyPolicy.vue";
 import Terms from "./meta/Terms.vue";
+import { usernameStorageKey } from '../store';
 
-@Component
+@Component({
+  sockets: {
+    [Events.invalidUsername](this: Welcome) {
+      this.buttonLoading = false;
+      this.$buefy.toast.open({
+        message: "Invalid username. Please try again.",
+        type: "is-danger"
+      });
+    }
+  }
+})
 export default class Welcome extends Vue {
-  username = "";
-  accepted = false;
+  username = localStorage.getItem(usernameStorageKey) ?? "";
+  accepted = (localStorage.getItem("accepted") ?? String(false)) === String(true);
   buttonLoading = false;
+
+  mounted() {
+    this.next(false)
+  }
+
+  next(accept: boolean) {
+    if(accept === true || this.username === "" || this.username === undefined) {
+      this.accepted = true
+      localStorage.setItem("accepted", String(true))
+    } else if(accept === false) {
+      this.buttonLoading = true
+      this.authenticate()
+    }
+  }
 
   authenticate() {
     if (this.username.length == 0) {

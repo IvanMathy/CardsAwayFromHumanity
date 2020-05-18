@@ -5,6 +5,7 @@ export enum Events {
     roomFull = "f",
     invalidPassword = "ip",
     invalidRoomCode = "ir",
+    invalidUsername = "iu",
     passwordNeeded = "pw",
     roomCreated = "r",
     rejoined = "re",
@@ -28,7 +29,10 @@ export enum GameStage {
     startingRound = "s",
     pickingCards = "p",
     pickingWinner = "c",
-    notEnoughPlayers = "n"
+    celebratingWinner = "a",
+    notEnoughPlayers = "n",
+    notEnoughCardsPlayed = "l",
+    gameOver = "o"
 }
 
 export enum GameEvents {
@@ -50,12 +54,17 @@ export enum PlayerLocation {
     spectating = "s"
 }
 
+export class GameStatePlayer {
+    constructor(public name: string, public id: string, public score: number, public host?: boolean, public czar?: boolean, public card?: number, public winner?: boolean) {
+    }
+}
+
 export class GameState {
-    players: {name: string; id: string; score: number; host?: boolean; czar?: boolean; card?: number; winner?: boolean}[] = []
+    players: GameStatePlayer[] = []
     gameInfo: any = {}
 
     constructor(
-        public stage: GameStage, 
+        public stage: GameStage,
         public time: number
-    ) {}
+    ) { }
 }

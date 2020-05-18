@@ -50,9 +50,15 @@ export class Player {
     }
 
 
-    static authenticate(user?: Record<string, string>): LocalPlayer {
+    static authenticate(user?: Record<string, string>): LocalPlayer | undefined {
+        
         var id = user?.id
-        var username = user?.name
+        var username = user?.name ?? "Guest"
+
+        if (username == undefined || !/^[0-9a-zA-Z_.-]{1,15}$/.test(username)) {
+            console.debug("Invalid username")
+            return undefined
+        }
 
         if (id?.length != 8 || /[^A-Z]/.test(id)) {
 
@@ -77,6 +83,8 @@ export class Player {
             console.debug("Returning player")
 
         }
+
+        
 
         let newPlayer = new LocalPlayer(id, username ?? "A dum dum with no name")
 
