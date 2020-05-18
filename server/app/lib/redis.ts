@@ -6,12 +6,12 @@ if (process.env.REDIS_PORT !== undefined) {
     port = parseInt(process.env.REDIS_PORT)
 }
 
-let tempRedisSettings: object = { host: process.env.REDIS_IP ?? 'localhost', port: port}
+let tempRedisSettings: any = { host: process.env.REDIS_IP ?? 'localhost', port: port}
 
 if(process.env.REDIS_URL !== undefined) {
 
-    // Running on Heroku, no need for a port
-    tempRedisSettings = { host: process.env.REDIS_URL}
+    // Running on Heroku, full url is included
+    tempRedisSettings = process.env.REDIS_URL
 }
 
 export const redisSettings = tempRedisSettings
