@@ -233,8 +233,10 @@ export class LocalPlayer implements Player {
                     room: values[PlayerKeys.room]
                 })
 
-                if(location == PlayerLocation.inGame) {
+                if(location === PlayerLocation.inGame) {
                     this.joinRoom(values[PlayerKeys.room])
+                } else if(location === PlayerLocation.spectating) {
+                    this.spectate(values[PlayerKeys.room])
                 }
                 
             })

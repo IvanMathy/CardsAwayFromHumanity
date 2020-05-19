@@ -194,7 +194,7 @@ export class CAFHGame implements Game<GameCommand> {
                     return
                 }
 
-                this.startTimer(45)
+                this.startTimer(450)
                 break
             case GameStage.celebratingWinner:
                 this.startTimer(10)
@@ -376,6 +376,9 @@ export class CAFHGame implements Game<GameCommand> {
         if (this.playerStates.hasOwnProperty(player.id)) {
             console.log("Player Left")
             this.playerStates[player.id].connected = false
+            if(this.stage !== GameStage.pickingWinner && this.stage !== GameStage.celebratingWinner) {
+                this.playerStates[player.id].active = false
+            }
         } else if (this.spectatorStates.hasOwnProperty(player.id)) {
             console.log("Spectator Left")
             delete this.spectatorStates[player.id]
