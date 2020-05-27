@@ -11,19 +11,16 @@
     "socket.io": "^2.3.0",
     "socket.io-redis": "^5.2.0",
     "ts-node-dev": "^1.0.0-pre.44",
-    "typescript": "^3.8.3"
-  },
-  "scripts": {
-    "dev": "ts-node-dev --respawn --transpileOnly ./app/app.ts",
-    "prod": "tsc && node ./build/server/app/app.js",
-    "start": "node ./build/server/app/app.js",
-    "build-client": "cd ../client && npm run pack",
-    "deploy": "npm run build-client && tsc && gcloud app deploy"
-  },
-  "devDependencies": {
+    "typescript": "^3.8.3",
     "@types/express": "^4.17.6",
     "@types/node": "^13.11.0",
     "@types/socket.io": "^2.1.4"
+  },
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpileOnly ./app/app.ts",
+    "prod": "tsc && npm run start",
+    "start": "node ./build/server/app/app.js",
+    "build-client": "cd ../client && npm run pack"
   },
   "engines": {
     "node": "12.x"

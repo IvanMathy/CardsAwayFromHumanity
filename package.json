@@ -1,0 +1,8 @@
+{
+  "name": "cafh",
+  "version": "1.0.0",
+  "scripts": {
+    "postinstall": "cd server && npm install --dev && cd ../client && npm install --dev && npm run pack ",
+    "start": "cd server && npm run prod"
+  }
+}

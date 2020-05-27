@@ -6,7 +6,6 @@
 
     <div v-if="gameState == null">Loading.</div>
     <div v-else>
-      <div v-if="picked">Waiting for other players.</div>
 
       <div class="black-card-container" v-if="showBlackCard">
         <p class="hero helvetica">{{ heroText }}</p>
@@ -19,13 +18,12 @@
       >
         <RoundRecap class="fullscreen" @invite="invitePlayers()"/>
       </div>
-      <div v-else-if="currentState == State.spectating"></div>
       <template v-else-if="gameState.stage == Stage.pickingCards">
         <div class="fullscreen centeredText" v-if="user.isCzar">
           <p class="hero helvetica">You are the Czar.</p>
           <p class="secondary">Wait for other players to pick their cards.</p>
         </div>
-        <CardPicker v-else />
+        <CardPicker v-else-if="!isSpectator" />
       </template>
       <template v-else-if="gameState.stage == Stage.pickingWinner">
         <CardPicker v-if="user.isCzar" :key="gameState.players" />
@@ -46,8 +44,8 @@
     </div>
     <transition name="fade">
       <div class="join helvetica is-hidden-mobile" v-if="showRoomCode">
-        Join at
-        <span class="has-text-info">away.game</span>
+        Join at<br />
+        <span class="has-text-info">cafh.herokuapp.com</span>
         <br />with room code
         <br />
         <span class="room-code has-text-light">{{ this.$store.state.joinedRoom }}</span>
@@ -74,7 +72,7 @@ import {
 import { Socket } from "vue-socket.io-extended";
 import { mapState } from "vuex";
 import RoundRecap from "./RoundRecap.vue";
-import ClientState from "../../store/index";
+import { ClientState } from "../../store/index";
 import { blackCards } from "../meta/cards";
 import Invite from './Invite.vue';
 
@@ -118,10 +116,19 @@ export default class Game extends Vue {
     return this.gameState.players.find(player => player.winner === true)?.name;
   }
 
+
+  get isSpectator(this: any): boolean {
+    return this.currentState == ClientState.spectating
+  }
+
   get heroText(this: any): string {
     switch (this.gameState.stage) {
       case GameStage.pickingCards:
-        return "Pick a card.";
+        if(this.isSpectator) {
+          return "Players are picking their cards.";
+        } else {
+          return "Pick a card.";
+        }
       case GameStage.pickingWinner:
         if (this.user.isCzar) {
           return "Pick the winner.";
@@ -194,6 +201,7 @@ export default class Game extends Vue {
   .hero {
     font-size: 35px;
     padding: 10px;
+    line-height: 45px;
   }
 
   .centeredText {
