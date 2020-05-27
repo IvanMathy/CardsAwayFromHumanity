@@ -1,27 +1,35 @@
 <template>
   <div class="join">
-  
-
     <div v-if="joinState == State.Init">
-        <p>Please enter the room code:</p>
-    <b-field class="wide" expanded>
-      <b-input
-        v-model="roomCode"
-        size="is-large"
-        placeholder="AAAH"
-        @input="roomCode=$event.toUpperCase()"
-        maxlength="4"
-      ></b-input>
-      <div class="control">
-        <b-button
-          type="is-info"
+      <p>Please enter the room code:</p>
+      <b-field class="wide" expanded>
+        <b-input
+          v-model="roomCode"
           size="is-large"
-          v-on:click="join(false)"
+          placeholder="AAAH"
+          @input="roomCode=$event.toUpperCase()"
+        ></b-input>
+        <div class="control">
+          <b-button
+            type="is-info"
+            size="is-large"
+            v-on:click="join(false)"
+            :disabled="roomCode.length !== 4"
+            :loading="buttonLoading"
+          >Join</b-button>
+        </div>
+      </b-field>
+      <div class="wide">
+        <b-button
+          type="is-primary"
+          v-on:click="spectate()"
           :disabled="roomCode.length !== 4"
           :loading="buttonLoading"
-        >Join</b-button>
+          size="is-medium"
+          outlined
+          expanded
+        >Join as Spectator</b-button>
       </div>
-    </b-field>
     </div>
     <div v-if="joinState == State.Joining">Joining {{roomCode}}.</div>
     <div v-if="joinState == State.Password">
@@ -84,6 +92,17 @@ export default class Join extends Vue {
     this.joinState = State.Joining;
 
     this.$socket.client.emit(Commands.joinGame, payload);
+  }
+
+  spectate() {
+    if (this.isRoomInvalid) {
+      alert("Room code is invalid.");
+      return;
+    }
+
+    this.joinState = State.Joining;
+
+    this.$socket.client.emit(Commands.joinGame, { gameId: this.roomCode, action: Commands.spectate});
   }
 
   askPassword(isRetry: boolean) {
