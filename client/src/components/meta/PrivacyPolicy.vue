@@ -9,19 +9,19 @@
       <p>Some data such as your chosen display name is kept in memory for a short time to allow for session-recovery. This data gets deleted automatically after a short period of time. Your display name may also appear in private error or debug logs as part of normal server operation.</p>
       <p>Regardless of its origin, no individual data generated from the game's code will ever be used for commercial purposes or sold to a third party.</p>
       <p>
-        This game is hosted on Google App Engine. You can find their privacy policy at this url:
+        This game is hosted on Heroku by Salesforce. You can find their privacy policy at this url:
         <a
-          href="https://cloud.google.com/appengine/privacy_20080407"
+          href="https://www.salesforce.com/company/privacy/"
           target="_blank"
-        >https://cloud.google.com/appengine/privacy_20080407</a>
+        >https://www.salesforce.com/company/privacy/</a>
       </p>
-      <p>
+     <!-- <p>
         This game uses Google Analytics. You can find their privacy policy at this url:
         <a
           href="https://support.google.com/analytics/answer/6004245"
           target="_blank"
         >https://support.google.com/analytics/answer/6004245</a>
-      </p>
+      </p> -->
       <p>This privacy policy may get updated at any point, so please check it often in case it does. If you do not agree, please leave this game.</p>
     </b-message>
   </div>

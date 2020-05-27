@@ -66,7 +66,8 @@ import { mapState } from "vuex";
     },
     disconnect(whyyyyy) {
       if (whyyyyy === "io server disconnect") {
-        alert("booted");
+        alert("Looks like you got disconnected. Did you open another tab?");
+        (this as App).error = true;
       } else {
         this.$buefy.toast.open({
           message: `Lost connection, trying again...`,

@@ -53,8 +53,8 @@
               <b-button type="is-light" expanded icon-right="angle-down">Read More</b-button>
             </span>
           </template>
-          <p>This game is provided for free, for the duration of the current pandemic. When the stay at home order expires, this game will be taken offline and its code released on Github.</p>
-          <p>If you liked this game, consider buying a physical version of the original once we get out of this mess. In the meantime please stay home, wash your hands, support local businesses, and stay safe!</p>
+          <p>This game is provided for free, as a hosted demo of the open source version. You can find the code on Github.
+          If you liked this game, please consider buying a physical version of the original.</p>
         </b-collapse>
 
         <br />
@@ -107,10 +107,10 @@ export default class Welcome extends Vue {
   }
 
   next(accept: boolean) {
-    if(accept === true || this.username === "" || this.username === undefined) {
+    if(accept === true && (this.username === "" || this.username === undefined)) {
       this.accepted = true
       localStorage.setItem("accepted", String(true))
-    } else if(accept === false) {
+    } else if(accept === false && !(this.username === "" || this.username === undefined)) {
       this.buttonLoading = true
       this.authenticate()
     }
