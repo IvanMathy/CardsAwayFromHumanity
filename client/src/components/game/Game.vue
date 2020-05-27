@@ -45,7 +45,7 @@
     <transition name="fade">
       <div class="join helvetica is-hidden-mobile" v-if="showRoomCode">
         Join at
-        <span class="has-text-info">away.game</span>
+        <span class="has-text-info">cafh.herokuapp.com</span>
         <br />with room code
         <br />
         <span class="room-code has-text-light">{{ this.$store.state.joinedRoom }}</span>

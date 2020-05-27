@@ -37,17 +37,17 @@ import { mapState } from "vuex";
 })
 export default class Invite extends Vue {
   get url(this: any): string {
-    return `https://away.game/${this.joinedRoom}`;
+    return `https://cafh.herokuapp.com/ Room Code: ${this.joinedRoom}`;
   }
 
   get canShare(): boolean {
     return (navigator as any).share !== undefined;
   }
 
-  share() {
+  share(this: any) {
     (navigator as any).share({
-      title: "Let's play Cards Away From Humanity!",
-      url: this.url
+      title: `Join me with room code: ${this.joinedRoom}`,
+      url: `https://cafh.herokuapp.com/`
     });
   }
 

@@ -28,7 +28,7 @@
             </div>
           </section>
         </article>
-
+<!--
         <b-field label="Points to win">
           <b-slider size="is-medium" :min="4" :max="12" v-model="points">
             <template v-for="val in [4,5,6,7,8,9,10,11,12]">
@@ -59,6 +59,7 @@
             </b-tooltip>
           </div>
         </b-collapse>
+        -->
       </section>
       <footer class="modal-card-foot modal-buttons">
         <button class="button" type="button" @click="$parent.close()">Close</button>

@@ -38,10 +38,10 @@
             <Join />
           </b-tab-item>
 
+          <!-- 
           <b-tab-item label="Public Games" icon="globe">
             <GameList />
           </b-tab-item>
-          <!-- 
           <b-tab-item label="About" icon="heart">
             Nunc nec velit nec libero vestibulum eleifend.
             Curabitur pulvinar congue luctus.
@@ -51,7 +51,7 @@
         </b-tabs>
       </article>
 
-      <p class="name"> Playing as <strong class="has-text-white">{{ $store.state.user.username }}</strong>. <a>Change your name.</a></p>
+      <p class="name"> Playing as <strong class="has-text-white">{{ $store.state.user.username }}</strong>. <a @click="changeName()">Change your name.</a></p>
     </div>
   </div>
 </template>
@@ -61,6 +61,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import Host from "./Host.vue";
 import Join from "./Join.vue";
 import GameList from "./GameList.vue";
+import { usernameStorageKey } from "../../store/index";
 
 @Component({
   components: {
@@ -81,6 +82,12 @@ export default class Home extends Vue {
       trapFocus: true,
       width: 420
     });
+  }
+
+  changeName() {
+    localStorage.removeItem(usernameStorageKey)
+    // Definitely not an ideal solution.
+    location.reload()
   }
 }
 </script>

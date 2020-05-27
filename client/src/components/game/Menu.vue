@@ -24,6 +24,7 @@
           </div>
         </div>
       </b-dropdown-item>
+        <!-- 
       <hr class="dropdown-divider" aria-role="menuitem" />
       <b-dropdown-item @click="toggleFullscreen()" aria-role="listitem">
         <div class="media">
@@ -34,7 +35,7 @@
           </div>
         </div>
       </b-dropdown-item>
-      <!-- <b-dropdown-item @click="toggleScoreboard()" aria-role="listitem">
+    <b-dropdown-item @click="toggleScoreboard()" aria-role="listitem">
         <div class="media">
           <b-icon class="media-left" icon="trophy"></b-icon>
           <div class="media-content">
@@ -42,7 +43,7 @@
             <small>Show or hide scoreboard.</small>
           </div>
         </div>
-      </b-dropdown-item> -->
+      </b-dropdown-item>
 
 
       <hr class="dropdown-divider" aria-role="menuitem" />
@@ -56,7 +57,7 @@
           </div>
         </div>
       </b-dropdown-item>
-
+ -->
     
       <hr class="dropdown-divider" aria-role="menuitem" />
       <b-dropdown-item :value="false" aria-role="listitem">
