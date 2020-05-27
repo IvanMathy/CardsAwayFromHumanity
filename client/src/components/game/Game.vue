@@ -44,7 +44,7 @@
     </div>
     <transition name="fade">
       <div class="join helvetica is-hidden-mobile" v-if="showRoomCode">
-        Join at
+        Join at<br />
         <span class="has-text-info">cafh.herokuapp.com</span>
         <br />with room code
         <br />
