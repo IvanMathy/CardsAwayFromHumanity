@@ -1,3 +1,5 @@
+Note: This project was created in a bubble, during the 2020 stay at home order, as a personal challenge. The base game was chosen because of its permissive license, allowing to easily bring in content to fill in the gameplay code. It is not affiliated, endorsed, nor approved by Cards Against Humanity. In turn, this project does not endorse Cards Against Humanity's content or behavior outside of the game.
+
 <img src="img/2.png?raw=true" alt="Home Page">
 
 
